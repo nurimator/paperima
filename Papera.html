@@ -1114,7 +1114,7 @@
 
             let animationFrameId = null;
             let needsRedraw = true; // Flag to optimize rendering
-
+            let isExporting = false;
             // Default state for a single object
             const DEFAULT_OBJECT_STATE = {
                 image: { element: null, size: 80, offset: { x: 0, y: 0 }, file: null },
@@ -1144,6 +1144,8 @@
                     lastImageSwitchTime: 0
                 },
                 animation: {
+                    previewing: null, // 'in' atau 'out', atau null
+                    previewStartTime: 0,
                     in: {
                         enabled: false,
                         type: 'move', // 'move' atau 'zoom'
@@ -1375,164 +1377,168 @@
                 const objectState = state.object; // Ambil objek tunggal
                 if (objectState.image.element) {
 
-					const canvasAspect = canvas.width / canvas.height;
-					const imageAspect = objectState.image.element.width / objectState.image.element.height;
-					let baseScale = (canvasAspect > imageAspect) ? canvas.height / objectState.image.element.height : canvas.width / objectState.image.element.width;
-					const userScale = objectState.image.size / 100;
-					const finalScale = baseScale * userScale;
-					const imgW = objectState.image.element.width * finalScale;
-					const imgH = objectState.image.element.height * finalScale;
-
                     let animOffsetX = 0;
                     let animOffsetY = 0;
                     let animScale = 1.0;
+                    // 1. Definisikan variabel dasar dan fungsi helper di bagian atas
+                    const canvasAspect = canvas.width / canvas.height;
+                    const imageAspect = objectState.image.element.width / objectState.image.element.height;
+                    const baseScale = (canvasAspect > imageAspect) ? canvas.height / objectState.image.element.height : canvas.width / objectState.image.element.width;
+                    const userScale = objectState.image.size / 100;
                     const timeInSeconds = timestamp / 1000;
 
-                    const applyAnimation = (animType) => {
+                    // Fungsi helper untuk menerapkan animasi berdasarkan PROGRESS (0.0 - 1.0)
+                    const applyAnimation = (animType, progress) => {
                         const anim = objectState.animation[animType];
-                        if (!anim.enabled || timeInSeconds < anim.startTime || timeInSeconds > anim.startTime + anim.duration) {
-                            return;
-                        }
+                        if (!anim.enabled) return;
 
-                        const progress = (timeInSeconds - anim.startTime) / anim.duration;
-                        const easingFunc = EASING[anim.easing.replace('-in', 'In').replace('-out', 'Out')] || EASING.linear;
+                        let easingKey = anim.easing;
+                        if (easingKey !== 'linear') {
+                            easingKey += (animType === 'in') ? 'Out' : 'In';
+                        }
+                        const easingFunc = EASING[easingKey] || EASING.linear;
                         const easedProgress = easingFunc(progress);
 
                         if (anim.type === 'move') {
-                            const distanceX = (canvas.width / 2 + imgW / 2) * (anim.move.distance / 100);
-                            const distanceY = (canvas.height / 2 + imgH / 2) * (anim.move.distance / 100);
+                            const preZoomImgW = objectState.image.element.width * baseScale * userScale;
+                            const preZoomImgH = objectState.image.element.height * baseScale * userScale;
+                            const distanceX = (canvas.width / 2 + preZoomImgW / 2) * (anim.move.distance / 100);
+                            const distanceY = (canvas.height / 2 + preZoomImgH / 2) * (anim.move.distance / 100);
+                            let startX = 0, startY = 0;
+                            if (anim.move.direction === 'left') { startX = -distanceX; }
+                            if (anim.move.direction === 'right') { startX = distanceX; }
+                            if (anim.move.direction === 'top') { startY = -distanceY; }
+                            if (anim.move.direction === 'bottom') { startY = distanceY; }
 
-                            let startX = 0, startY = 0, endX = 0, endY = 0;
-                            if(anim.move.direction === 'left') { startX = -distanceX; }
-                            if(anim.move.direction === 'right') { startX = distanceX; }
-                            if(anim.move.direction === 'top') { startY = -distanceY; }
-                            if(anim.move.direction === 'bottom') { startY = distanceY; }
-
-                            if(animType === 'in') {
-                                animOffsetX = startX * (1 - easedProgress);
-                                animOffsetY = startY * (1 - easedProgress);
+                            if (animType === 'in') {
+                                animOffsetX += startX * (1 - easedProgress);
+                                animOffsetY += startY * (1 - easedProgress);
                             } else { // 'out'
-                                animOffsetX = startX * easedProgress;
-                                animOffsetY = startY * easedProgress;
+                                animOffsetX += startX * easedProgress;
+                                animOffsetY += startY * easedProgress;
                             }
                         } else if (anim.type === 'zoom') {
                             const startScale = anim.zoom.scale / 100;
                             const endScale = 1.0;
-
-                            if(animType === 'in') {
-                                animScale = startScale + (endScale - startScale) * easedProgress;
+                            if (animType === 'in') {
+                                animScale *= startScale + (endScale - startScale) * easedProgress;
                             } else { // 'out'
-                                animScale = endScale - (endScale - startScale) * easedProgress;
+                                animScale *= endScale - (endScale - startScale) * easedProgress;
                             }
                         }
                     };
 
-                    // Terapkan animasi Out terlebih dahulu, lalu In (jika ada tumpang tindih)
-                    applyAnimation('out');
-                    applyAnimation('in');                    
+                    // Logika utama untuk menentukan progres animasi
+                    const animState = objectState.animation;
+                    if (animState.previewing) {
+                        // MODE PRATINJAU: Hitung progres relatif dari awal pratinjau.
+                        const anim = animState[animState.previewing];
+                        const timeSincePreviewStart = (timestamp - animState.previewStartTime) / 1000;
+                        const progress = Math.max(0, Math.min(1, timeSincePreviewStart / anim.duration));
+                        
+                        applyAnimation(animState.previewing, progress);
 
-					const compositedObjectCanvas = finalObjectCanvas;
-					const compositedObjectCtx = finalObjectCtx;
-					compositedObjectCtx.clearRect(0, 0, compositedObjectCanvas.width, compositedObjectCanvas.height);
+                        if (timeSincePreviewStart > anim.duration) {
+                            animState.previewing = null;
+                        }
+                    } else {
+                        // MODE NORMAL / EKSPOR: Hitung progres berdasarkan timeline absolut.
+                        const animIn = animState.in;
+                        if (animIn.enabled && timeInSeconds >= animIn.startTime && timeInSeconds < animIn.startTime + animIn.duration) {
+                            const progressIn = (timeInSeconds - animIn.startTime) / animIn.duration;
+                            applyAnimation('in', progressIn);
+                        }
 
-					const imgBaseOffsetX = (canvas.width * objectState.image.offset.x) / 100;
-					const imgBaseOffsetY = (canvas.height * objectState.image.offset.y) / 100;
-					const totalOffsetX = imgBaseOffsetX + objectState.movement.positionOffset.x;
-					const totalOffsetY = imgBaseOffsetY + objectState.movement.positionOffset.y;
+                        const animOut = animState.out;
+                        if (animOut.enabled && timeInSeconds >= animOut.startTime && timeInSeconds < animOut.startTime + animOut.duration) {
+                            const progressOut = (timeInSeconds - animOut.startTime) / animOut.duration;
+                            applyAnimation('out', progressOut);
+                        }
 
-					let fgColorFilterString = '';
-					if (objectState.color.enabled) {
-						let filterParts = [];
-						if (objectState.color.colorize) { filterParts.push('sepia(1)'); }
-						filterParts.push(`hue-rotate(${objectState.color.hue}deg)`);
-						filterParts.push(`saturate(${100 + objectState.color.saturation}%)`);
-						filterParts.push(`brightness(${100 + objectState.color.brightness}%)`);
-						fgColorFilterString = filterParts.join(' ');
-					}
+                        // Sembunyikan objek sebelum animasi 'in' atau setelah animasi 'out'.
+                        if (animIn.enabled && timeInSeconds < animIn.startTime) {
+                            animScale = 0;
+                        } else if (isExporting && animOut.enabled && timeInSeconds >= animOut.startTime + animOut.duration) {
+                            // Sembunyikan objek HANYA JIKA sedang mengekspor video.
+                            animScale = 0;
+                        }
+                    }
 
-					if (objectState.paperFoldOverlay.enabled) {
-						objectCtx.save();
-						objectCtx.clearRect(0, 0, objectCanvas.width, objectCanvas.height);
-						objectCtx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + totalOffsetY);
-						if (objectState.movement.enabled) { objectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
+                    // Hitung ukuran dan posisi final SETELAH semua animasi dihitung
+                    const finalScale = baseScale * userScale * animScale;
+                    const imgW = objectState.image.element.width * finalScale;
+                    const imgH = objectState.image.element.height * finalScale;
+                    const imgBaseOffsetX = (canvas.width * objectState.image.offset.x) / 100;
+                    const imgBaseOffsetY = (canvas.height * objectState.image.offset.y) / 100;
+                    const totalOffsetX = imgBaseOffsetX + objectState.movement.positionOffset.x + animOffsetX;
+                    const totalOffsetY = imgBaseOffsetY + objectState.movement.positionOffset.y + animOffsetY;
 
-						objectCtx.filter = fgColorFilterString;
-						objectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
-
-						const overlayImage = originalOverlayImages[objectState.paperFoldOverlay.currentImageIndex];
-						if (overlayImage && overlayImage.complete && overlayImage.naturalWidth > 0) {
-							objectCtx.save();
-							const effectStrength = objectState.paperFoldOverlay.opacity;
-							const overlayW = imgW * 1.25;
-							const overlayH = imgH * 1.25;
-							objectCtx.globalCompositeOperation = objectState.paperFoldOverlay.blendMode;
-							const tempCanvas = document.createElement('canvas');
-							tempCanvas.width = overlayImage.width;
-							tempCanvas.height = overlayImage.height;
-							const tempCtx = tempCanvas.getContext('2d');
-							tempCtx.drawImage(overlayImage, 0, 0);
-							const imageData = tempCtx.getImageData(0, 0, overlayImage.width, overlayImage.height);
-							const data = imageData.data;
-							const strength = (100 - effectStrength) / 100;
-							for (let i = 0; i < data.length; i += 4) {
-								data[i]     = data[i]     + (255 - data[i])     * strength;
-								data[i + 1] = data[i + 1] + (255 - data[i + 1]) * strength;
-								data[i + 2] = data[i + 2] + (255 - data[i + 2]) * strength;
-							}
-							tempCtx.putImageData(imageData, 0, 0);
-							objectCtx.drawImage(tempCanvas, -overlayW / 2, -overlayH / 2, overlayW, overlayH);
-							objectCtx.restore();
-						}
-						objectCtx.restore();
-
-						compositedObjectCtx.save();
-						let tornFilterString = '';
-						if (objectState.stroke.enabled && objectState.stroke.width > 0) {
-							tornDilate.setAttribute('radius', objectState.stroke.width);
-							tornDisplacement.setAttribute('scale', objectState.stroke.roughness);
-							tornTurbulence.setAttribute('baseFrequency', objectState.stroke.detail);
-							tornFlood.setAttribute('flood-color', '#FFFFFF');
-							tornFilterString = `url(#combined-filter)`;
-						}
-						compositedObjectCtx.filter = tornFilterString;
-						compositedObjectCtx.translate(compositedObjectCanvas.width / 2 + totalOffsetX, compositedObjectCanvas.height / 2 + totalOffsetY);
-						if (objectState.movement.enabled) { compositedObjectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
-						compositedObjectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
-						compositedObjectCtx.restore();
-						compositedObjectCtx.save();
-						compositedObjectCtx.globalCompositeOperation = 'source-in';
-						compositedObjectCtx.drawImage(objectCanvas, 0, 0);
-						compositedObjectCtx.restore();
-					} else {
-						compositedObjectCtx.save();
-						let tornFilterString = '';
-						if (objectState.stroke.enabled && objectState.stroke.width > 0) {
-							tornDilate.setAttribute('radius', objectState.stroke.width);
-							tornDisplacement.setAttribute('scale', objectState.stroke.roughness);
-							tornTurbulence.setAttribute('baseFrequency', objectState.stroke.detail);
-							tornFlood.setAttribute('flood-color', '#FFFFFF');
-							tornFilterString = `url(#combined-filter)`;
-						}
-						compositedObjectCtx.filter = [fgColorFilterString, tornFilterString].filter(Boolean).join(' ');
-						compositedObjectCtx.translate(compositedObjectCanvas.width / 2 + totalOffsetX, compositedObjectCanvas.height / 2 + totalOffsetY);
-						if (objectState.movement.enabled) { compositedObjectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
-						compositedObjectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
-						compositedObjectCtx.restore();
-					}
-
-					ctx.save();
-					if (objectState.shadow.enabled) {
-						ctx.shadowColor = hexToRgba(objectState.shadow.color, objectState.shadow.opacity / 100);
-						ctx.shadowBlur = objectState.shadow.blur;
-						ctx.shadowOffsetX = objectState.shadow.offsetX;
-						ctx.shadowOffsetY = objectState.shadow.offsetY;
-					}
-					ctx.drawImage(compositedObjectCanvas, 0, 0);
-					ctx.restore();
+                    // Sisa kode untuk menggambar objek ke kanvas (tidak ada perubahan)
+                    const compositedObjectCanvas = finalObjectCanvas;
+                    const compositedObjectCtx = finalObjectCtx;
+                    // ... (Salin semua sisa kode gambar dari `compositedObjectCtx.clearRect` hingga `ctx.restore()` terakhir di dalam blok if)
+                    compositedObjectCtx.clearRect(0, 0, compositedObjectCanvas.width, compositedObjectCanvas.height);
+                    let fgColorFilterString = '';
+                    if (objectState.color.enabled) { let filterParts = []; if (objectState.color.colorize) { filterParts.push('sepia(1)'); } filterParts.push(`hue-rotate(${objectState.color.hue}deg)`); filterParts.push(`saturate(${100 + objectState.color.saturation}%)`); filterParts.push(`brightness(${100 + objectState.color.brightness}%)`); fgColorFilterString = filterParts.join(' '); }
+                    if (objectState.paperFoldOverlay.enabled) {
+                        objectCtx.save();
+                        objectCtx.clearRect(0, 0, objectCanvas.width, objectCanvas.height);
+                        objectCtx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + totalOffsetY);
+                        if (objectState.movement.enabled) { objectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
+                        objectCtx.filter = fgColorFilterString;
+                        objectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
+                        const overlayImage = originalOverlayImages[objectState.paperFoldOverlay.currentImageIndex];
+                        if (overlayImage && overlayImage.complete && overlayImage.naturalWidth > 0) { objectCtx.save(); const effectStrength = objectState.paperFoldOverlay.opacity; const overlayW = imgW * 1.25; const overlayH = imgH * 1.25; objectCtx.globalCompositeOperation = objectState.paperFoldOverlay.blendMode; const tempCanvas = document.createElement('canvas'); tempCanvas.width = overlayImage.width; tempCanvas.height = overlayImage.height; const tempCtx = tempCanvas.getContext('2d'); tempCtx.drawImage(overlayImage, 0, 0); const imageData = tempCtx.getImageData(0, 0, overlayImage.width, overlayImage.height); const data = imageData.data; const strength = (100 - effectStrength) / 100; for (let i = 0; i < data.length; i += 4) { data[i] = data[i] + (255 - data[i]) * strength; data[i + 1] = data[i + 1] + (255 - data[i + 1]) * strength; data[i + 2] = data[i + 2] + (255 - data[i + 2]) * strength; } tempCtx.putImageData(imageData, 0, 0); objectCtx.drawImage(tempCanvas, -overlayW / 2, -overlayH / 2, overlayW, overlayH); objectCtx.restore(); }
+                        objectCtx.restore();
+                        compositedObjectCtx.save();
+                        let tornFilterString = '';
+                        if (objectState.stroke.enabled && objectState.stroke.width > 0) { tornDilate.setAttribute('radius', objectState.stroke.width); tornDisplacement.setAttribute('scale', objectState.stroke.roughness); tornTurbulence.setAttribute('baseFrequency', objectState.stroke.detail); tornFlood.setAttribute('flood-color', '#FFFFFF'); tornFilterString = `url(#combined-filter)`; }
+                        compositedObjectCtx.filter = tornFilterString;
+                        compositedObjectCtx.translate(compositedObjectCanvas.width / 2 + totalOffsetX, compositedObjectCanvas.height / 2 + totalOffsetY);
+                        if (objectState.movement.enabled) { compositedObjectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
+                        compositedObjectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
+                        compositedObjectCtx.restore();
+                        compositedObjectCtx.save();
+                        compositedObjectCtx.globalCompositeOperation = 'source-in';
+                        compositedObjectCtx.drawImage(objectCanvas, 0, 0);
+                        compositedObjectCtx.restore();
+                    } else {
+                        compositedObjectCtx.save();
+                        let tornFilterString = '';
+                        if (objectState.stroke.enabled && objectState.stroke.width > 0) { tornDilate.setAttribute('radius', objectState.stroke.width); tornDisplacement.setAttribute('scale', objectState.stroke.roughness); tornTurbulence.setAttribute('baseFrequency', objectState.stroke.detail); tornFlood.setAttribute('flood-color', '#FFFFFF'); tornFilterString = `url(#combined-filter)`; }
+                        compositedObjectCtx.filter = [fgColorFilterString, tornFilterString].filter(Boolean).join(' ');
+                        compositedObjectCtx.translate(compositedObjectCanvas.width / 2 + totalOffsetX, compositedObjectCanvas.height / 2 + totalOffsetY);
+                        if (objectState.movement.enabled) { compositedObjectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
+                        compositedObjectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
+                        compositedObjectCtx.restore();
+                    }
+                    ctx.save();
+                    if (objectState.shadow.enabled) { ctx.shadowColor = hexToRgba(objectState.shadow.color, objectState.shadow.opacity / 100); ctx.shadowBlur = objectState.shadow.blur; ctx.shadowOffsetX = objectState.shadow.offsetX; ctx.shadowOffsetY = objectState.shadow.offsetY; }
+                    ctx.drawImage(compositedObjectCanvas, 0, 0);
+                    ctx.restore();
                 }
             }
 
+
             /**
+            * The main animation loop.
+            */
+            function animationLoop(timestamp = 0) {
+                updateMovement(timestamp);
+                updatePaperFoldOverlay(timestamp);
+
+                // Selalu minta gambar ulang jika sedang pratinjau untuk memastikan animasi berjalan
+                if (state.object.animation.previewing) {
+                    needsRedraw = true;
+                }
+                
+                if (needsRedraw) {
+                    draw(timestamp);
+                    needsRedraw = false;
+                }
+
+                animationFrameId = requestAnimationFrame(animationLoop);
+            }            /**
              * Updates objects' positions and rotations based on movement settings and time.
              */
             function updateMovement(timestamp) {
@@ -1623,16 +1629,15 @@
             function animationLoop(timestamp = 0) {
                 updateMovement(timestamp);
                 updatePaperFoldOverlay(timestamp);
-                if (needsRedraw) {
-                    draw();
+                
+                if (state.object.animation.previewing || needsRedraw) {
+                    draw(timestamp); // Selalu berikan timestamp
                     needsRedraw = false;
                 }
+
                 animationFrameId = requestAnimationFrame(animationLoop);
             }
             
-            /**
-             * Sets the internal resolution of all canvases based on the current state.
-             */
             function updateInternalCanvasResolution() {
                 const targetResolutionKey = state.canvasDisplayResolution.toString();
                 const aspectRatioKey = state.aspectRatio;
@@ -2173,6 +2178,7 @@
              * Starts the video export process using CCapture.js.
              */
             async function startExport() {
+                isExporting = true;
 				const hasAnyImage = state.object.image.element || state.background.element;
                 if (!hasAnyImage) {
                     showTopNotification("notificationWarnUpload");
@@ -2224,7 +2230,7 @@
                     const timestamp = (i / FRAME_RATE) * 1000;
                     updateMovement(timestamp);
                     updatePaperFoldOverlay(timestamp);
-                    draw();
+                    draw(timestamp);
                     capturer.capture(canvas);
                     const percentage = Math.round((i / TOTAL_FRAMES) * 100);
                     if (progressBarFill) {
@@ -2241,10 +2247,12 @@
                         exportProgressPopup.classList.add('hidden');
                         exportProgressPopup.classList.remove('flex');
                     }
-                    // Restore original canvas size and restart animation loop
                     canvas.width = originalCanvasWidth;
                     canvas.height = originalCanvasHeight;
                     resizeAndRedrawAll();
+                    
+                    isExporting = false; // <-- KEMBALIKAN JADI FALSE SAAT SELESAI
+                    
                     animationFrameId = requestAnimationFrame(animationLoop);
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -2297,49 +2305,7 @@
                     history.pushState({ panel: 'open' }, 'Panel Open');
                     panelWrapper.classList.add('panel-open');
                 }
-            }
-            function previewAnimation(type) { // type adalah 'in' atau 'out'
-                const canvasEl = document.getElementById('main-canvas');
-                const anim = state.object.animation[type];
-
-                if (!anim.enabled || !state.object.image.element) {
-                    showTopNotification("notificationWarnObject");
-                    return;
-                }
-
-                // Hapus kelas animasi sebelumnya jika ada
-                canvasEl.className = canvasEl.className.replace(/\banim-.*\b/g, '');
-
-                let animClass = '';
-                let easingClass = '';
-
-                if (anim.type === 'move') {
-                    const direction = anim.move.direction;
-                    animClass = type === 'in' ? `move-from-${direction}` : `move-to-${direction}`;
-                } else { // type === 'zoom'
-                    animClass = `zoom-${type}`;
-                    const scaleVar = type === 'in' ? '--anim-scale-start' : '--anim-scale-end';
-                    canvasEl.style.setProperty(scaleVar, anim.zoom.scale / 100);
-                }
-
-                if(anim.easing === 'ease') easingClass = `anim-ease-${type}`;
-                if(anim.easing === 'back') easingClass = `anim-back-${type}`;
-                if(anim.easing === 'linear') easingClass = 'anim-linear';
-
-                // Terapkan durasi dan kelas animasi
-                canvasEl.style.animationDuration = `${anim.duration}s`;
-                canvasEl.style.animationName = animClass;
-                canvasEl.classList.add(easingClass);
-
-                // Hapus kelas setelah animasi selesai
-                canvasEl.addEventListener('animationend', () => {
-                    canvasEl.style.animationDuration = '';
-                    canvasEl.style.animationName = '';
-                    canvasEl.classList.remove(easingClass);
-                    canvasEl.style.removeProperty('--anim-scale-start');
-                    canvasEl.style.removeProperty('--anim-scale-end');
-                }, { once: true });
-            }            
+            }          
             /**
              * Initializes the application, sets up event listeners, and starts the animation loop.
              */
@@ -2738,7 +2704,16 @@
 
                     document.getElementById(`preview-anim-${type}-btn`).addEventListener('click', (e) => {
                         e.stopPropagation();
-                        previewAnimation(type);
+
+                        if (!state.object.image.element) {
+                            showTopNotification("notificationWarnObject");
+                            return;
+                        }
+
+                        // Set state untuk memulai pratinjau
+                        state.object.animation.previewing = type;
+                        state.object.animation.previewStartTime = performance.now();
+                        requestRedraw();
                     });
                 }
 
