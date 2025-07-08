@@ -811,126 +811,48 @@
                 </div>
 
                 <div id="animasi-tab-content" class="tab-content hidden space-y-4 md:space-y-4">
-                    <h2 class="text-lg font-bold text-slate-300" data-translate-key="animationObject"></h2>
+                    <div class="space-y-4 md:space-y-4">
+                        <h2 class="text-lg font-bold text-slate-300" data-translate-key="animationObject"></h2>
 
-                    <div class="accordion-section border border-[var(--border-color)]" id="anim-in-accordion">
-                        <div class="accordion-header w-full flex items-center justify-between p-4 transition-colors duration-200 cursor-pointer">
-                            <div class="flex items-center gap-3">
-                                <svg class="accordion-chevron transition-transform duration-300 text-[var(--text-muted)]" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                                <h2 class="text-base font-semibold text-slate-300" data-translate-key="animIn"></h2>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <button id="preview-anim-in-btn" class="px-2.5 py-1.5 bg-[var(--accent-color)] text-white text-xs font-semibold hover:bg-[var(--accent-color-hover)] transition-all" data-translate-key="preview"></button>
-                                <label class="switch"><input type="checkbox" id="anim-in-enabled-switch"><span class="toggle-slider"></span></label>
+                        <div>
+                            <label class="text-sm font-medium text-[var(--text-muted)]" data-translate-key="controlMode"></label>
+                            <div id="animation-mode-btns" class="grid grid-cols-2 gap-2 md:gap-2 mt-2 btn-group-toggle">
+                                <button data-mode="simple" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="simple"></button>
+                                <button data-mode="advanced" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="advanced"></button>
                             </div>
                         </div>
-                        <div class="accordion-body space-y-4 p-4 border-t border-[var(--border-color)] hidden">
-                            <div>
-                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="type"></label>
-                                <div id="anim-in-type-btns" class="grid grid-cols-2 gap-2 mt-2 btn-group-toggle">
-                                    <button data-type="move" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150 active" data-translate-key="move"></button>
-                                    <button data-type="zoom" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="zoom"></button>
+                        
+                        <div id="animation-simple-controls" class="space-y-2 pt-4 border-t border-slate-700">
+                            <div class="flex items-center justify-between p-2 bg-slate-800/50 border border-slate-700">
+                                <div class="flex items-center gap-3">
+                                    <label class="switch"><input type="checkbox" id="simple-anim-open-switch"><span class="toggle-slider"></span></label>
+                                    <span class="text-sm font-medium text-slate-300" data-translate-key="openAnim">Animasi Kertas Terbuka</span>
                                 </div>
+                                <button id="preview-simple-open" class="px-2.5 py-1.5 bg-[var(--accent-color)] text-white text-xs font-semibold hover:bg-[var(--accent-color-hover)] transition-all" data-translate-key="preview"></button>
                             </div>
-                            <div id="anim-in-move-controls" class="space-y-4">
-                                <div>
-                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="direction"></label>
-                                    <div id="anim-in-move-direction-btns" class="grid grid-cols-4 gap-2 mt-2 btn-group-toggle">
-                                        <button data-direction="left" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150 active">→</button>
-                                        <button data-direction="right" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150">←</button>
-                                        <button data-direction="top" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150">↓</button>
-                                        <button data-direction="bottom" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150">↑</button>
-                                    </div>
+                            <div class="flex items-center justify-between p-2 bg-slate-800/50 border border-slate-700">
+                                <div class="flex items-center gap-3">
+                                    <label class="switch"><input type="checkbox" id="simple-anim-close-switch"><span class="toggle-slider"></span></label>
+                                    <span class="text-sm font-medium text-slate-300" data-translate-key="closeAnim">Animasi Kertas Tertutup</span>
                                 </div>
-                                <div>
-                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="distance"></label>
-                                    <div class="flex items-center gap-3"><input type="range" id="anim-in-move-distance" min="0" max="200" value="100" class="w-full slider"><input type="number" id="anim-in-move-distance-input" min="0" max="200" value="100" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
-                                </div>
-                            </div>
-                            <div id="anim-in-zoom-controls" class="space-y-4 hidden">
-                                <div>
-                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="initialScale"></label>
-                                    <div class="flex items-center gap-3"><input type="range" id="anim-in-zoom-scale" min="0" max="200" value="50" class="w-full slider"><input type="number" id="anim-in-zoom-scale-input" min="0" max="200" value="50" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
-                                </div>
-                            </div>
-                            <div class="space-y-4 pt-4 border-t border-slate-700">
-                                <div>
-                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="duration"></label>
-                                    <div class="flex items-center gap-3"><input type="range" id="anim-in-duration" min="0" max="3" value="1" step="0.1" class="w-full slider"><input type="number" id="anim-in-duration-input" min="0" max="3" step="0.1" value="1" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
-                                </div>
-                                <div>
-                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="startAt"></label>
-                                    <div class="flex items-center gap-3"><input type="range" id="anim-in-start" min="0" max="10" value="0" step="0.1" class="w-full slider"><input type="number" id="anim-in-start-input" min="0" max="10" step="0.1" value="0" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
-                                </div>
-                                <div>
-                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="easing"></label>
-                                    <div id="anim-in-easing-btns" class="grid grid-cols-3 gap-2 mt-2 btn-group-toggle">
-                                        <button data-easing="linear" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150 active" data-translate-key="linear"></button>
-                                        <button data-easing="ease" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="easeIn"></button>
-                                        <button data-easing="back" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="backIn"></button>
-                                    </div>
-                                </div>
+                                <button id="preview-simple-close" class="px-2.5 py-1.5 bg-[var(--accent-color)] text-white text-xs font-semibold hover:bg-[var(--accent-color-hover)] transition-all" data-translate-key="preview"></button>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="accordion-section border border-[var(--border-color)]" id="anim-out-accordion">
-                        <div class="accordion-header w-full flex items-center justify-between p-4 transition-colors duration-200 cursor-pointer">
-                            <div class="flex items-center gap-3">
-                                <svg class="accordion-chevron transition-transform duration-300 text-[var(--text-muted)]" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                                <h2 class="text-base font-semibold text-slate-300" data-translate-key="animOut"></h2>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <button id="preview-anim-out-btn" class="px-2.5 py-1.5 bg-[var(--accent-color)] text-white text-xs font-semibold hover:bg-[var(--accent-color-hover)] transition-all" data-translate-key="preview"></button>
-                                <label class="switch"><input type="checkbox" id="anim-out-enabled-switch"><span class="toggle-slider"></span></label>
-                            </div>
-                        </div>
-                        <div class="accordion-body space-y-4 p-4 border-t border-[var(--border-color)] hidden">
-                            <div>
-                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="type"></label>
-                                <div id="anim-out-type-btns" class="grid grid-cols-2 gap-2 mt-2 btn-group-toggle">
-                                    <button data-type="move" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150 active" data-translate-key="move"></button>
-                                    <button data-type="zoom" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="zoom"></button>
-                                </div>
-                            </div>
-                            <div id="anim-out-move-controls" class="space-y-4">
-                                <div>
-                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="direction"></label>
-                                    <div id="anim-out-move-direction-btns" class="grid grid-cols-4 gap-2 mt-2 btn-group-toggle">
-                                        <button data-direction="left" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150 active">→</button>
-                                        <button data-direction="right" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150">←</button>
-                                        <button data-direction="top" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150">↓</button>
-                                        <button data-direction="bottom" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150">↑</button>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="distance"></label>
-                                    <div class="flex items-center gap-3"><input type="range" id="anim-out-move-distance" min="0" max="200" value="100" class="w-full slider"><input type="number" id="anim-out-move-distance-input" min="0" max="200" value="100" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
-                                </div>
-                            </div>
-                            <div id="anim-out-zoom-controls" class="space-y-4 hidden">
-                                <div>
-                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="finalScale"></label>
-                                    <div class="flex items-center gap-3"><input type="range" id="anim-out-zoom-scale" min="0" max="200" value="50" class="w-full slider"><input type="number" id="anim-out-zoom-scale-input" min="0" max="200" value="50" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
-                                </div>
-                            </div>
+                        <div id="animation-advanced-controls" class="hidden">
                             <div class="space-y-4 pt-4 border-t border-slate-700">
-                                <div>
-                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="duration"></label>
-                                    <div class="flex items-center gap-3"><input type="range" id="anim-out-duration" min="0" max="3" value="1" step="0.1" class="w-full slider"><input type="number" id="anim-out-duration-input" min="0" max="3" step="0.1" value="1" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                <div class="flex justify-end">
+                                    <button id="add-keyframe-btn" class="flex items-center gap-2 px-4 py-2 bg-[var(--accent-color)] text-white text-sm font-semibold hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2z"/>
+                                        </svg>
+                                        <span data-translate-key="addKeyframe">Tambah Keyframe</span>
+                                    </button>
                                 </div>
-                                <div>
-                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="startAt"></label>
-                                    <div class="flex items-center gap-3"><input type="range" id="anim-out-start" min="0" max="10" value="4" step="0.1" class="w-full slider"><input type="number" id="anim-out-start-input" min="0" max="10" step="0.1" value="4" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
-                                </div>
-                                <div>
-                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="easing"></label>
-                                    <div id="anim-out-easing-btns" class="grid grid-cols-3 gap-2 mt-2 btn-group-toggle">
-                                        <button data-easing="linear" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150 active" data-translate-key="linear"></button>
-                                        <button data-easing="ease" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="easeOut"></button>
-                                        <button data-easing="back" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="backOut"></button>
-                                    </div>
-                                </div>
+                        
+                                <div id="keyframe-list" class="space-y-2"></div>
+                        
+                                <div id="keyframe-properties-panel" class="hidden"></div>
                             </div>
                         </div>
                     </div>
@@ -1102,6 +1024,22 @@
                 'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper3.webp',
                 'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper4.webp'
             ];
+            const MASK_IMAGE_URLS = [
+                'https://raw.githubusercontent.com/nurimator/paperimator/main/img/mask-1.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/main/img/mask-2.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/main/img/mask-3.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/main/img/mask-4.webp'
+            ];
+
+            const LAYER_IMAGE_URLS = [
+                'https://raw.githubusercontent.com/nurimator/paperimator/main/img/layer-1.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/main/img/layer-2.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/main/img/layer-3.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/main/img/layer-4.webp'
+            ];
+
+            let maskImages = [];
+            let layerImages = [];
             
             let originalOverlayImages = []; 
             
@@ -1144,37 +1082,33 @@
                     lastImageSwitchTime: 0
                 },
                 animation: {
-                    previewing: null, // 'in' atau 'out', atau null
-                    previewStartTime: 0,
-                    in: {
-                        enabled: false,
-                        type: 'move', // 'move' atau 'zoom'
-                        duration: 1,
-                        startTime: 0,
-                        easing: 'linear', // 'linear', 'ease', 'back'
-                        move: {
-                            direction: 'left', // 'left', 'right', 'top', 'bottom'
-                            distance: 100
+                    mode: 'simple', // 'simple' atau 'advanced'
+                    simple: {
+                        open: false,
+                        close: false
+                    },                    
+                    activeKeyframeId: null, // ID dari keyframe yang sedang dipilih
+                    previewTime: null,
+                    keyframes: [
+                        // Kita mulai dengan dua keyframe default untuk contoh
+                        {
+                            id: Date.now(), // ID unik untuk setiap keyframe
+                            time: 0,        // Waktu (dalam detik)
+                            x: 0,           // Offset X (%)
+                            y: 0,           // Offset Y (%)
+                            scale: 20,      // Ukuran (%) - sama dengan ukuran default gambar
+                            easing: 'linear'// Easing ke keyframe berikutnya
                         },
-                        zoom: {
-                            scale: 50
+                        {
+                            id: Date.now() + 1,
+                            time: 1,
+                            x: 0,
+                            y: 0,
+                            scale: 80,
+                            easing: 'linear'
                         }
-                    },
-                    out: {
-                        enabled: false,
-                        type: 'move',
-                        duration: 1,
-                        startTime: 4,
-                        easing: 'linear',
-                        move: {
-                            direction: 'left',
-                            distance: 100
-                        },
-                        zoom: {
-                            scale: 50
-                        }
-                    }
-                }                
+                    ]
+                }             
             };
 
             // Default state for the entire application
@@ -1213,11 +1147,21 @@
                 linear: t => t,
                 easeIn: t => t * t,
                 easeOut: t => t * (2 - t),
-                backIn: t => t * t * t - t * Math.sin(t * Math.PI),
+                easeInOut: t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+                backIn: t => {
+                    const s = 1.70158;
+                    return t * t * ((s + 1) * t - s);
+                },
                 backOut: t => {
-                    const f = (1 - t);
-                    return 1 - (f * f * f - f * Math.sin(f * Math.PI));
+                    const s = 1.70158;
+                    return (t = t - 1) * t * ((s + 1) * t + s) + 1;
+                },
+                backInOut: t => {
+                    const s = 1.70158 * 1.525;
+                    if ((t /= 0.5) < 1) return 0.5 * (t * t * (((s) + 1) * t - s));
+                    return 0.5 * ((t -= 2) * t * (((s) + 1) * t + s) + 2);
                 }
+                // 'instant' akan ditangani secara khusus
             };
 
             // Language translations
@@ -1275,6 +1219,16 @@
                     backIn: 'Back In',
                     backOut: 'Back Out',
                     startAt: 'Start At (sec)',
+                    instant: 'Instant',
+                    easeInOut: 'Ease In Out',
+                    backInOut: 'Back In Out',
+                    keyframeProperties: 'Keyframe Properties',
+                    easingToNext: 'Easing to Next Keyframe',
+                    addKeyframe: 'Add Keyframe',
+                    simple: 'Simple',
+                    advanced: 'Advanced',
+                    openAnim: 'Opening Animation',
+                    closeAnim: 'Closing Animation'                  
                 },
                 'id': {
                     settings: 'Pengaturan', export: 'Ekspor', canvas: 'Kanvas', previewAspectRatio: 'Aspek Rasio',
@@ -1329,6 +1283,16 @@
                     backIn: 'Back In',
                     backOut: 'Back Out',
                     startAt: 'Mulai (detik ke-)',
+                    instant: 'Instan',
+                    easeInOut: 'Ease In Out',
+                    backInOut: 'Back In Out',
+                    keyframeProperties: 'Properti Keyframe',
+                    easingToNext: 'Easing ke Keyframe Berikutnya',
+                    addKeyframe: 'Tambah Keyframe',       
+                    simple: 'Simpel',
+                    advanced: 'Lanjutan',
+                    openAnim: 'Animasi Terbuka',
+                    closeAnim: 'Animasi Tertutup'                       
                 }
             };
             
@@ -1412,102 +1376,88 @@
                 // --- DRAW ALL OBJECTS ---
                 const objectState = state.object; // Ambil objek tunggal
                 if (objectState.image.element) {
+                    const currentTimeSource = isExporting ? timestamp : performance.now();
+                    let timeInSeconds;
 
-                    let animOffsetX = 0;
-                    let animOffsetY = 0;
-                    let animScale = 1.0;
-                    // 1. Definisikan variabel dasar dan fungsi helper di bagian atas
+                    if (state.object.animation.previewTime !== null) {
+                        // Jika ada waktu pratinjau, gunakan itu dan jangan update otomatis
+                        timeInSeconds = state.object.animation.previewTime;
+                    } else {
+                        // Jika tidak, gunakan waktu normal untuk animasi
+                        timeInSeconds = currentTimeSource / 1000;
+                    }                    
+                    // 1. Dapatkan keyframe yang sudah diurutkan
+                    const keyframes = [...state.object.animation.keyframes].sort((a, b) => a.time - b.time);
+
+                    let currentTransform = { x: 0, y: 0, scale: 100 };
+
+                    if (keyframes.length > 0) {
+                        // 2. Tentukan posisi objek berdasarkan waktu saat ini
+                        let prevKeyframe = keyframes[0];
+                        let nextKeyframe = keyframes[keyframes.length - 1];
+
+                        // Cari keyframe sebelum dan sesudah waktu saat ini
+                        for (let i = 0; i < keyframes.length; i++) {
+                            if (keyframes[i].time <= timeInSeconds) {
+                                prevKeyframe = keyframes[i];
+                            }
+                            if (keyframes[i].time > timeInSeconds) {
+                                nextKeyframe = keyframes[i];
+                                break;
+                            }
+                        }
+                        
+                        // 3. Hitung interpolasi
+                        if (prevKeyframe === nextKeyframe) {
+                            // Jika waktu berada di luar jangkauan (sebelum awal atau setelah akhir), gunakan properti keyframe terdekat
+                            currentTransform = { x: prevKeyframe.x, y: prevKeyframe.y, scale: prevKeyframe.scale };
+                        } else {
+                            // +++ TAMBAHKAN PENGECEKAN UNTUK EASING INSTANT DI SINI +++
+                            if (prevKeyframe.easing === 'instant') {
+                                currentTransform = { x: nextKeyframe.x, y: nextKeyframe.y, scale: nextKeyframe.scale };
+                            } else {
+                            // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                                // Hitung progress (0.0 - 1.0) antara dua keyframe
+                                const segmentDuration = nextKeyframe.time - prevKeyframe.time;
+                                const timeIntoSegment = timeInSeconds - prevKeyframe.time;
+                                let progress = (segmentDuration > 0) ? timeIntoSegment / segmentDuration : 1;
+                                progress = Math.max(0, Math.min(1, progress));
+
+                                // Terapkan easing dari keyframe sebelumnya
+                                const easingFunc = EASING[prevKeyframe.easing] || EASING.linear;
+                                const easedProgress = easingFunc(progress);
+
+                                // Interpolasi properti
+                                currentTransform.x = lerp(prevKeyframe.x, nextKeyframe.x, easedProgress);
+                                currentTransform.y = lerp(prevKeyframe.y, nextKeyframe.y, easedProgress);
+                                currentTransform.scale = lerp(prevKeyframe.scale, nextKeyframe.scale, easedProgress);
+                            
+                            // +++ TAMBAHKAN KURUNG PENUTUP UNTUK BLOK ELSE +++
+                            } 
+                        }
+                    } else {
+                        // Jika tidak ada keyframe, gunakan nilai dari state gambar statis
+                        currentTransform = { x: objectState.image.offset.x, y: objectState.image.offset.y, scale: objectState.image.size };
+                    }
+
+
+                    // 4. Terapkan transformasi yang telah dihitung
                     const canvasAspect = canvas.width / canvas.height;
                     const imageAspect = objectState.image.element.width / objectState.image.element.height;
                     const baseScale = (canvasAspect > imageAspect) ? canvas.height / objectState.image.element.height : canvas.width / objectState.image.element.width;
-                    const userScale = objectState.image.size / 100;
-                    const timeInSeconds = timestamp / 1000;
+                    
+                    // Skala dari keyframe menggantikan ukuran gambar statis
+                    const finalScale = baseScale * (currentTransform.scale / 100); 
 
-                    // Fungsi helper untuk menerapkan animasi berdasarkan PROGRESS (0.0 - 1.0)
-                    const applyAnimation = (animType, progress) => {
-                        const anim = objectState.animation[animType];
-                        if (!anim.enabled) return;
-
-                        let easingKey = anim.easing;
-                        if (easingKey !== 'linear') {
-                            easingKey += (animType === 'in') ? 'Out' : 'In';
-                        }
-                        const easingFunc = EASING[easingKey] || EASING.linear;
-                        const easedProgress = easingFunc(progress);
-
-                        if (anim.type === 'move') {
-                            const preZoomImgW = objectState.image.element.width * baseScale * userScale;
-                            const preZoomImgH = objectState.image.element.height * baseScale * userScale;
-                            const distanceX = (canvas.width / 2 + preZoomImgW / 2) * (anim.move.distance / 100);
-                            const distanceY = (canvas.height / 2 + preZoomImgH / 2) * (anim.move.distance / 100);
-                            let startX = 0, startY = 0;
-                            if (anim.move.direction === 'left') { startX = -distanceX; }
-                            if (anim.move.direction === 'right') { startX = distanceX; }
-                            if (anim.move.direction === 'top') { startY = -distanceY; }
-                            if (anim.move.direction === 'bottom') { startY = distanceY; }
-
-                            if (animType === 'in') {
-                                animOffsetX += startX * (1 - easedProgress);
-                                animOffsetY += startY * (1 - easedProgress);
-                            } else { // 'out'
-                                animOffsetX += startX * easedProgress;
-                                animOffsetY += startY * easedProgress;
-                            }
-                        } else if (anim.type === 'zoom') {
-                            const startScale = anim.zoom.scale / 100;
-                            const endScale = 1.0;
-                            if (animType === 'in') {
-                                animScale *= startScale + (endScale - startScale) * easedProgress;
-                            } else { // 'out'
-                                animScale *= endScale - (endScale - startScale) * easedProgress;
-                            }
-                        }
-                    };
-
-                    // Logika utama untuk menentukan progres animasi
-                    const animState = objectState.animation;
-                    if (animState.previewing) {
-                        // MODE PRATINJAU: Hitung progres relatif dari awal pratinjau.
-                        const anim = animState[animState.previewing];
-                        const timeSincePreviewStart = (timestamp - animState.previewStartTime) / 1000;
-                        const progress = Math.max(0, Math.min(1, timeSincePreviewStart / anim.duration));
-                        
-                        applyAnimation(animState.previewing, progress);
-
-                        if (timeSincePreviewStart > anim.duration) {
-                            animState.previewing = null;
-                        }
-                    } else {
-                        // MODE NORMAL / EKSPOR: Hitung progres berdasarkan timeline absolut.
-                        const animIn = animState.in;
-                        if (animIn.enabled && timeInSeconds >= animIn.startTime && timeInSeconds < animIn.startTime + animIn.duration) {
-                            const progressIn = (timeInSeconds - animIn.startTime) / animIn.duration;
-                            applyAnimation('in', progressIn);
-                        }
-
-                        const animOut = animState.out;
-                        if (animOut.enabled && timeInSeconds >= animOut.startTime && timeInSeconds < animOut.startTime + animOut.duration) {
-                            const progressOut = (timeInSeconds - animOut.startTime) / animOut.duration;
-                            applyAnimation('out', progressOut);
-                        }
-
-                        // Sembunyikan objek sebelum animasi 'in' atau setelah animasi 'out'.
-                        if (animIn.enabled && timeInSeconds < animIn.startTime) {
-                            animScale = 0;
-                        } else if (isExporting && animOut.enabled && timeInSeconds >= animOut.startTime + animOut.duration) {
-                            // Sembunyikan objek HANYA JIKA sedang mengekspor video.
-                            animScale = 0;
-                        }
-                    }
-
-                    // Hitung ukuran dan posisi final SETELAH semua animasi dihitung
-                    const finalScale = baseScale * userScale * animScale;
                     const imgW = objectState.image.element.width * finalScale;
                     const imgH = objectState.image.element.height * finalScale;
-                    const imgBaseOffsetX = (canvas.width * objectState.image.offset.x) / 100;
-                    const imgBaseOffsetY = (canvas.height * objectState.image.offset.y) / 100;
-                    const totalOffsetX = imgBaseOffsetX + objectState.movement.positionOffset.x + animOffsetX;
-                    const totalOffsetY = imgBaseOffsetY + objectState.movement.positionOffset.y + animOffsetY;
+
+                    // Offset dari keyframe menggantikan offset gambar statis
+                    const imgBaseOffsetX = (canvas.width * currentTransform.x) / 100;
+                    const imgBaseOffsetY = (canvas.height * currentTransform.y) / 100;
+
+                    const totalOffsetX = imgBaseOffsetX + objectState.movement.positionOffset.x;
+                    const totalOffsetY = imgBaseOffsetY + objectState.movement.positionOffset.y;
 
                     // Sisa kode untuk menggambar objek ke kanvas (tidak ada perubahan)
                     const compositedObjectCanvas = finalObjectCanvas;
@@ -1562,6 +1512,12 @@
             function animationLoop(timestamp = 0) {
                 updateMovement(timestamp);
                 updatePaperFoldOverlay(timestamp);
+                
+                // Hentikan pratinjau animasi simpel setelah 1 detik
+                const simpleAnimState = state.object.animation.simple;
+                if (simpleAnimState.previewing && (timestamp - simpleAnimState.previewStartTime > 1000)) {
+                    simpleAnimState.previewing = null;
+                }                
 
                 // Selalu minta gambar ulang jika sedang pratinjau untuk memastikan animasi berjalan
                 if (state.object.animation.previewing) {
@@ -1833,7 +1789,9 @@
                     }
                 });
             }
-
+            function lerp(a, b, t) {
+                return a + (b - a) * t;
+            }
             /**
              * Truncates a filename for display purposes.
              */
@@ -1869,12 +1827,151 @@
                 });
             }
 
+            let activeKeyframeUI = null; // Variabel global untuk melacak UI keyframe yang aktif
+
+            /**
+             * Membuat dan merender seluruh daftar keyframe berdasarkan state.
+             */
+            function renderKeyframeList() {
+                const keyframeListContainer = document.getElementById('keyframe-list');
+                const keyframes = state.object.animation.keyframes.sort((a, b) => a.time - b.time); // Selalu urutkan berdasarkan waktu
+                keyframeListContainer.innerHTML = ''; // Kosongkan daftar
+
+                keyframes.forEach((kf, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'keyframe-item flex items-center gap-3 p-2 border border-slate-700 bg-slate-800 cursor-pointer transition-colors hover:bg-slate-700/50';
+                    item.dataset.keyframeId = kf.id;
+
+                    if (kf.id === state.object.animation.activeKeyframeId) {
+                        item.classList.add('border-accent-400', 'bg-slate-700');
+                        item.style.borderColor = 'var(--accent-color)';
+                    }
+
+                    item.innerHTML = `
+                        <span class="font-semibold text-slate-300 flex-shrink-0">Keyframe ${index + 1}</span>
+                        <input type="number" min="0" step="0.1" value="${kf.time}" class="keyframe-time-input number-input-uniform bg-slate-900 border border-[var(--border-color-light)] py-1 px-2 text-sm focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)]">
+                        <span class="text-sm text-[var(--text-muted)]">s</span>
+                        <button class="delete-keyframe-btn ml-auto p-1.5 text-red-400 hover:text-white hover:bg-red-500/80 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                    `;
+                    keyframeListContainer.appendChild(item);
+                });
+                renderKeyframeProperties(); // Update panel properti setelah daftar di-render
+            }
+
+            /**
+             * Merender panel properti untuk keyframe yang sedang aktif.
+             */
+            function renderKeyframeProperties() {
+                const panel = document.getElementById('keyframe-properties-panel');
+                const activeKeyframeId = state.object.animation.activeKeyframeId;
+                const keyframe = state.object.animation.keyframes.find(kf => kf.id === activeKeyframeId);
+
+                if (!keyframe) {
+                    panel.innerHTML = '';
+                    panel.classList.add('hidden');
+                    return;
+                }
+
+                panel.classList.remove('hidden');
+                panel.innerHTML = `
+                    <div class="accordion-section border border-[var(--border-color)] accordion-open">
+                        <div class="accordion-header w-full flex items-center justify-between p-4 bg-slate-700/30">
+                            <h2 class="text-base font-semibold text-slate-300" data-translate-key="keyframeProperties">Properti Keyframe</h2>
+                        </div>
+                        <div class="accordion-body space-y-4 p-4 border-t border-[var(--border-color)]">
+                            <div>
+                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="imageSize">Ukuran (%)</label>
+                                <div class="flex items-center gap-3">
+                                    <input type="range" id="kf-scale" min="10" max="200" value="${keyframe.scale}" class="w-full slider">
+                                    <input type="number" id="kf-scale-input" min="10" max="200" value="${keyframe.scale}" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="offsetX">Offset X (%)</label>
+                                <div class="flex items-center gap-3">
+                                    <input type="range" id="kf-offset-x" min="-150" max="150" value="${keyframe.x}" class="w-full slider">
+                                    <input type="number" id="kf-offset-x-input" min="-150" max="150" value="${keyframe.x}" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="offsetY">Offset Y (%)</label>
+                                <div class="flex items-center gap-3">
+                                    <input type="range" id="kf-offset-y" min="-150" max="150" value="${keyframe.y}" class="w-full slider">
+                                    <input type="number" id="kf-offset-y-input" min="-150" max="150" value="${keyframe.y}" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
+                                </div>
+                            </div>
+                            <div class="pt-4 border-t border-slate-700">
+                            <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="easingToNext">Easing ke Keyframe Berikutnya</label>
+                            <div id="kf-easing-btns" class="space-y-2">
+                                <div class="grid grid-cols-4 gap-2 btn-group-toggle">
+                                    <button data-easing="linear" title="Linear" class="${keyframe.easing === 'linear' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">Linear</button>
+                                    <button data-easing="easeIn" title="Ease In" class="${keyframe.easing === 'easeIn' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">In</button>
+                                    <button data-easing="easeOut" title="Ease Out" class="${keyframe.easing === 'easeOut' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">Out</button>
+                                    <button data-easing="easeInOut" title="Ease In Out" class="${keyframe.easing === 'easeInOut' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">In-Out</button>
+                                </div>
+                                <div class="grid grid-cols-4 gap-2 btn-group-toggle">
+                                    <button data-easing="instant" title="Instant" class="${keyframe.easing === 'instant' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">Instan</button>
+                                    <button data-easing="backIn" title="Back In" class="${keyframe.easing === 'backIn' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">Back In</button>
+                                    <button data-easing="backOut" title="Back Out" class="${keyframe.easing === 'backOut' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">Back Out</button>
+                                    <button data-easing="backInOut" title="Back In Out" class="${keyframe.easing === 'backInOut' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">Back In-Out</button>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Hubungkan slider dan input dengan state
+                syncSliderAndInput('kf-scale', 'kf-scale-input', val => keyframe.scale = val);
+                syncSliderAndInput('kf-offset-x', 'kf-offset-x-input', val => keyframe.x = val);
+                syncSliderAndInput('kf-offset-y', 'kf-offset-y-input', val => keyframe.y = val);
+                
+                // Event listener untuk tombol easing
+                document.getElementById('kf-easing-btns').addEventListener('click', e => {
+                    const btn = e.target.closest('button');
+                    if (btn) {
+                        keyframe.easing = btn.dataset.easing;
+                        renderKeyframeProperties(); // Render ulang untuk menunjukkan tombol aktif
+                        requestRedraw();
+                    }
+                });
+            }
+
             function updateUIFromState() {
                 updateUIText(state.language);
 
                 // Get the currently active object's state
                 const activeObjectState = state.object;                
+                // Kelola visibilitas panel Simple vs Advanced
+                const animMode = activeObjectState.animation.mode;
+                document.getElementById('animation-simple-controls').classList.toggle('hidden', animMode !== 'simple');
+                document.getElementById('animation-advanced-controls').classList.toggle('hidden', animMode !== 'advanced');
 
+                // Update tombol mode yang aktif
+                document.querySelectorAll('#animation-mode-btns button').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.mode === animMode);
+                });
+
+                // Update switch di mode simple
+                document.getElementById('simple-anim-open-switch').checked = activeObjectState.animation.simple.open;
+                document.getElementById('simple-anim-close-switch').checked = activeObjectState.animation.simple.close;
+
+                // Nonaktifkan panel Transform di tab Objek jika mode animasi adalah Advanced
+                const transformAccordion = document.getElementById('foreground-transform-accordion');
+                if (transformAccordion) {
+                    if (animMode === 'advanced') {
+                        transformAccordion.classList.add('is-disabled');
+                        // Jika sedang terbuka, tutup paksa
+                        if (transformAccordion.classList.contains('accordion-open')) {
+                            transformAccordion.classList.remove('accordion-open');
+                            transformAccordion.querySelector('.accordion-body').classList.add('hidden');
+                        }
+                    } else {
+                        transformAccordion.classList.remove('is-disabled');
+                    }
+                }
                 // Update object image controls based on the active object
                 const imageSpecificControls = document.getElementById('image-specific-controls');
                 const dropZonePrompt = document.getElementById('drop-zone-prompt');
@@ -2029,8 +2126,7 @@
                 });
                 showTab(state.activeTab);
                 requestRedraw();
-                updateAnimationPanels('in');
-                updateAnimationPanels('out');
+                renderKeyframeList();
             }
 
             /**
@@ -2305,6 +2401,7 @@
              * Shows the content for a specific tab and updates the active state of tab buttons.
              */
             function showTab(tabName) {
+                state.object.animation.previewTime = null;
                 const lang = state.language;
                 const tabTitles = {
                     background: translations[lang].tabTitleBackground,
@@ -2384,6 +2481,19 @@
                     img.src = url;
                 });
 
+                function loadImageAsset(url, targetArray, index) {
+                    const img = new Image();
+                    img.crossOrigin = "Anonymous";
+                    img.onload = () => {
+                        targetArray[index] = img;
+                        // Mungkin bisa ditambahkan logika preloader di sini jika perlu
+                    };
+                    img.onerror = () => console.error(`Gagal memuat aset: ${url}`);
+                    img.src = url;
+                }
+
+                MASK_IMAGE_URLS.forEach((url, index) => loadImageAsset(url, maskImages, index));
+                LAYER_IMAGE_URLS.forEach((url, index) => loadImageAsset(url, layerImages, index));
                 // --- EVENT LISTENERS ---
                 window.addEventListener('resize', () => {
                     if (state.displayMode === 'auto') {
@@ -2693,70 +2803,87 @@
                     document.addEventListener('touchend', resizerStop);
                 });
 
-                // --- BIND ANIMATION CONTROLS ---
+                document.getElementById('animation-mode-btns').addEventListener('click', (e) => {
+                    const button = e.target.closest('button');
+                    if (button) {
+                        state.object.animation.mode = button.dataset.mode;
+                        // Reset pratinjau saat berganti mode
+                        state.object.animation.previewTime = null;
+                        updateUIFromState(); // Panggil ini untuk update seluruh UI
+                    }
+                });
 
-                function setupAnimationControls(type) { // type adalah 'in' atau 'out'
-                    // Toggle utama
-                    document.getElementById(`anim-${type}-enabled-switch`).addEventListener('change', (e) => {
-                        getActiveObject().animation[type].enabled = e.target.checked;
-                        requestRedraw();
-                    });
+                // Event listener untuk switch di mode simpel
+                document.getElementById('simple-anim-open-switch').addEventListener('change', (e) => {
+                    state.object.animation.simple.open = e.target.checked;
+                    // Di masa depan, logika animasi simpel akan dipanggil di sini
+                });
 
-                    // Toggle antara Move dan Zoom
-                    const typeBtns = document.getElementById(`anim-${type}-type-btns`);
-                    typeBtns.addEventListener('click', (e) => {
-                        const btn = e.target.closest('button');
-                        if (!btn) return;
-                        getActiveObject().animation[type].type = btn.dataset.type;
-                        updateUIFromState(); // Panggil ini untuk menampilkan/menyembunyikan panel yg sesuai
-                        requestRedraw();
-                    });
+                document.getElementById('simple-anim-close-switch').addEventListener('change', (e) => {
+                    state.object.animation.simple.close = e.target.checked;
+                    // Di masa depan, logika animasi simpel akan dipanggil di sini
+                });
+                             
+                document.getElementById('add-keyframe-btn').addEventListener('click', () => {
+                    const keyframes = state.object.animation.keyframes;
+                    // Tentukan waktu default untuk keyframe baru, sedikit setelah keyframe terakhir
+                    const lastTime = keyframes.length > 0 ? keyframes.sort((a, b) => a.time - b.time)[keyframes.length - 1].time : 0;
+                    const lastProps = keyframes.length > 0 ? keyframes[keyframes.length - 1] : DEFAULT_OBJECT_STATE.animation.keyframes[0];
 
-                    // Kontrol Durasi & Waktu Mulai
-                    syncSliderAndInput(`anim-${type}-duration`, `anim-${type}-duration-input`, (val) => getActiveObject().animation[type].duration = val);
-                    syncSliderAndInput(`anim-${type}-start`, `anim-${type}-start-input`, (val) => getActiveObject().animation[type].startTime = val);
+                    const newKeyframe = {
+                        id: Date.now(),
+                        time: Math.round((lastTime + 1) * 10) / 10, // Menambah 1 detik dari keyframe terakhir
+                        x: lastProps.x,
+                        y: lastProps.y,
+                        scale: lastProps.scale,
+                        easing: 'linear'
+                    };
+                    keyframes.push(newKeyframe);
+                    state.object.animation.activeKeyframeId = newKeyframe.id; // Langsung aktifkan keyframe baru
+                    renderKeyframeList();
+                    requestRedraw();
+                });
 
-                    // Kontrol Arah Gerak (Move)
-                    document.getElementById(`anim-${type}-move-direction-btns`).addEventListener('click', (e) => {
-                        const btn = e.target.closest('button');
-                        if (!btn) return;
-                        getActiveObject().animation[type].move.direction = btn.dataset.direction;
-                        updateUIFromState();
-                        requestRedraw();
-                    });
-                    syncSliderAndInput(`anim-${type}-move-distance`, `anim-${type}-move-distance-input`, (val) => getActiveObject().animation[type].move.distance = val);
+                document.getElementById('keyframe-list').addEventListener('click', (e) => {
+                    const item = e.target.closest('.keyframe-item');
+                    if (!item) return;
 
-                    // Kontrol Skala (Zoom)
-                    syncSliderAndInput(`anim-${type}-zoom-scale`, `anim-${type}-zoom-scale-input`, (val) => getActiveObject().animation[type].zoom.scale = val);
+                    const id = Number(item.dataset.keyframeId);
+                    const kf = state.object.animation.keyframes.find(k => k.id === id); // +++ Tambah ini                    // Cek apakah tombol hapus yang diklik
 
-                    // Kontrol Easing
-                    document.getElementById(`anim-${type}-easing-btns`).addEventListener('click', (e) => {
-                        const btn = e.target.closest('button');
-                        if (!btn) return;
-                        getActiveObject().animation[type].easing = btn.dataset.easing;
-                        updateUIFromState();
-                        requestRedraw();
-                    });
-
-                    document.getElementById(`preview-anim-${type}-btn`).addEventListener('click', (e) => {
-                        e.stopPropagation();
-
-                        if (!state.object.image.element) {
-                            showTopNotification("notificationWarnObject");
-                            return;
+                    if (e.target.closest('.delete-keyframe-btn')) {
+                        state.object.animation.keyframes = state.object.animation.keyframes.filter(kf => kf.id !== id);
+                        // Jika keyframe yang dihapus adalah yang aktif, nonaktifkan
+                        if (state.object.animation.activeKeyframeId === id) {
+                            state.object.animation.activeKeyframeId = null;
                         }
-
-                        // Set state untuk memulai pratinjau
-                        state.object.animation.previewing = type;
-                        state.object.animation.previewStartTime = performance.now();
+                        renderKeyframeList();
                         requestRedraw();
-                    });
-                }
+                        return;
+                    }
 
-                setupAnimationControls('in');
-                setupAnimationControls('out');
+                    // Jika item biasa yang diklik, set sebagai aktif
+                    state.object.animation.activeKeyframeId = id;
+                    if (kf) {
+                        state.object.animation.previewTime = kf.time;
+                        needsRedraw = true; // Paksa gambar ulang untuk menampilkan pratinjau
+                    }                    
+                    renderKeyframeList(); // Render ulang untuk update highlight dan panel properti
+                });
 
-
+                // Event listener untuk input waktu
+                document.getElementById('keyframe-list').addEventListener('change', e => {
+                    if (e.target.classList.contains('keyframe-time-input')) {
+                        const item = e.target.closest('.keyframe-item');
+                        const id = Number(item.dataset.keyframeId);
+                        const kf = state.object.animation.keyframes.find(k => k.id === id);
+                        if (kf) {
+                            kf.time = Math.max(0, parseFloat(e.target.value) || 0);
+                            renderKeyframeList(); // Urutkan ulang dan render kembali
+                            requestRedraw();
+                        }
+                    }
+                });
                 updateUIFromState();
             }
             init(); 
