@@ -1,0 +1,2378 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Editor Gambar dengan Efek Kertas Sobek</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ccapture.js-npmfixed/build/CCapture.all.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            font-family: 'Inter', sans-serif;
+            --bg-dark: #0f172a;
+            --bg-panel: #243143;
+            --bg-header: #283649;
+            --border-color: #334155;
+            --border-color-light: #475569;
+            --text-primary: #f8fafc;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent-color: #3b82f6;
+            --accent-color-hover: #2563eb;
+            --danger-color: #ef4444;
+            --danger-color-hover: #dc2626;
+            --red-accent-bg: #fee2e2;
+            --red-accent-text: #ef4444;
+            --red-accent-border: #fca5a5;
+        }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-secondary);
+            overflow: hidden;
+            --panel-width: 24rem;
+            --panel-handle-display: flex;
+            --mobile-footer-display: none;
+            --export-header-btn-display: flex;
+            --panel-transform: translateX(100%);
+        }
+        .controls-panel::-webkit-scrollbar { width: 8px; }
+        .controls-panel::-webkit-scrollbar-track { background: transparent; }
+        .controls-panel::-webkit-scrollbar-thumb { background: var(--border-color-light); }
+        .slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; background: var(--border-color); outline: none; transition: background 0.3s; pointer-events: none; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background: var(--text-primary); cursor: pointer; border: 3px solid var(--accent-color); box-shadow: 0 0 8px rgba(59, 130, 246, 0.5); border-radius: 50%; pointer-events: auto; }
+        .is-disabled, .controls-disabled-for-bg, .controls-disabled-for-overlay { opacity: 0.5; pointer-events: none; user-select: none; }
+        .drag-over { border-color: var(--accent-color) !important; background-color: rgba(59, 130, 246, 0.1); }
+        .number-input-uniform { width: 5rem; text-align: center; }
+        .popup-overlay { position: fixed; inset: 0; background-color: rgba(15, 23, 42, 0.8); z-index: 1000; backdrop-filter: blur(5px); }
+        #export-progress-popup h3 { font-size: 1.75rem; font-weight: 700; margin-bottom: 1rem; }
+        #export-progress-popup p { font-size: 1rem; color: var(--text-secondary); }
+        #progress-bar-container { width: 50%; max-width: 500px; height: 12px; background-color: var(--border-color); margin-top: 1.5rem; overflow: hidden; border-radius: 0; }
+        #progress-bar-fill { width: 0%; height: 100%; background-color: var(--accent-color); transition: width 0.1s linear; text-align: center; line-height: 12px; font-size: 0.75rem; font-weight: 600; color: var(--text-primary); }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color-light); transition: .4s; border-radius: 0; }
+        .toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 0; }
+        input:checked + .toggle-slider { background-color: var(--accent-color); }
+        input:checked + .toggle-slider:before { transform: translateX(20px); }
+        .accordion-section { border-radius: 0; }
+        .accordion-open > .accordion-header .accordion-chevron { transform: rotate(180deg); color: var(--text-primary); }
+        .accordion-open > .accordion-header { background-color: rgba(51, 65, 85, 0.3); }
+        .reset-section-btn { background: none; border: none; color: var(--text-muted); padding: 0.25rem; margin-right: 0.5rem; transition: color 0.2s; }
+        .reset-section-btn:hover { color: var(--text-primary); }
+        .btn-group-toggle button { border-radius: 0; }
+        .btn-group-toggle button:hover { border-color: var(--accent-color); color: var(--text-primary); }
+        .btn-group-toggle .active { border-color: var(--accent-color); color: var(--accent-color); background-color: rgba(59, 130, 246, 0.1); }
+        #main-canvas { display: block; width: 100%; height: 100%; object-fit: contain; cursor: default; border-radius: 0; }
+        .drop-zone-delete-btn { position: absolute; top: 0.5rem; right: 0.5rem; z-index: 10; padding: 0.25rem; background-color: rgba(239, 68, 68, 0.8); color: white; transition: background-color 0.15s ease-in-out; line-height: 1; border-radius: 0; }
+        .drop-zone-delete-btn svg { width: 1rem; height: 1rem; }
+        .drop-zone-delete-btn:hover { background-color: rgba(220, 38, 38, 0.9); }
+        #settings-panel-wrapper { transform: var(--panel-transform); width: var(--panel-width); max-width: var(--panel-width); border-radius: 0; }
+        #settings-panel-wrapper.panel-open { transform: translateX(0); }
+        .main-handle, .tab-handle { position: absolute; left: -48px; width: 48px; height: 63px; display: var(--panel-handle-display); align-items: center; justify-content: center; border: 1px solid var(--border-color); border-right: none; cursor: pointer; transition: background-color 0.3s, color 0.3s, transform 0.3s ease-in-out; background-color: var(--bg-header); color: var(--text-muted); border-top-left-radius: 0; border-bottom-left-radius: 0; }
+        .main-handle { top: 0; }
+        #handle-background { top: 63px; }
+        #handle-object { top: 126px; }
+        #handle-info { top: 187px; }
+        .tab-handle { opacity: 0; pointer-events: none; transition: opacity 0.3s 0.1s, transform 0.3s ease-in-out; }
+        #settings-panel-wrapper.panel-open .tab-handle { opacity: 1; pointer-events: auto; transition-delay: 0.1s; }
+        .main-handle:hover, .tab-handle:hover { color: #FFFFFF; background-color: var(--bg-header); }
+        .tab-handle.active { background-color: var(--bg-panel); color: var(--text-primary); transform: translateX(2px); }
+        .tab-handle.active:hover { background-color: var(--bg-panel); }
+        #settings-panel-wrapper.panel-open #handle-icon-open { display: block; }
+        #settings-panel-wrapper.panel-open #handle-icon-closed { display: none; }
+        #settings-panel-wrapper:not(.panel-open) #handle-icon-open { display: none; }
+        #settings-panel-wrapper:not(.panel-open) #handle-icon-closed { display: block; }
+        #export-video-btn-header { display: var(--export-header-btn-display); border-radius: 0; }
+        [data-ui-size="compact"] .controls-panel { --p: 0.6rem; }
+        [data-ui-size="compact"] .p-4, [data-ui-size="compact"] .md\:p-4 { padding: 0.6rem; }
+        [data-ui-size="compact"] .px-4 { padding-left: 0.6rem; padding-right: 0.6rem; }
+        [data-ui-size="compact"] .py-2\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+        [data-ui-size="compact"] .px-2\.5 { padding-left: 0.375rem; padding-right: 0.375rem; }
+        [data-ui-size="compact"] .space-y-4 > *:not([hidden]) ~ *:not([hidden]), [data-ui-size="compact"] .md\:space-y-4 > *:not([hidden]) ~ *:not([hidden]) { margin-top: 0.75rem; }
+        [data-ui-size="compact"] .space-y-2 > *:not([hidden]) ~ *:not([hidden]), [data-ui-size="compact"] .md\:space-y-2 > *:not([hidden]) ~ *:not([hidden]) { margin-top: 0.375rem; }
+        [data-ui-size="compact"] .gap-2, [data-ui-size="compact"] .md\:gap-2 { gap: 0.25rem; }
+        [data-ui-size="compact"] .gap-3, [data-ui-size="compact"] .md\:gap-3 { gap: 0.5rem; }
+        [data-ui-size="compact"] .accordion-section .accordion-header { padding: 0.6rem; }
+        [data-ui-size="compact"] .accordion-section .accordion-body { padding: 0.6rem; }
+        [data-ui-size="compact"] #drop-zone, [data-ui-size="compact"] #background-drop-zone { height: 90px; }
+        [data-ui-size="compact"] #drop-zone-prompt svg, [data-ui-size="compact"] #background-drop-zone-prompt svg { display: none; }
+        [data-ui-size="compact"] #drop-zone-prompt .flex-col, [data-ui-size="compact"] #background-drop-zone-prompt .flex-col { gap: 0.1rem; }
+        [data-ui-size="compact"] .overlay-drop-zone { height: 60px; }
+        [data-ui-size="compact"] .drop-zone-delete-btn { top: 0.25rem; right: 0.25rem; padding: 0.125rem; }
+        [data-ui-size="compact"] #export-settings-popup > div, [data-ui-size="compact"] #confirmation-popup > div { padding: 1.5rem; }
+        [data-ui-size="compact"] #export-progress-popup h3 { font-size: 1.25rem; margin-bottom: 0.75rem; }
+        [data-ui-size="compact"] #export-progress-popup p { font-size: 0.875rem; }
+        [data-ui-size="compact"] #progress-bar-container { margin-top: 1rem; }
+        [data-ui-size="compact"] #panel-title { font-size: 1rem; }
+        [data-ui-size="compact"] #export-video-btn-header { padding: 0.5rem 0.75rem; font-size: 0.875rem; }
+        [data-ui-size="compact"] #mobile-export-btn { padding: 0.5rem 1rem; font-size: 0.875rem; }
+        [data-ui-size="compact"] .text-lg, [data-ui-size="compact"] .md\:text-lg { font-size: 1rem; }
+        [data-ui-size="compact"] .text-base { font-size: 0.875rem; }
+        [data-ui-size="compact"] .text-sm, [data-ui-size="compact"] .md\:text-sm { font-size: 0.8rem; }
+        [data-ui-size="compact"] .text-xs { font-size: 0.75rem; }
+        [data-ui-size="compact"] .w-6, [data-ui-size="compact"] .h-6 { width: 1.25rem; height: 1.25rem; }
+        [data-ui-size="compact"] .w-7, [data-ui-size="compact"] .h-7 { width: 1.5rem; height: 1.5rem; }
+        [data-ui-size="compact"] #settings-panel .desktop-header { height: 3rem; }
+        [data-ui-size="compact"] #mobile-panel-header { height: 2.5rem; font-size: 0.8rem; }
+        [data-ui-size="compact"] #mobile-footer { height: 3.5rem; }
+        [data-ui-size="compact"] #reset-settings-btn { padding: 0.5rem 1rem; font-size: 0.875rem; }
+        [data-ui-size="compact"] .controls-panel { padding-bottom: 5rem; }
+        [data-ui-size="normal"] #settings-panel .desktop-header { height: 4rem; }
+        [data-ui-size="normal"] #mobile-panel-header { height: 3rem; font-size: 0.9rem; }
+        [data-ui-size="normal"] #mobile-footer { height: 4rem; }
+        [data-ui-size="normal"] #reset-settings-btn { padding: 0.75rem 1.25rem; }
+        [data-ui-size="normal"] .controls-panel { padding-bottom: 6rem; }
+        [data-ui-size="luas"] .p-4, [data-ui-size="luas"] .md\:p-4 { padding: 1.5rem; }
+        [data-ui-size="luas"] .px-4 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        [data-ui-size="luas"] .py-2\.5 { padding-top: 1rem; padding-bottom: 1rem; }
+        [data-ui-size="luas"] .px-2\.5 { padding-left: 1rem; padding-right: 1rem; }
+        [data-ui-size="luas"] .space-y-4 > *:not([hidden]) ~ *:not([hidden]), [data-ui-size="luas"] .md\:space-y-4 > *:not([hidden]) ~ *:not([hidden]) { margin-top: 1.5rem; }
+        [data-ui-size="luas"] .space-y-2 > *:not([hidden]) ~ *:not([hidden]), [data-ui-size="luas"] .md\:space-y-2 > *:not([hidden]) ~ *:not([hidden]) { margin-top: 0.75rem; }
+        [data-ui-size="luas"] .gap-2, [data-ui-size="luas"] .md\:gap-2 { gap: 0.75rem; }
+        [data-ui-size="luas"] .gap-3, [data-ui-size="luas"] .md\:gap-3 { gap: 1rem; }
+        [data-ui-size="luas"] .accordion-section .accordion-header { padding: 1.5rem; }
+        [data-ui-size="luas"] .accordion-section .accordion-body { padding: 1.5rem; }
+        [data-ui-size="luas"] #drop-zone, [data-ui-size="luas"] #background-drop-zone { height: 160px; }
+        [data-ui-size="luas"] .overlay-drop-zone { height: 120px; }
+        [data-ui-size="luas"] .drop-zone-delete-btn { top: 0.75rem; right: 0.75rem; padding: 0.5rem; }
+        [data-ui-size="luas"] #export-settings-popup > div, [data-ui-size="luas"] #confirmation-popup > div { padding: 2.5rem; }
+        [data-ui-size="luas"] #export-progress-popup h3 { font-size: 2rem; margin-bottom: 1.25rem; }
+        [data-ui-size="luas"] #export-progress-popup p { font-size: 1.125rem; }
+        [data-ui-size="luas"] #progress-bar-container { margin-top: 2rem; }
+        [data-ui-size="luas"] #panel-title { font-size: 1.25rem; }
+        [data-ui-size="luas"] #export-video-btn-header { padding: 0.75rem 1.25rem; font-size: 1rem; }
+        [data-ui-size="luas"] #mobile-export-btn { padding: 0.75rem 1.5rem; font-size: 1rem; }
+        [data-ui-size="luas"] .text-lg, [data-ui-size="luas"] .md\:text-lg { font-size: 1.25rem; }
+        [data-ui-size="luas"] .text-base { font-size: 1.125rem; }
+        [data-ui-size="luas"] .text-sm, [data-ui-size="luas"] .md\:text-sm { font-size: 1rem; }
+        [data-ui-size="luas"] .text-xs { font-size: 0.875rem; }
+        [data-ui-size="luas"] .w-6, [data-ui-size="luas"] .h-6 { width: 1.75rem; height: 1.75rem; }
+        [data-ui-size="luas"] .w-7, [data-ui-size="luas"] .h-7 { width: 2rem; height: 2rem; }
+        [data-ui-size="luas"] #settings-panel .desktop-header { height: 5rem; }
+        [data-ui-size="luas"] #mobile-panel-header { height: 3.5rem; font-size: 1.1rem; }
+        [data-ui-size="luas"] #mobile-footer { height: 5rem; }
+        [data-ui-size="luas"] #reset-settings-btn { padding: 1rem 1.5rem; font-size: 1rem; }
+        [data-ui-size="luas"] .controls-panel { padding-bottom: 7rem; }
+        #mobile-footer .mobile-tab-btn {
+            border: 2px solid transparent;
+            border-radius: 0;
+            transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+        }
+        #mobile-footer .mobile-tab-btn.active {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+        #mobile-panel-header {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            background-color: var(--bg-header);
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            cursor: ns-resize;
+        }
+        @media (max-width: 768px) {
+            body:not(.force-desktop) {
+                display: flex;
+                flex-direction: column;
+                height: 100vh;
+                overflow: hidden;
+                --panel-handle-display: none;
+                --mobile-footer-display: flex;
+                --export-header-btn-display: none;
+                --panel-transform: none;
+            }
+            body:not(.force-desktop) #canvas-container {
+                flex-basis: 50%;
+                width: 100%;
+                flex-shrink: 0;
+                padding: 0.5rem;
+                box-sizing: border-box;
+                overflow: hidden;
+                border-bottom: 1px solid var(--border-color);
+            }
+            body:not(.force-desktop) #main-canvas {
+                max-width: 100%;
+                max-height: 100%;
+            }
+            body:not(.force-desktop) #settings-panel-wrapper {
+                position: relative;
+                flex-basis: 50%;
+                width: 100vw;
+                max-width: 100vw;
+                transform: none !important;
+                transition: none;
+                border-top: none;
+                inset: auto;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+            }
+            body:not(.force-desktop) #settings-panel {
+                height: 100%;
+                border-left: none;
+                border-bottom: none;
+                display: flex;
+                flex-direction: column;
+            }
+            body:not(.force-desktop) #settings-panel .desktop-header {
+                display: none;
+            }
+            body:not(.force-desktop) #mobile-panel-header {
+                display: flex;
+            }
+            body:not(.force-desktop) .controls-panel {
+                flex-grow: 1;
+                overflow-y: auto;
+            }
+            body:not(.force-desktop) #mobile-footer {
+                display: var(--mobile-footer-display);
+            }
+        }
+        body.force-mobile {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            --panel-handle-display: none;
+            --mobile-footer-display: flex;
+            --export-header-btn-display: none;
+            --panel-transform: none;
+        }
+        body.force-mobile #canvas-container {
+            flex-basis: 50%; width: 100%; flex-shrink: 0; padding: 0.5rem; box-sizing: border-box; overflow:hidden; border-bottom: 1px solid var(--border-color);
+        }
+        body.force-mobile #main-canvas { max-width: 100%; max-height: 100%; }
+        body.force-mobile #settings-panel-wrapper {
+            position: relative; flex-basis: 50%; width: 100vw; max-width: 100vw; transform: none !important; transition: none; border-top: none; inset: auto; overflow: hidden; display: flex; flex-direction: column;
+        }
+        body.force-mobile #settings-panel-wrapper.panel-open { transform: none !important; }
+        body.force-mobile #settings-panel { height: 100%; border-left: none; border-bottom: none; display: flex; flex-direction: column;}
+        body.force-mobile #settings-panel .desktop-header { display: none; }
+        body.force-mobile #mobile-panel-header {
+            display: flex;
+        }
+        body.force-mobile .controls-panel {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        body.force-mobile #mobile-footer { display: var(--mobile-footer-display); }
+        body.force-desktop {
+            --panel-width: 24rem;
+            --panel-handle-display: flex;
+            --mobile-footer-display: none;
+            --export-header-btn-display: flex;
+            --panel-transform: translateX(100%);
+        }
+        body.force-desktop #settings-panel-wrapper {
+            inset: 0 0 0 auto;
+            height: 100%;
+            max-width: 24rem;
+            border-radius: 0;
+        }
+        body.force-desktop #settings-panel {
+            border-left: 1px solid var(--border-color);
+            border-top: none;
+            border-bottom: 1px solid var(--border-color);
+        }
+        body.force-desktop #settings-panel-wrapper.panel-open {
+            transform: translateX(0);
+        }
+        #top-notification-popup { position: fixed; top: 1rem; left: 50%; transform: translateX(-50%); width: calc(100% - 2rem); max-width: 500px; background-color: var(--red-accent-bg); color: var(--red-accent-text); border: 1px solid var(--red-accent-border); padding: 1rem 1.5rem; border-radius: 0; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); opacity: 0; visibility: hidden; transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; z-index: 1001; }
+        #top-notification-popup.show { opacity: 1; visibility: visible; }
+        #top-notification-popup .close-btn { background: none; border: none; color: var(--red-accent-text); font-size: 1.25rem; line-height: 1; cursor: pointer; padding: 0.25rem; margin-left: 1rem; border-radius: 0; }
+        #top-notification-popup .close-btn:hover { background-color: rgba(239, 68, 68, 0.1); }
+        .info-tooltip-trigger .info-tooltip { visibility: hidden; opacity: 0; transition: opacity 0.3s, visibility 0.3s; }
+        .info-tooltip-trigger:hover .info-tooltip, .info-tooltip-trigger:focus .info-tooltip, .info-tooltip-trigger:active .info-tooltip { visibility: visible; opacity: 1; }
+        .rounded-md, .rounded-lg, .rounded-full { border-radius: 0; }
+    </style>
+</head>
+<body class="bg-slate-900 relative">
+    <!-- SVG filter definition for the torn edge effect -->
+    <svg width="0" height="0" style="position:absolute; z-index: -1;">
+        <defs>
+            <filter id="combined-filter" x="-50%" y="-50%" width="200%" height="200%">
+                <!-- Dilate the source image to create the stroke thickness -->
+                <feMorphology id="torn-dilate" in="SourceGraphic" operator="dilate" radius="10" result="dilatedShape"/>
+                <!-- Generate fractal noise -->
+                <feTurbulence id="torn-turbulence" type="fractalNoise" baseFrequency="0.02" numOctaves="3" result="tornNoise"/>
+                <!-- Use the noise to displace the edges of the dilated shape -->
+                <feDisplacementMap id="torn-displacement" in="dilatedShape" in2="tornNoise" scale="15" xChannelSelector="R" yChannelSelector="G" result="tornEdgeShape"/>
+                <!-- Create a solid color for the stroke -->
+                <feFlood id="torn-flood" flood-color="#FFFFFF" result="strokeColor"/>
+                <!-- Combine the color with the torn edge shape -->
+                <feComposite in="strokeColor" in2="tornEdgeShape" operator="in" result="coloredTornEdge"/>
+                <!-- Merge the torn edge stroke with the original image -->
+                <feMerge>
+                    <feMergeNode in="coloredTornEdge"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+        </defs>
+    </svg>
+
+    <!-- Main container for the canvas -->
+    <main id="canvas-container" class="w-screen h-screen flex items-center justify-center p-0">
+        <canvas id="main-canvas" class="shadow-lg"></canvas>
+    </main>
+
+    <!-- Settings panel wrapper -->
+    <div id="settings-panel-wrapper" class="absolute inset-y-0 right-0 h-full w-full transition-transform duration-300 ease-in-out z-40">
+        <!-- Handle to open/close the settings panel on desktop -->
+        <button id="panel-handle" class="main-handle">
+            <svg id="handle-icon-closed" class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22 6.5H16" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M6 6.5H2" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10 10C11.933 10 13.5 8.433 13.5 6.5C13.5 4.567 11.933 3 10 3C8.067 3 6.5 4.567 6.5 6.5C6.5 8.433 8.067 10 10 10Z" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M22 17.5H18" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 17.5H2" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M14 21C15.933 21 17.5 19.433 17.5 17.5C17.5 15.567 15.933 14 14 14C12.067 14 10.5 15.567 10.5 17.5C10.5 19.433 12.067 21 14 21Z" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <svg id="handle-icon-open" class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+        <!-- Tab handles for desktop -->
+        <button id="handle-background" class="tab-handle active">
+            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="0" ry="0"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </button>
+        <button id="handle-object" class="tab-handle">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.01 2.92007L18.91 5.54007C20.61 6.29007 20.61 7.53007 18.91 8.28007L13.01 10.9001C12.34 11.2001 11.24 11.2001 10.57 10.9001L4.67 8.28007C2.97 7.53007 2.97 6.29007 4.67 5.54007L10.57 2.92007C11.24 2.62007 12.34 2.62007 13.01 2.92007Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11C3 11.84 3.63 12.81 4.40 13.15L11.19 16.17C11.71 16.40 12.30 16.40 12.81 16.17L19.60 13.15C20.37 12.81 21 11.84 21 11" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 16C3 16.93 3.55 17.77 4.40 18.15L11.19 21.17C11.71 21.40 12.30 21.40 12.81 21.17L19.60 18.15C20.45 17.77 21 16.93 21 16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button id="handle-info" class="tab-handle">
+            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1s1 .45 1 1v4c0 .55-.45 1-1 1zm1-8h-2V7h2v2z"/></svg>
+        </button>
+
+        <!-- The actual settings panel -->
+        <aside id="settings-panel" class="w-full h-full bg-[var(--bg-panel)] flex flex-col flex-shrink-0 border-l border-t border-b border-[var(--border-color)]">
+            <!-- Desktop header for the panel -->
+            <div class="desktop-header sticky top-0 bg-[var(--bg-header)] z-10 flex items-center justify-between p-4 border-b border-[var(--border-color)]">
+                <h2 id="panel-title" class="text-lg font-bold text-slate-100" data-translate-key="settings"></h2>
+                <button id="export-video-btn-header" class="flex items-center justify-center w-auto px-4 py-2 bg-[var(--accent-color)] text-white text-sm font-semibold hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="export"></button>
+            </div>
+            <!-- Mobile header for the panel (draggable) -->
+            <div id="mobile-panel-header"></div>
+            
+            <!-- Scrollable container for all controls -->
+            <div class="overflow-y-auto controls-panel flex-grow p-4 md:p-4">
+                <!-- Background Tab Content -->
+                <div id="background-tab-content" class="tab-content space-y-4 md:space-y-4">
+                    <h2 class="text-lg font-bold text-slate-300" data-translate-key="canvas"></h2>
+                    <!-- Aspect Ratio Controls -->
+                    <div id="aspect-ratio-controls">
+                        <label class="text-sm font-medium text-[var(--text-muted)]" data-translate-key="previewAspectRatio"></label>
+                        <div id="aspect-ratio-btns" class="grid grid-cols-5 gap-2 md:gap-2 mt-2 btn-group-toggle">
+                            <button data-ratio="9/16" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-xs font-medium transition-all duration-150">9:16</button>
+                            <button data-ratio="16/9" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-xs font-medium transition-all duration-150 active">16:9</button>
+                            <button data-ratio="4/3" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-xs font-medium transition-all duration-150">4:3</button>
+                            <button data-ratio="3/4" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-xs font-medium transition-all duration-150">3:4</button>
+                            <button data-ratio="1/1" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-xs font-medium transition-all duration-150">1:1</button>
+                        </div>
+                    </div>
+                    <!-- Resolution Controls -->
+                    <div>
+                        <label class="block text-sm font-medium text-[var(--text-muted)] mb-2" data-translate-key="canvasResolution"></label>
+                        <div id="canvas-resolution-btns" class="grid grid-cols-3 gap-2 md:gap-2 btn-group-toggle">
+                            <button data-res="720" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)] active">720p</button>
+                            <button data-res="1080" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">1080p</button>
+                            <button data-res="1440" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">1440p</button>
+                        </div>
+                    </div>
+                    <!-- Solid Background Color -->
+                    <div id="background-color-control" class="mt-4 pt-4 border-t border-[var(--border-color)]">
+                        <label for="background-color" class="text-sm font-medium text-[var(--text-muted)]" data-translate-key="solidBackgroundColor"></label>
+                        <input type="color" id="background-color" value="#00ff00" class="w-full h-10 mt-2 p-1 bg-slate-900 border border-[var(--border-color)] cursor-pointer">
+                    </div>
+                    <!-- Background Image Upload -->
+                    <div class="space-y-2 md:space-y-2 mt-4 pt-4 border-t border-[var(--border-color)]">
+                        <h2 class="text-lg font-bold text-slate-300" data-translate-key="backgroundImage"></h2>
+                        <label for="background-image-upload" id="background-drop-zone" class="group relative flex flex-col items-center justify-center w-full h-32 md:h-32 px-4 md:px-4 py-2 md:py-2 border-2 border-dashed border-[var(--border-color)] cursor-pointer transition-colors">
+                            <div id="background-drop-zone-prompt" class="flex flex-col items-center justify-center pointer-events-none w-full h-full">
+                                <svg class="w-8 h-8 text-[var(--text-muted)] group-hover:text-[var(--accent-color)] transition-colors" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/></svg>
+                                <p class="text-sm text-[var(--text-muted)] group-hover:text-[var(--accent-color)] transition-colors text-center mt-2 leading-tight" data-translate-key="dropImagePrompt"></p>
+                            </div>
+                            <div id="background-drop-zone-filename" class="hidden text-center pointer-events-none p-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-10 h-10 mx-auto mb-2 text-green-500"><rect x="3" y="3" width="18" height="18" rx="0" ry="0"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                <p class="text-sm font-semibold text-slate-300 break-all"></p>
+                            </div>
+                            <button id="remove-background-image" class="drop-zone-delete-btn hidden">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                            </button>
+                        </label>
+                        <input type="file" id="background-image-upload" class="hidden" accept="image/png, image/jpeg, image/webp">
+                    </div>
+                    <!-- Background Transform Accordion -->
+                    <div class="accordion-section border border-[var(--border-color)]" id="background-transform-accordion">
+                        <div class="accordion-header w-full flex items-center justify-between p-4 md:p-4 transition-colors duration-200 cursor-pointer">
+                            <div class="flex items-center gap-3 md:gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="accordion-chevron transition-transform duration-300 text-[var(--text-muted)]"><path d="m6 9 6 6 6-6"/></svg>
+                                <h2 class="text-base font-semibold text-slate-300" data-translate-key="backgroundTransform"></h2>
+                            </div>
+                                <button class="reset-section-btn" data-section-key="background.transform" data-translate-key-title="resetBackgroundTransformTitle">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                </button>
+                        </div>
+                        <div class="accordion-body space-y-4 md:space-y-4 p-4 md:p-4 border-t border-[var(--border-color)] hidden">
+                            <div id="background-mode-controls">
+                                <label class="text-sm font-medium text-[var(--text-muted)]" data-translate-key="backgroundMode"></label>
+                                <div id="background-mode-btns" class="grid grid-cols-2 gap-2 md:gap-2 mt-2 btn-group-toggle">
+                                    <button data-mode="fill" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="fill"></button>
+                                    <button data-mode="stretch" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="stretch"></button>
+                                </div>
+                            </div>
+                            <div id="background-size-control">
+                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="backgroundSize"></label>
+                                <div class="flex items-center gap-3 md:gap-3"><input type="range" id="background-size" min="10" max="200" value="100" class="w-full slider"><input type="number" id="background-size-input" min="10" max="200" value="100" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)]"></div>
+                            </div>
+                            <div id="background-offset-x-control">
+                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="offsetX"></label>
+                                <div class="flex items-center gap-3 md:gap-3"><input type="range" id="background-offset-x" min="-150" max="150" value="0" class="w-full slider"><input type="number" id="background-offset-x-input" min="-150" max="150" value="0" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)]"></div>
+                            </div>
+                            <div id="background-offset-y-control">
+                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="offsetY"></label>
+                                <div class="flex items-center gap-3 md:gap-3"><input type="range" id="background-offset-y" min="-150" max="150" value="0" class="w-full slider"><input type="number" id="background-offset-y-input" min="-150" max="150" value="0" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)]"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Background Blur Accordion -->
+                    <div class="accordion-section border border-[var(--border-color)]" id="background-blur-accordion">
+                        <div class="accordion-header w-full flex items-center justify-between p-4 md:p-4 transition-colors duration-200 cursor-pointer">
+                            <div class="flex items-center gap-3 md:gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="accordion-chevron transition-transform duration-300 text-[var(--text-muted)]"><path d="m6 9 6 6 6-6"/></svg>
+                                <h2 class="text-base font-semibold text-slate-300" data-translate-key="backgroundBlur"></h2>
+                            </div>
+                            <div class="flex items-center">
+                                <button class="reset-section-btn" data-section-key="background.effects.blur" data-translate-key-title="resetBackgroundBlurTitle">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                </button>
+                                <label class="switch"><input type="checkbox" id="background-blur-enabled-switch"><span class="toggle-slider"></span></label>
+                            </div>
+                        </div>
+                        <div class="accordion-body space-y-4 md:space-y-4 p-4 md:p-4 border-t border-[var(--border-color)] hidden">
+                            <div>
+                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="intensity"></label>
+                                <div class="flex items-center gap-3 md:gap-3"><input type="range" id="background-blur-intensity" min="0" max="20" value="10" step="0.1" class="w-full slider"><input type="number" id="background-blur-intensity-input" min="0" max="20" value="10" step="0.1" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Background Vignette Accordion -->
+                    <div class="accordion-section border border-[var(--border-color)]" id="background-vignette-accordion">
+                        <div class="accordion-header w-full flex items-center justify-between p-4 md:p-4 transition-colors duration-200 cursor-pointer">
+                            <div class="flex items-center gap-3 md:gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="accordion-chevron transition-transform duration-300 text-[var(--text-muted)]"><path d="m6 9 6 6 6-6"/></svg>
+                                <h2 class="text-base font-semibold text-slate-300" data-translate-key="backgroundVignette"></h2>
+                            </div>
+                            <div class="flex items-center">
+                                <button class="reset-section-btn" data-section-key="background.effects.vignette" data-translate-key-title="resetBackgroundVignetteTitle">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                </button>
+                                <label class="switch"><input type="checkbox" id="background-vignette-enabled-switch"><span class="toggle-slider"></span></label>
+                            </div>
+                        </div>
+                        <div class="accordion-body space-y-4 md:space-y-4 p-4 md:p-4 border-t border-[var(--border-color)] hidden">
+                            <div>
+                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="opacity"></label>
+                                <div class="flex items-center gap-3 md:gap-3"><input type="range" id="background-vignette-opacity" min="0" max="100" value="100" class="w-full slider"><input type="number" id="background-vignette-opacity-input" min="0" max="100" value="100" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="radius"></label>
+                                <div class="flex items-center gap-3 md:gap-3"><input type="range" id="background-vignette-radius" min="0" max="100" value="0" class="w-full slider"><input type="number" id="background-vignette-radius-input" min="0" max="100" value="0" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="feather"></label>
+                                <div class="flex items-center gap-3 md:gap-3"><input type="range" id="background-vignette-feather" min="0" max="100" value="100" class="w-full slider"><input type="number" id="background-vignette-feather-input" min="0" max="100" value="100" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                            </div>
+                            <div>
+                                <label for="background-vignette-color" class="text-sm font-medium text-[var(--text-muted)]" data-translate-key="vignetteColor"></label>
+                                <input type="color" id="background-vignette-color" value="#000000" class="w-full h-10 mt-2 p-1 bg-slate-900 border border-[var(--border-color)] cursor-pointer">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Background Color Correction Accordion -->
+                    <div class="accordion-section border border-[var(--border-color)]" id="background-color-correction-accordion">
+                        <div class="accordion-header w-full flex items-center justify-between p-4 md:p-4 transition-colors duration-200 cursor-pointer">
+                            <div class="flex items-center gap-3 md:gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="accordion-chevron transition-transform duration-300 text-[var(--text-muted)]"><path d="m6 9 6 6 6-6"/></svg>
+                                <h2 class="text-base font-semibold text-slate-300" data-translate-key="backgroundColorCorrection"></h2>
+                            </div>
+                            <div class="flex items-center">
+                                <button class="reset-section-btn" data-section-key="background.effects.colorCorrection" data-translate-key-title="resetBackgroundColorCorrectionTitle">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                </button>
+                                <label class="switch"><input type="checkbox" id="background-color-correction-enabled-switch"><span class="toggle-slider"></span></label>
+                            </div>
+                        </div>
+                        <div class="accordion-body space-y-4 md:space-y-4 p-4 md:p-4 border-t border-[var(--border-color)] hidden">
+                            <div>
+                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="hue"></label>
+                                <div class="flex items-center gap-3 md:gap-3"><input type="range" id="background-color-hue" min="-180" max="180" value="0" class="w-full slider"><input type="number" id="background-color-hue-input" min="-180" max="180" value="0" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                            </div>
+                            <div id="background-color-correction-standard-controls" class="space-y-4">
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="saturation"></label>
+                                    <div class="flex items-center gap-3 md:gap-3"><input type="range" id="background-color-saturation" min="-100" max="100" value="0" class="w-full slider"><input type="number" id="background-color-saturation-input" min="-100" max="100" value="0" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="brightness"></label>
+                                    <div class="flex items-center gap-3 md:gap-3"><input type="range" id="background-color-brightness" min="-100" max="100" value="0" class="w-full slider"><input type="number" id="background-color-brightness-input" min="-100" max="100" value="0" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2 pt-2 border-t border-slate-700">
+                                <input type="checkbox" id="background-colorize-switch" class="h-4 w-4 bg-slate-600 border-slate-500 text-[var(--accent-color)] focus:ring-[var(--accent-color)]">
+                                <label for="background-colorize-switch" class="text-sm text-slate-300" data-translate-key="colorize"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Object Tab Content -->
+                <div id="object-tab-content" class="tab-content space-y-4 md:space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-lg font-bold text-slate-300" data-translate-key="objectImage"></h2>
+                    </div>
+                    
+                    <!-- Object Image Upload -->
+                    <label for="image-upload" id="drop-zone" class="group relative flex flex-col items-center justify-center w-full h-32 md:h-32 px-4 md:px-4 py-2 md:py-2 border-2 border-dashed border-[var(--border-color)] cursor-pointer transition-colors">
+                        <div id="drop-zone-prompt" class="flex flex-col items-center justify-center pointer-events-none w-full h-full">
+                           <svg class="w-8 h-8 text-[var(--text-muted)] group-hover:text-[var(--accent-color)] transition-colors" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/></svg>
+                           <p class="text-sm text-[var(--text-muted)] group-hover:text-[var(--accent-color)] transition-colors text-center mt-2 leading-tight" data-translate-key="dropImagePrompt"></p>
+                        </div>
+                        <div id="drop-zone-filename" class="hidden text-center pointer-events-none p-2">
+                           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mx-auto mb-2 text-green-500"><path d="M13.01 2.92007L18.91 5.54007C20.61 6.29007 20.61 7.53007 18.91 8.28007L13.01 10.9001C12.34 11.2001 11.24 11.2001 10.57 10.9001L4.67 8.28007C2.97 7.53007 2.97 6.29007 4.67 5.54007L10.57 2.92007C11.24 2.62007 12.34 2.62007 13.01 2.92007Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11C3 11.84 3.63 12.81 4.40 13.15L11.19 16.17C11.71 16.40 12.30 16.40 12.81 16.17L19.60 13.15C20.37 12.81 21 11.84 21 11" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 16C3 16.93 3.55 17.77 4.40 18.15L11.19 21.17C11.71 21.40 12.30 21.40 12.81 21.17L19.60 18.15C20.45 17.77 21 16.93 21 16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                           <p class="text-sm font-semibold text-slate-300 break-all"></p>
+                        </div>
+                        <button id="delete-image-btn" class="drop-zone-delete-btn hidden">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                        </button>
+                    </label>
+                    <input type="file" id="image-upload" class="hidden" accept="image/png, image/jpeg, image/webp">
+                    <!-- Controls that are only enabled when an object image is loaded -->
+                    <div id="image-specific-controls" class="is-disabled space-y-4 md:space-y-4">
+                        <!-- Transform Accordion -->
+                        <div class="accordion-section border border-[var(--border-color)]" id="foreground-transform-accordion">
+                            <div class="accordion-header w-full flex items-center justify-between p-4 md:p-4 transition-colors duration-200 cursor-pointer">
+                                <div class="flex items-center gap-3 md:gap-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="accordion-chevron transition-transform duration-300 text-[var(--text-muted)]"><path d="m6 9 6 6 6-6"/></svg>
+                                    <h2 class="text-base font-semibold text-slate-300" data-translate-key="transform"></h2>
+                                </div>
+                                <button class="reset-section-btn" data-section-key="image" data-translate-key-title="resetTransformTitle">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                </button>
+                            </div>
+                            <div class="accordion-body space-y-4 md:space-y-4 p-4 md:p-4 border-t border-[var(--border-color)]">
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="imageSize"></label>
+                                    <div class="flex items-center gap-3 md:gap-3"><input type="range" id="image-size" min="10" max="200" value="80" class="w-full slider"><input type="number" id="image-size-input" min="10" max="200" value="80" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)]"></div>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="offsetX"></label>
+                                    <div class="flex items-center gap-3 md:gap-3"><input type="range" id="image-offset-x" min="-150" max="150" value="0" class="w-full slider"><input type="number" id="image-offset-x-input" min="-150" max="150" value="0" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)]"></div>
+                                </div>
+                                 <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="offsetY"></label>
+                                    <div class="flex items-center gap-3 md:gap-3"><input type="range" id="image-offset-y" min="-150" max="150" value="0" class="w-full slider"><input type="number" id="image-offset-y-input" min="-150" max="150" value="0" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)]"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Torn Edges (Stroke) Accordion -->
+                        <div class="accordion-section border border-[var(--border-color)]" id="foreground-stroke-accordion">
+                            <div class="accordion-header w-full flex items-center justify-between p-4 md:p-4 transition-colors duration-200 cursor-pointer">
+                                <div class="flex items-center gap-3 md:gap-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="accordion-chevron transition-transform duration-300 text-[var(--text-muted)]"><path d="m6 9 6 6 6-6"/></svg>
+                                    <h2 class="text-base font-semibold text-slate-300" data-translate-key="tornEdges"></h2>
+                                </div>
+                                <div class="flex items-center">
+                                    <button class="reset-section-btn" data-section-key="stroke" data-translate-key-title="resetTornEdgesTitle">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                    </button>
+                                    <label class="switch"><input type="checkbox" id="stroke-enabled-switch" checked><span class="toggle-slider"></span></label>
+                                </div>
+                            </div>
+                            <div class="accordion-body space-y-4 md:space-y-4 p-4 md:p-4 border-t border-[var(--border-color)]">
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="thickness"></label>
+                                    <div class="flex items-center gap-3 md:gap-3"><input type="range" id="stroke-width" min="0" max="50" value="10" class="w-full slider"><input type="number" id="stroke-width-input" min="0" max="50" value="10" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="roughness"></label>
+                                    <div class="flex items-center gap-3 md:gap-3"><input type="range" id="stroke-roughness" min="0" max="100" value="25" class="w-full slider"><input type="number" id="stroke-roughness-input" min="0" max="100" value="25" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="detail"></label>
+                                    <div class="flex items-center gap-3 md:gap-3"><input type="range" id="stroke-detail" min="1" max="100" step="1" value="20" class="w-full slider"><input type="number" id="stroke-detail-input" min="1" max="100" step="1" value="20" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Paper Texture Accordion -->
+                        <div class="accordion-section border border-[var(--border-color)]" id="paper-fold-overlay-accordion">
+                            <div class="accordion-header w-full flex items-center justify-between p-4 md:p-4 transition-colors duration-200 cursor-pointer">
+                                <div class="flex items-center gap-3 md:gap-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="accordion-chevron transition-transform duration-300 text-[var(--text-muted)]"><path d="m6 9 6 6 6-6"/></svg>
+                                    <h2 class="text-base font-semibold text-slate-300" data-translate-key="paperTexture"></h2>
+                                </div>
+                                <div class="flex items-center">
+                                    <button class="reset-section-btn" data-section-key="paperFoldOverlay" data-translate-key-title="resetPaperTextureTitle">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                    </button>
+                                    <label class="switch"><input type="checkbox" id="paper-fold-overlay-enabled-switch"><span class="toggle-slider"></span></label>
+                                </div>
+                            </div>
+                            <div class="accordion-body space-y-4 md:space-y-4 p-4 md:p-4 border-t border-[var(--border-color)]">
+                                <div id="overlay-controls" class="controls-disabled-for-overlay space-y-4">
+                                    <div>
+                                        <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="opacity"></label>
+                                        <div class="flex items-center gap-3 md:gap-3"><input type="range" id="overlay-opacity" min="0" max="100" value="100" class="w-full slider"><input type="number" id="overlay-opacity-input" min="0" max="100" value="100" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                    </div>
+                                    <div>
+                                        <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="speedFps"></label>
+                                        <div class="flex items-center gap-3 md:gap-3"><input type="range" id="overlay-speed" min="0" max="15" value="4" step="0.5" class="w-full slider"><input type="number" id="overlay-speed-input" min="0" max="15" value="4" step="0.5" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Drop Shadow Accordion -->
+                        <div class="accordion-section border border-[var(--border-color)]" id="foreground-shadow-accordion">
+                            <div class="accordion-header w-full flex items-center justify-between p-4 md:p-4 transition-colors duration-200 cursor-pointer">
+                                <div class="flex items-center gap-3 md:gap-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="accordion-chevron transition-transform duration-300 text-[var(--text-muted)]"><path d="m6 9 6 6 6-6"/></svg>
+                                    <h2 class="text-base font-semibold text-slate-300" data-translate-key="dropShadow"></h2>
+                                </div>
+                                <div class="flex items-center">
+                                    <button class="reset-section-btn" data-section-key="shadow" data-translate-key-title="resetDropShadowTitle">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                    </button>
+                                    <label class="switch"><input type="checkbox" id="shadow-enabled-switch" checked><span class="toggle-slider"></span></label>
+                                </div>
+                            </div>
+                            <div class="accordion-body space-y-4 md:space-y-4 p-4 md:p-4 border-t border-[var(--border-color)]">
+                                <div class="flex items-center justify-between flex-wrap gap-2">
+                                    <label class="text-sm font-medium text-[var(--text-muted)]" data-translate-key="offset"></label>
+                                    <div class="flex items-center gap-2 md:gap-2"><label for="shadow-offset-x-input" class="text-sm text-[var(--text-muted)]">X:</label><input type="number" id="shadow-offset-x-input" min="-100" max="100" value="5" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"><label for="shadow-offset-y-input" class="text-sm text-[var(--text-muted)] ml-1">Y:</label><input type="number" id="shadow-offset-y-input" min="-100" max="100" value="5" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="blur"></label>
+                                    <div class="flex items-center gap-3 md:gap-3"><input type="range" id="shadow-blur" min="0" max="50" value="5" class="w-full slider"><input type="number" id="shadow-blur-input" min="0" max="50" value="5" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="opacity"></label>
+                                    <div class="flex items-center gap-3 md:gap-3"><input type="range" id="shadow-opacity" min="0" max="100" value="50" step="1" class="w-full slider"><input type="number" id="shadow-opacity-input" min="0" max="100" value="50" step="1" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                </div>
+                                <div>
+                                    <label for="shadow-color" class="text-sm font-medium text-[var(--text-muted)]" data-translate-key="color"></label>
+                                    <input type="color" id="shadow-color" value="#000000" class="w-full h-10 mt-2 p-1 bg-slate-900 border border-[var(--border-color)] cursor-pointer">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Movement Accordion -->
+                        <div class="accordion-section border border-[var(--border-color)]" id="movement-accordion">
+                            <div class="accordion-header w-full flex items-center justify-between p-4 md:p-4 transition-colors duration-200 cursor-pointer">
+                                <div class="flex items-center gap-3 md:gap-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="accordion-chevron transition-transform duration-300 text-[var(--text-muted)]"><path d="m6 9 6 6 6-6"/></svg>
+                                    <h2 class="text-base font-semibold text-slate-300" data-translate-key="movement"></h2>
+                                </div>
+                                <div class="flex items-center">
+                                    <button class="reset-section-btn" data-section-key="movement" data-translate-key-title="resetMovementTitle">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                    </button>
+                                    <label class="switch"><input type="checkbox" id="movement-enabled-switch" checked><span class="toggle-slider"></span></label>
+                                </div>
+                            </div>
+                            <div class="accordion-body space-y-4 md:space-y-4 p-4 md:p-4 border-t border-[var(--border-color)]">
+                                <div id="movement-mode-controls">
+                                    <label class="text-sm font-medium text-[var(--text-muted)]" data-translate-key="controlMode"></label>
+                                    <div id="movement-mode-btns" class="grid grid-cols-2 gap-2 md:gap-2 mt-2 btn-group-toggle">
+                                        <button data-mode="simpel" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150 active" data-translate-key="simple"></button>
+                                        <button data-mode="lengkap" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="advanced"></button>
+                                    </div>
+                                </div>
+                                <div id="movement-controls-simpel" class="space-y-4 md:space-y-4 mt-4">
+                                        <div>
+                                            <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="speed"></label>
+                                            <div class="flex items-center gap-3 md:gap-3"><input type="range" id="movement-simpel-speed" min="0" max="15" value="1" step="0.5" class="w-full slider"><input type="number" id="movement-simpel-speed-input" min="0" max="15" value="1" step="0.5" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                        </div>
+                                        <div>
+                                            <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="strength"></label>
+                                            <div class="flex items-center gap-3 md:gap-3"><input type="range" id="movement-simpel-strength" min="0" max="10" value="1" step="0.25" class="w-full slider"><input type="number" id="movement-simpel-strength-input" min="0" max="10" value="1" step="0.25" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                        </div>
+                                </div>
+                                <div id="movement-controls-lengkap" class="hidden space-y-4 md:space-y-4 mt-4">
+                                    <div>
+                                        <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="rotationSpeed"></label>
+                                        <div class="flex items-center gap-3 md:gap-3"><input type="range" id="movement-rotation-speed" min="0" max="15" value="3" step="0.5" class="w-full slider"><input type="number" id="movement-rotation-speed-input" min="0" max="15" value="3" step="0.5" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                    </div>
+                                    <div>
+                                        <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="rotationStrength"></label>
+                                        <div class="flex items-center gap-3 md:gap-3"><input type="range" id="movement-rotation-strength" min="0" max="10" value="1" step="0.25" class="w-full slider"><input type="number" id="movement-rotation-strength-input" min="0" max="10" value="1" step="0.25" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                    </div>
+                                    <div>
+                                        <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="positionSpeedX"></label>
+                                        <div class="flex items-center gap-3 md:gap-3"><input type="range" id="movement-position-speed-x" min="0" max="15" value="2" step="0.5" class="w-full slider"><input type="number" id="movement-position-speed-x-input" min="0" max="15" value="2" step="0.5" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                    </div>
+                                    <div>
+                                        <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="positionSpeedY"></label>
+                                        <div class="flex items-center gap-3 md:gap-3"><input type="range" id="movement-position-speed-y" min="0" max="15" value="4" step="0.5" class="w-full slider"><input type="number" id="movement-position-speed-y-input" min="0" max="15" value="4" step="0.5" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                    </div>
+                                    <div>
+                                        <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="positionStrengthX"></label>
+                                        <div class="flex items-center gap-3 md:gap-3"><input type="range" id="movement-position-strength-x" min="0" max="50" value="1" class="w-full slider"><input type="number" id="movement-position-strength-x-input" min="0" max="50" value="1" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                    </div>
+                                    <div>
+                                        <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="positionStrengthY"></label>
+                                        <div class="flex items-center gap-3 md:gap-3"><input type="range" id="movement-position-strength-y" min="0" max="50" value="5" class="w-full slider"><input type="number" id="movement-position-strength-y-input" min="0" max="50" value="5" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Color Correction Accordion -->
+                        <div class="accordion-section border border-[var(--border-color)]" id="foreground-color-accordion">
+                            <div class="accordion-header w-full flex items-center justify-between p-4 md:p-4 transition-colors duration-200 cursor-pointer">
+                               <div class="flex items-center gap-3 md:gap-3">
+                                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="accordion-chevron transition-transform duration-300 text-[var(--text-muted)]"><path d="m6 9 6 6 6-6"/></svg>
+                                   <h2 class="text-base font-semibold text-slate-300" data-translate-key="colorCorrection"></h2>
+                               </div>
+                                <div class="flex items-center">
+                                    <button class="reset-section-btn" data-section-key="color" data-translate-key-title="resetColorCorrectionTitle">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                    </button>
+                                    <label class="switch"><input type="checkbox" id="color-enabled-switch"><span class="toggle-slider"></span></label>
+                                </div>
+                            </div>
+                            <div class="accordion-body space-y-4 md:space-y-4 p-4 md:p-4 border-t border-[var(--border-color)] hidden">
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="hue"></label>
+                                    <div class="flex items-center gap-3 md:gap-3"><input type="range" id="color-hue" min="-180" max="180" value="0" class="w-full slider"><input type="number" id="color-hue-input" min="-180" max="180" value="0" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                </div>
+                                <div id="color-correction-standard-controls" class="space-y-4">
+                                    <div>
+                                        <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="saturation"></label>
+                                        <div class="flex items-center gap-3 md:gap-3"><input type="range" id="color-saturation" min="-100" max="100" value="0" class="w-full slider"><input type="number" id="color-saturation-input" min="-100" max="100" value="0" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                    </div>
+                                    <div>
+                                        <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="brightness"></label>
+                                        <div class="flex items-center gap-3 md:gap-3"><input type="range" id="color-brightness" min="-100" max="100" value="0" class="w-full slider"><input type="number" id="color-brightness-input" min="-100" max="100" value="0" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2 pt-2 border-t border-slate-700">
+                                    <input type="checkbox" id="colorize-switch" class="h-4 w-4 bg-slate-600 border-slate-500 text-[var(--accent-color)] focus:ring-[var(--accent-color)]">
+                                    <label for="colorize-switch" class="text-sm text-slate-300" data-translate-key="colorize"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Info/Settings Tab Content -->
+                <div id="info-tab-content" class="tab-content hidden space-y-4 md:space-y-4 text-slate-300">
+                     <div class="space-y-2 md:space-y-2">
+                         <h2 class="text-lg font-bold text-slate-300" data-translate-key="language"></h2>
+                         <div id="language-btns" class="grid grid-cols-2 gap-2 md:gap-2 mt-2 btn-group-toggle">
+                             <button data-lang="en" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150">English</button>
+                             <button data-lang="id" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150">Indonesia</button>
+                         </div>
+                 </div>
+                    <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
+                        <h2 class="text-lg font-bold text-slate-300" data-translate-key="displayMode"></h2>
+                        <div id="display-mode-btns" class="flex flex-col gap-2 mt-2 btn-group-toggle">
+                             <button data-mode="auto" class="w-full p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="auto"></button>
+                             <button data-mode="mobile" class="w-full p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="mobile"></button>
+                             <button data-mode="desktop" class="w-full p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="desktop"></button>
+                        </div>
+                        <p id="display-mode-warning" class="text-sm text-red-400 mt-2 hidden" data-translate-key="displayModeWarning"></p>
+                    </div>
+                    <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
+                        <h2 class="text-lg font-bold text-slate-300" data-translate-key="uiSize"></h2>
+                        <div id="ui-size-btns" class="grid grid-cols-3 gap-2 md:gap-2 mt-2 btn-group-toggle">
+                             <button data-size="compact" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="compact"></button>
+                             <button data-size="normal" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="normal"></button>
+                             <button data-size="luas" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="spacious"></button>
+                        </div>
+                    </div>
+                    <h2 class="text-lg font-bold pt-4 border-t border-[var(--border-color)]" data-translate-key="appInfo"></h2>
+                    <p class="text-sm" data-translate-key="appDescription"></p>
+                    
+                    <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
+                        <h3 class="text-md font-semibold" data-translate-key="creatorInfo"></h3>
+                        <p class="text-sm" data-translate-key="creatorInfo2"></p>
+                        <div class="flex flex-col space-y-2 md:space-y-2 mt-4">
+                            <a href="https://lynk.id/nurimator" target="_blank" class="w-full px-4 py-2 bg-[var(--accent-color)] text-white text-sm font-semibold text-center hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="donateLocal">
+                            </a>
+                            <a href="https://lynk.id/nurimator" target="_blank" class="w-full px-4 py-2 bg-[var(--accent-color)] text-white text-sm font-semibold text-center hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="donateLocal">
+                            </a>
+                            <a href="https://ko-fi.com/nurimator" target="_blank" class="w-full px-4 py-2 bg-[var(--accent-color)] text-white text-sm font-semibold text-center hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="donateGlobal">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Reset All Settings Button -->
+                <div class="space-y-4 md:space-y-4 pt-4 border-t border-[var(--border-color)] mt-4">
+                    <button id="reset-settings-btn" class="flex items-center justify-center gap-2 md:gap-2 w-full px-5 py-3 bg-[var(--danger-color)] text-white text-sm font-semibold hover:bg-[var(--danger-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="resetAll"></button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Mobile footer with tabs and export button -->
+    <footer id="mobile-footer" class="fixed bottom-0 left-0 right-0 h-16 bg-[var(--bg-header)] border-t border-[var(--border-color)] z-50 flex justify-around items-center" style="display: var(--mobile-footer-display);">
+        <button id="mobile-tab-background" data-tab="background" class="mobile-tab-btn p-2 text-slate-300 hover:text-white active">
+            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="0" ry="0"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </button>
+        <button id="mobile-tab-object" data-tab="object" class="mobile-tab-btn p-2 text-slate-300 hover:text-white">
+            <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.01 2.92007L18.91 5.54007C20.61 6.29007 20.61 7.53007 18.91 8.28007L13.01 10.9001C12.34 11.2001 11.24 11.2001 10.57 10.9001L4.67 8.28007C2.97 7.53007 2.97 6.29007 4.67 5.54007L10.57 2.92007C11.24 2.62007 12.34 2.62007 13.01 2.92007Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11C3 11.84 3.63 12.81 4.40 13.15L11.19 16.17C11.71 16.40 12.30 16.40 12.81 16.17L19.60 13.15C20.37 12.81 21 11.84 21 11" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 16C3 16.93 3.55 17.77 4.40 18.15L11.19 21.17C11.71 21.40 12.30 21.40 12.81 21.17L19.60 18.15C20.45 17.77 21 16.93 21 16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button id="mobile-tab-info" data-tab="info" class="mobile-tab-btn p-2 text-slate-300 hover:text-white">
+            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1s1 .45 1 1v4c0 .55-.45 1-1 1zm1-8h-2V7h2v2z"/></svg>
+        </button>
+        <button id="mobile-export-btn" class="px-5 py-2.5 bg-[var(--accent-color)] text-white text-sm font-semibold hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="export">
+        </button>
+    </footer>
+
+    <!-- Top notification popup -->
+    <div id="top-notification-popup" class="hidden">
+        <p id="top-notification-message"></p>
+        <button class="close-btn">&times;</button>
+    </div>
+
+    <!-- Export settings popup -->
+    <div id="export-settings-popup" class="hidden popup-overlay flex items-center justify-center p-4">
+        <div class="bg-slate-800 shadow-xl p-8 w-full max-w-sm text-left border border-[var(--border-color)]">
+            <h3 class="text-xl font-bold mb-6 text-slate-100" data-translate-key="exportSettings"></h3>
+            <div class="space-y-4 md:space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-[var(--text-muted)] mb-2" data-translate-key="fps"></label>
+                    <div id="export-fps-btns" class="grid grid-cols-3 gap-2 md:gap-2 btn-group-toggle">
+                        <button data-fps="24" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">24</button>
+                        <button data-fps="30" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">30</button>
+                        <button data-fps="60" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">60</button>
+                    </div>
+                </div>
+                <div>
+                    <label for="export-duration-input" class="block text-sm font-medium text-[var(--text-muted)] mt-4 mb-2" data-translate-key="duration"></label>
+                    <input type="number" id="export-duration-input" value="5" min="1" max="60" class="w-full mt-1 p-2 bg-slate-700 border border-[var(--border-color-light)]">
+                </div>
+                <div>
+                    <label for="export-filename-input" class="block text-sm font-medium text-[var(--text-muted)] mt-4 mb-2" data-translate-key="fileName"></label>
+                    <input type="text" id="export-filename-input" value="animasi-sobek" class="w-full mt-1 p-2 bg-slate-700 border border-[var(--border-color-light)]">
+                </div>
+            </div>
+            <div class="mt-8 flex justify-end space-x-4">
+                <button id="cancel-export-settings-btn" class="px-5 py-2.5 bg-slate-600 text-white text-sm font-semibold hover:bg-slate-500 transition-all duration-150 cursor-pointer" data-translate-key="cancel"></button>
+                <button id="start-export-with-settings-btn" class="px-5 py-2.5 bg-[var(--accent-color)] text-white text-sm font-semibold hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="startExport"></button>
+            </div>
+        </div>
+    </div>
+    <!-- Export progress popup -->
+    <div id="export-progress-popup" class="hidden popup-overlay flex-col items-center justify-center">
+        <h3 data-translate-key="exportingVideo"></h3>
+        <p data-translate-key="exportingVideoWait"></p>
+        <div id="progress-bar-container">
+            <div id="progress-bar-fill">0%</div>
+        </div>
+    </div>
+
+    <!-- Confirmation popup for resetting settings -->
+    <div id="confirmation-popup" class="hidden popup-overlay flex items-center justify-center p-4">
+        <div class="bg-slate-800 shadow-xl p-8 w-full max-w-sm text-left border border-[var(--border-color)]">
+            <h3 id="confirmation-title" class="text-xl font-bold mb-4 text-slate-100"></h3>
+            <p id="confirmation-message" class="text-sm text-slate-300 mb-6"></p>
+            <div id="reset-images-option" class="hidden items-center space-x-2 mb-6">
+                <input type="checkbox" id="confirm-delete-images-checkbox" class="h-4 w-4 bg-slate-600 border-slate-500 text-[var(--accent-color)] focus:ring-[var(--accent-color)]">
+                <label for="confirm-delete-images-checkbox" class="text-sm text-slate-300" data-translate-key="deleteImportedImages"></label>
+            </div>
+            <div class="flex justify-end space-x-4">
+                <button id="confirm-cancel-btn" class="px-5 py-2.5 bg-slate-600 text-white text-sm font-semibold hover:bg-slate-500 transition-all duration-150 cursor-pointer" data-translate-key="cancel"></button>
+                <button id="confirm-continue-btn" class="px-5 py-2.5 bg-[var(--danger-color)] text-white text-sm font-semibold hover:bg-[var(--danger-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="continue"></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Main canvas and context
+            const canvas = document.getElementById('main-canvas');
+            const ctx = canvas.getContext('2d');
+            const canvasContainer = document.getElementById('canvas-container');
+            const panelWrapper = document.getElementById('settings-panel-wrapper');
+            const panelHandle = document.getElementById('panel-handle');
+            const body = document.body;
+            const mobilePanelHeader = document.getElementById('mobile-panel-header');
+            
+            // Notification elements
+            const topNotificationPopup = document.getElementById('top-notification-popup');
+            const topNotificationMessage = document.getElementById('top-notification-message');
+            const topNotificationCloseBtn = topNotificationPopup.querySelector('.close-btn');
+            let notificationTimeout;
+
+            // Confirmation dialog elements
+            const confirmationPopup = document.getElementById('confirmation-popup');
+            const confirmationTitle = document.getElementById('confirmation-title');
+            const confirmationMessage = document.getElementById('confirmation-message');
+            const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+            const confirmContinueBtn = document.getElementById('confirm-continue-btn');
+            const resetImagesOption = document.getElementById('reset-images-option');
+            const deleteImagesCheckbox = document.getElementById('confirm-delete-images-checkbox');
+
+            // SVG Filter elements
+            const tornDilate = document.getElementById('torn-dilate');
+            const tornTurbulence = document.getElementById('torn-turbulence');
+            const tornDisplacement = document.getElementById('torn-displacement');
+            const tornFlood = document.getElementById('torn-flood');
+
+            // URLs for overlay images from GitHub repository.
+            const overlayImageUrls = [
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper1.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper2.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper3.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper4.webp'
+            ];
+            
+            let originalOverlayImages = []; 
+            
+            // Offscreen canvases for processing
+            const objectCanvas = document.createElement('canvas');
+            const objectCtx = objectCanvas.getContext('2d');
+            
+            const finalObjectCanvas = document.createElement('canvas');
+            const finalObjectCtx = finalObjectCanvas.getContext('2d');
+
+            let animationFrameId = null;
+            let needsRedraw = true; // Flag to optimize rendering
+
+            // Default state for a single object
+            const DEFAULT_OBJECT_STATE = {
+                image: { element: null, size: 80, offset: { x: 0, y: 0 }, file: null },
+                stroke: { enabled: true, width: 10, roughness: 25, detail: 0.020 },
+                shadow: { enabled: true, offsetX: 5, offsetY: 5, blur: 5, color: '#000000', opacity: 50 },
+                color: { enabled: false, hue: 0, saturation: 0, brightness: 0, colorize: false },
+                movement: { 
+                    enabled: true, 
+                    mode: 'simpel',
+                    simpelSpeed: 1,
+                    simpelStrength: 1,
+                    rotationSpeed: 3, 
+                    rotationStrength: 1, 
+                    positionSpeed: { x: 2, y: 4 },
+                    positionStrength: { x: 1, y: 5 },
+                    lastRotationUpdateTime: 0, 
+                    lastPositionUpdateTime: { x: 0, y: 0 },
+                    rotation: 0,
+                    positionOffset: { x: 0, y: 0 }
+                },
+                paperFoldOverlay: {
+                    enabled: true,
+                    currentImageIndex: 0,
+                    opacity: 75,
+                    speed: 4,
+                    blendMode: 'multiply',
+                    lastImageSwitchTime: 0
+                }
+            };
+
+            // Default state for the entire application
+            const DEFAULT_STATE = {
+                activeTab: 'background',
+                language: 'en',
+                displayMode: 'auto', 
+                uiSize: 'normal',
+                background: {
+                    element: null, color: '#00ff00', file: null,
+                    transform: { enabled: true, mode: 'fill', size: 100, offset: { x: 0, y: 0 } },
+                    effects: {
+                        colorCorrection: { enabled: false, hue: 0, saturation: 0, brightness: 0, colorize: false },
+                        blur: { enabled: false, intensity: 10 },
+                        vignette: { enabled: false, opacity: 100, radius: 0, feather: 100, color: '#000000' }
+                    }
+                },
+                aspectRatio: '16/9',
+                canvasDisplayResolution: 720,
+                export: {
+                    duration: 5, fps: 24, filename: 'animasi-sobek'
+                },
+                object: JSON.parse(JSON.stringify(DEFAULT_OBJECT_STATE))
+            };
+
+            let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+            
+            // Maps for calculating canvas dimensions based on resolution and aspect ratio
+            const RESOLUTION_MAPS = {
+                '720': { '16/9': { w: 1280, h: 720 }, '9/16': { w: 720, h: 1280 }, '4/3': { w: 960, h: 720 }, '3/4': { w: 720, h: 960 }, '1/1': { w: 720, h: 720 } },
+                '1080': { '16/9': { w: 1920, h: 1080 }, '9/16': { w: 1080, h: 1920 }, '4/3': { w: 1440, h: 1080 }, '3/4': { w: 1080, h: 1440 }, '1/1': { w: 1080, h: 1080 } },
+                '1440': { '16/9': { w: 2560, h: 1440 }, '9/16': { w: 1440, h: 2560 }, '4/3': { w: 1920, h: 1440 }, '3/4': { w: 1440, h: 1920 }, '1/1': { w: 1440, h: 1440 } }
+            };
+
+            // Language translations
+            const translations = {
+                'en': {
+                    settings: 'Settings', export: 'Export', canvas: 'Canvas', previewAspectRatio: 'Aspect Ratio',
+                    canvasResolution: 'Resolution', solidBackgroundColor: 'Solid Background Color', backgroundImage: 'Background Image',
+                    dropImagePrompt: 'Drop Image Here<br>- or -<br>Click to Upload', backgroundTransform: 'Background Transform',
+                    resetBackgroundTransformTitle: 'Reset Background Transform', backgroundMode: 'Background Mode', fill: 'Fill',
+                    stretch: 'Stretch', backgroundSize: 'Background Size (%)', offsetX: 'Offset X (%)', offsetY: 'Offset Y (%)',
+                    backgroundColorCorrection: 'Background Color Correction', resetBackgroundColorCorrectionTitle: 'Reset Background Color Correction',
+                    hue: 'Hue', saturation: 'Saturation', brightness: 'Brightness', colorize: 'Colorize', backgroundBlur: 'Background Blur',
+                    resetBackgroundBlurTitle: 'Reset Background Blur', intensity: 'Intensity', backgroundVignette: 'Background Vignette',
+                    resetBackgroundVignetteTitle: 'Reset Background Vignette', opacity: 'Opacity', radius: 'Radius', feather: 'Feather',
+                    vignetteColor: 'Vignette Color', objectImage: 'Object Image', transform: 'Transform', resetTransformTitle: 'Reset Transform',
+                    imageSize: 'Image Size (%)', tornEdges: 'Torn Edges', resetTornEdgesTitle: 'Reset Torn Edges', thickness: 'Thickness',
+                    roughness: 'Roughness', detail: 'Detail', paperTexture: 'Paper Texture',
+                    resetPaperTextureTitle: 'Reset Paper Texture', speedFps: 'Speed', dropShadow: 'Drop Shadow',
+                    resetDropShadowTitle: 'Reset Drop Shadow', offset: 'Offset', blur: 'Blur', color: 'Color', movement: 'Movement',
+                    resetMovementTitle: 'Reset Movement', controlMode: 'Control Mode', simple: 'Simple', advanced: 'Advanced', speed: 'Speed',
+                    strength: 'Strength', rotationSpeed: 'Rotation Speed', rotationStrength: 'Rotation Strength',
+                    positionSpeedX: 'Position Speed X', positionSpeedY: 'Position Speed Y', positionStrengthX: 'Position Strength X',
+                    positionStrengthY: 'Position Strength Y', colorCorrection: 'Color Correction', resetColorCorrectionTitle: 'Reset Color Correction',
+                    language: 'Language', displayMode: 'Display Mode', auto: 'Auto', mobile: 'Mobile (Force)', desktop: 'Desktop (Force)',
+                    displayModeWarning: 'Warning: Forcing a display mode may break layout or functionality if it doesn\'t match your screen size.',
+                    uiSize: 'UI Size', compact: 'Compact', normal: 'Normal', spacious: 'Spacious', appInfo: 'App Information',
+                    appDescription: 'This app was created to allow users to easily add paper tear effects and animations to their images.',
+                    creatorInfo: 'Creator Info', donateLocal: 'Local Donation [IDR]', donateGlobal: 'Global Donation [USD]',
+                    resetAll: 'Reset All', exportSettings: 'Export Settings', fps: 'Frames per Second (FPS)', duration: 'Duration (seconds)',
+                    fileName: 'File Name', cancel: 'Cancel', startExport: 'Start Export', exportingVideo: 'Exporting Video...',
+                    creatorInfo2: 'This app was created by Nurhidayat and is completely free to use.<br>If you find it useful, your support through donations is greatly appreciated.<br>YouTube: @nurimator | Instagram: @nurimator',
+                    exportingVideoWait: 'Please wait and do not close this window.', confirmResetTitle: 'Confirm Reset',
+                    confirmResetMessage: 'Are you sure you want to reset all settings to their default values?',
+                    deleteImportedImages: 'Delete imported images', continue: 'Continue',
+                    notificationWarnUpload: 'Please upload an image first!',
+                    notificationWarnBg: 'Upload a background image first to adjust its settings.',
+                    notificationWarnObject: 'Upload an object image first to adjust its settings.',
+                    tabTitleBackground: 'Background Settings', tabTitleObject: 'Object Settings', tabTitleInfo: 'Preferences',
+                    activeObject: 'Active Object'
+                },
+                'id': {
+                    settings: 'Pengaturan', export: 'Ekspor', canvas: 'Kanvas', previewAspectRatio: 'Aspek Rasio',
+                    canvasResolution: 'Resolusi', solidBackgroundColor: 'Warna Latar Belakang Solid', backgroundImage: 'Gambar Latar Belakang',
+                    dropImagePrompt: 'Jatuhkan Gambar Disini<br>- atau -<br>Klik untuk Upload', backgroundTransform: 'Transformasi Latar',
+                    resetBackgroundTransformTitle: 'Reset Transformasi Latar', backgroundMode: 'Mode Latar', fill: 'Isi',
+                    stretch: 'Regangkan', backgroundSize: 'Ukuran Latar (%)', offsetX: 'Offset X (%)', offsetY: 'Offset Y (%)',
+                    backgroundColorCorrection: 'Koreksi Warna Latar', resetBackgroundColorCorrectionTitle: 'Reset Koreksi Warna Latar',
+                    hue: 'Hue', saturation: 'Saturasi', brightness: 'Kecerahan', colorize: 'Warnai', backgroundBlur: 'Blur Latar',
+                    resetBackgroundBlurTitle: 'Reset Blur Latar', intensity: 'Intensitas', backgroundVignette: 'Vinyet Latar',
+                    resetBackgroundVignetteTitle: 'Reset Vinyet Latar', opacity: 'Opasitas', radius: 'Radius', feather: 'Feather',
+                    vignetteColor: 'Warna Vinyet', objectImage: 'Gambar Objek', transform: 'Transformasi', resetTransformTitle: 'Reset Transformasi',
+                    imageSize: 'Ukuran Gambar (%)', tornEdges: 'Pinggiran Sobek', resetTornEdgesTitle: 'Reset Pinggiran Sobek', thickness: 'Ketebalan',
+                    roughness: 'Kekasaran', detail: 'Detail', paperTexture: 'Tekstur Kertas',
+                    resetPaperTextureTitle: 'Reset Tekstur Kertas', speedFps: 'Kecepatan', dropShadow: 'Bayangan',
+                    resetDropShadowTitle: 'Reset Bayangan', offset: 'Offset', blur: 'Blur', color: 'Warna', movement: 'Gerakan',
+                    resetMovementTitle: 'Reset Gerakan', controlMode: 'Mode Kontrol', simple: 'Simpel', advanced: 'Lengkap', speed: 'Kecepatan',
+                    strength: 'Kekuatan', rotationSpeed: 'Kecepatan Rotasi', rotationStrength: 'Kekuatan Rotasi',
+                    positionSpeedX: 'Kecepatan Posisi X', positionSpeedY: 'Kecepatan Posisi Y', positionStrengthX: 'Kekuatan Posisi X',
+                    positionStrengthY: 'Kekuatan Posisi Y', colorCorrection: 'Koreksi Warna', resetColorCorrectionTitle: 'Reset Koreksi Warna',
+                    language: 'Bahasa', displayMode: 'Mode Tampilan', auto: 'Otomatis', mobile: 'Seluler (Paksa)', desktop: 'Desktop (Paksa)',
+                    displayModeWarning: 'Peringatan: Memaksa mode tampilan dapat merusak tata letak atau fungsionalitas jika tidak sesuai dengan ukuran layar Anda.',
+                    uiSize: 'Ukuran UI', compact: 'Sempit', normal: 'Normal', spacious: 'Luas', appInfo: 'Informasi Aplikasi',
+                    appDescription: 'Aplikasi ini dibuat untuk memungkinkan pengguna menambahkan efek sobekan kertas dan animasi pada gambar mereka dengan mudah.',
+                    creatorInfo: 'Informasi Kreator', donateLocal: 'Donasi Lokal [IDR]', donateGlobal: 'Donasi Global [USD]',
+                    resetAll: 'Reset Semua', exportSettings: 'Pengaturan Ekspor', fps: 'Frame per Detik (FPS)', duration: 'Durasi (detik)',
+                    fileName: 'Nama File', cancel: 'Batal', startExport: 'Mulai Ekspor', exportingVideo: 'Mengekspor Video...',
+                    creatorInfo2: 'Aplikasi ini dibuat oleh Nurhidayat dan sepenuhnya gratis untuk digunakan.<br>Jika kamu merasa aplikasi ini bermanfaat, dukungan dalam bentuk donasi sangat diapresiasi.<br>YouTube: @nurimator | Instagram: @nurimator',
+                    exportingVideoWait: 'Harap tunggu dan jangan tutup jendela ini.', confirmResetTitle: 'Konfirmasi Reset',
+                    confirmResetMessage: 'Apakah Anda yakin ingin mereset semua pengaturan ke nilai default?',
+                    deleteImportedImages: 'Hapus gambar yang telah diimpor', continue: 'Lanjutkan',
+                    notificationWarnUpload: 'Silakan masukan gambar terlebih dahulu!',
+                    notificationWarnBg: 'Masukan gambar latar terlebih dahulu untuk mengaturnya.',
+                    notificationWarnObject: 'Masukan gambar objek terlebih dahulu untuk mengaturnya.',
+                    tabTitleBackground: 'Pengaturan Latar', tabTitleObject: 'Pengaturan Objek', tabTitleInfo: 'Preferensi',
+                    activeObject: 'Objek Aktif'
+                }
+            };
+            
+            /**
+             * Converts a HEX color to an RGBA string.
+             */
+            function hexToRgba(hex, opacity) {
+                let r = 0, g = 0, b = 0;
+                if (hex.length === 7) { 
+                    r = parseInt(hex.substring(1, 3), 16); 
+                    g = parseInt(hex.substring(3, 5), 16); 
+                    b = parseInt(hex.substring(5, 7), 16); 
+                }
+                return `rgba(${r},${g},${b},${opacity})`;
+            }
+
+            /**
+             * Sets a flag to indicate that the canvas needs to be redrawn in the next animation frame.
+             */
+            function requestRedraw() { needsRedraw = true; }
+            
+            /**
+             * The main drawing function. Renders the background, all objects, and all effects onto the canvas.
+             */
+            function draw() {
+                ctx.save();
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // --- DRAW BACKGROUND ---
+                let bgFilterString = '';
+                const bgCC = state.background.effects.colorCorrection;
+                if (bgCC.enabled) {
+                    let filterParts = [];
+                    if (bgCC.colorize) { filterParts.push('sepia(1)'); }
+                    filterParts.push(`hue-rotate(${bgCC.hue}deg)`);
+                    filterParts.push(`saturate(${100 + bgCC.saturation}%)`);
+                    filterParts.push(`brightness(${100 + bgCC.brightness}%)`);
+                    bgFilterString = filterParts.join(' ');
+                }
+
+                if (state.background.effects.blur.enabled && state.background.effects.blur.intensity > 0) {
+                    bgFilterString += ` blur(${state.background.effects.blur.intensity}px)`;
+                }
+                ctx.filter = bgFilterString.trim();
+
+                const bgOffsetX = (canvas.width * state.background.transform.offset.x) / 100;
+                const bgOffsetY = (canvas.height * state.background.transform.offset.y) / 100;
+
+                if (state.background.element) {
+                    if (state.background.transform.mode === 'fill') {
+                        ctx.translate(canvas.width / 2 + bgOffsetX, canvas.height / 2 + bgOffsetY);
+                        const userScale = state.background.transform.size / 100;
+                        const canvasAspect = canvas.width / canvas.height;
+                        const bgAspect = state.background.element.width / state.background.element.height;
+                        let fillScale = (canvasAspect > bgAspect) ? canvas.width / state.background.element.width : canvas.height / state.background.element.height;
+                        ctx.scale(fillScale * userScale, fillScale * userScale);
+                        ctx.drawImage(state.background.element, -state.background.element.width / 2, -state.background.element.height / 2);
+                    } else if (state.background.transform.mode === 'stretch') {
+                        ctx.drawImage(state.background.element, 0, 0, canvas.width, canvas.height);
+                    }
+                } else {
+                    ctx.fillStyle = state.background.color;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+                ctx.restore();
+
+                // Draw background vignette if enabled
+                if (state.background.effects.vignette.enabled) {
+                    ctx.save();
+                    const gradient = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, Math.max(canvas.width, canvas.height) / 2);
+                    const vignetteColor = hexToRgba(state.background.effects.vignette.color, state.background.effects.vignette.opacity / 100);
+                    const normalizedRadius = state.background.effects.vignette.radius / 100;
+                    const normalizedFeather = state.background.effects.vignette.feather / 100; 
+                    gradient.addColorStop(normalizedRadius, 'rgba(0,0,0,0)');
+                    gradient.addColorStop(Math.min(1, normalizedRadius + normalizedFeather), vignetteColor);
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.restore();
+                }
+
+                // --- DRAW ALL OBJECTS ---
+                const objectState = state.object; // Ambil objek tunggal
+                if (objectState.image.element) {
+                    
+					const canvasAspect = canvas.width / canvas.height;
+					const imageAspect = objectState.image.element.width / objectState.image.element.height;
+					let baseScale = (canvasAspect > imageAspect) ? canvas.height / objectState.image.element.height : canvas.width / objectState.image.element.width;
+					const userScale = objectState.image.size / 100;
+					const finalScale = baseScale * userScale;
+					const imgW = objectState.image.element.width * finalScale;
+					const imgH = objectState.image.element.height * finalScale;
+
+					const compositedObjectCanvas = finalObjectCanvas;
+					const compositedObjectCtx = finalObjectCtx;
+					compositedObjectCtx.clearRect(0, 0, compositedObjectCanvas.width, compositedObjectCanvas.height);
+
+					const imgBaseOffsetX = (canvas.width * objectState.image.offset.x) / 100;
+					const imgBaseOffsetY = (canvas.height * objectState.image.offset.y) / 100;
+					const totalOffsetX = imgBaseOffsetX + objectState.movement.positionOffset.x;
+					const totalOffsetY = imgBaseOffsetY + objectState.movement.positionOffset.y;
+
+					let fgColorFilterString = '';
+					if (objectState.color.enabled) {
+						let filterParts = [];
+						if (objectState.color.colorize) { filterParts.push('sepia(1)'); }
+						filterParts.push(`hue-rotate(${objectState.color.hue}deg)`);
+						filterParts.push(`saturate(${100 + objectState.color.saturation}%)`);
+						filterParts.push(`brightness(${100 + objectState.color.brightness}%)`);
+						fgColorFilterString = filterParts.join(' ');
+					}
+
+					if (objectState.paperFoldOverlay.enabled) {
+						objectCtx.save();
+						objectCtx.clearRect(0, 0, objectCanvas.width, objectCanvas.height);
+						objectCtx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + totalOffsetY);
+						if (objectState.movement.enabled) { objectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
+
+						objectCtx.filter = fgColorFilterString;
+						objectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
+
+						const overlayImage = originalOverlayImages[objectState.paperFoldOverlay.currentImageIndex];
+						if (overlayImage && overlayImage.complete && overlayImage.naturalWidth > 0) {
+							objectCtx.save();
+							const effectStrength = objectState.paperFoldOverlay.opacity;
+							const overlayW = imgW * 1.25;
+							const overlayH = imgH * 1.25;
+							objectCtx.globalCompositeOperation = objectState.paperFoldOverlay.blendMode;
+							const tempCanvas = document.createElement('canvas');
+							tempCanvas.width = overlayImage.width;
+							tempCanvas.height = overlayImage.height;
+							const tempCtx = tempCanvas.getContext('2d');
+							tempCtx.drawImage(overlayImage, 0, 0);
+							const imageData = tempCtx.getImageData(0, 0, overlayImage.width, overlayImage.height);
+							const data = imageData.data;
+							const strength = (100 - effectStrength) / 100;
+							for (let i = 0; i < data.length; i += 4) {
+								data[i]     = data[i]     + (255 - data[i])     * strength;
+								data[i + 1] = data[i + 1] + (255 - data[i + 1]) * strength;
+								data[i + 2] = data[i + 2] + (255 - data[i + 2]) * strength;
+							}
+							tempCtx.putImageData(imageData, 0, 0);
+							objectCtx.drawImage(tempCanvas, -overlayW / 2, -overlayH / 2, overlayW, overlayH);
+							objectCtx.restore();
+						}
+						objectCtx.restore();
+
+						compositedObjectCtx.save();
+						let tornFilterString = '';
+						if (objectState.stroke.enabled && objectState.stroke.width > 0) {
+							tornDilate.setAttribute('radius', objectState.stroke.width);
+							tornDisplacement.setAttribute('scale', objectState.stroke.roughness);
+							tornTurbulence.setAttribute('baseFrequency', objectState.stroke.detail);
+							tornFlood.setAttribute('flood-color', '#FFFFFF');
+							tornFilterString = `url(#combined-filter)`;
+						}
+						compositedObjectCtx.filter = tornFilterString;
+						compositedObjectCtx.translate(compositedObjectCanvas.width / 2 + totalOffsetX, compositedObjectCanvas.height / 2 + totalOffsetY);
+						if (objectState.movement.enabled) { compositedObjectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
+						compositedObjectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
+						compositedObjectCtx.restore();
+						compositedObjectCtx.save();
+						compositedObjectCtx.globalCompositeOperation = 'source-in';
+						compositedObjectCtx.drawImage(objectCanvas, 0, 0);
+						compositedObjectCtx.restore();
+					} else {
+						compositedObjectCtx.save();
+						let tornFilterString = '';
+						if (objectState.stroke.enabled && objectState.stroke.width > 0) {
+							tornDilate.setAttribute('radius', objectState.stroke.width);
+							tornDisplacement.setAttribute('scale', objectState.stroke.roughness);
+							tornTurbulence.setAttribute('baseFrequency', objectState.stroke.detail);
+							tornFlood.setAttribute('flood-color', '#FFFFFF');
+							tornFilterString = `url(#combined-filter)`;
+						}
+						compositedObjectCtx.filter = [fgColorFilterString, tornFilterString].filter(Boolean).join(' ');
+						compositedObjectCtx.translate(compositedObjectCanvas.width / 2 + totalOffsetX, compositedObjectCanvas.height / 2 + totalOffsetY);
+						if (objectState.movement.enabled) { compositedObjectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
+						compositedObjectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
+						compositedObjectCtx.restore();
+					}
+
+					ctx.save();
+					if (objectState.shadow.enabled) {
+						ctx.shadowColor = hexToRgba(objectState.shadow.color, objectState.shadow.opacity / 100);
+						ctx.shadowBlur = objectState.shadow.blur;
+						ctx.shadowOffsetX = objectState.shadow.offsetX;
+						ctx.shadowOffsetY = objectState.shadow.offsetY;
+					}
+					ctx.drawImage(compositedObjectCanvas, 0, 0);
+					ctx.restore();
+                }
+            }
+
+            /**
+             * Updates objects' positions and rotations based on movement settings and time.
+             */
+            function updateMovement(timestamp) {
+                let hasChanged = false;
+                const objectState = state.object; // Ganti dari forEach ke referensi langsung
+
+                if (!objectState.movement.enabled) {
+                    if (objectState.movement.rotation !== 0 || objectState.movement.positionOffset.x !== 0 || objectState.movement.positionOffset.y !== 0) {
+                        objectState.movement.rotation = 0;
+                        objectState.movement.positionOffset = { x: 0, y: 0 };
+                        hasChanged = true;
+                    }
+                    // Hapus 'return' karena kita tidak lagi di dalam loop
+                } else { // Tambahkan 'else' untuk menjalankan logika jika movement enabled
+                    const isSimpelMode = objectState.movement.mode === 'simpel';
+                    const speedMultiplier = isSimpelMode ? objectState.movement.simpelSpeed : 1;
+                    const strengthMultiplier = isSimpelMode ? objectState.movement.simpelStrength : 1;
+                    const effectiveRotationSpeed = objectState.movement.rotationSpeed * speedMultiplier;
+                    const effectiveRotationStrength = objectState.movement.rotationStrength * strengthMultiplier;
+                    const effectivePositionSpeedX = objectState.movement.positionSpeed.x * speedMultiplier;
+                    const effectivePositionSpeedY = objectState.movement.positionSpeed.y * speedMultiplier;
+                    const effectivePositionStrengthX = objectState.movement.positionStrength.x * strengthMultiplier;
+                    const effectivePositionStrengthY = objectState.movement.positionStrength.y * strengthMultiplier;
+
+                    if (effectiveRotationSpeed > 0 && effectiveRotationStrength > 0) {
+                        const rotationInterval = 1000 / effectiveRotationSpeed;
+                        if (timestamp - objectState.movement.lastRotationUpdateTime > rotationInterval) {
+                            objectState.movement.rotation = objectState.movement.rotation > 0 ? -effectiveRotationStrength : effectiveRotationStrength;
+                            objectState.movement.lastRotationUpdateTime = timestamp;
+                            hasChanged = true;
+                        }
+                    } else if (objectState.movement.rotation !== 0) {
+                        objectState.movement.rotation = 0; hasChanged = true;
+                    }
+
+                    if (effectivePositionSpeedX > 0 && effectivePositionStrengthX > 0) {
+                        const positionIntervalX = 1000 / effectivePositionSpeedX;
+                        if (timestamp - objectState.movement.lastPositionUpdateTime.x > positionIntervalX) {
+                            objectState.movement.positionOffset.x = (Math.random() - 0.5) * 2 * effectivePositionStrengthX;
+                            objectState.movement.lastPositionUpdateTime.x = timestamp;
+                            hasChanged = true;
+                        }
+                    } else if (objectState.movement.positionOffset.x !== 0) {
+                        objectState.movement.positionOffset.x = 0; hasChanged = true;
+                    }
+
+                    if (effectivePositionSpeedY > 0 && effectivePositionStrengthY > 0) {
+                        const positionIntervalY = 1000 / effectivePositionSpeedY;
+                        if (timestamp - objectState.movement.lastPositionUpdateTime.y > positionIntervalY) {
+                            objectState.movement.positionOffset.y = (Math.random() - 0.5) * 2 * effectivePositionStrengthY;
+                            objectState.movement.lastPositionUpdateTime.y = timestamp;
+                            hasChanged = true;
+                        }
+                    } else if (objectState.movement.positionOffset.y !== 0) {
+                        objectState.movement.positionOffset.y = 0; hasChanged = true;
+                    }
+                }
+
+                if (hasChanged) { requestRedraw(); }
+            }
+            
+            /**
+             * Cycles through the paper texture overlay images for each object.
+             */
+            function updatePaperFoldOverlay(timestamp) {
+                const loadedImages = originalOverlayImages.filter(img => img !== null);
+                if (loadedImages.length === 0) return;
+
+                let hasChanged = false;
+                const objectState = state.object; // Ganti dari forEach ke referensi langsung
+
+                if (objectState.paperFoldOverlay.enabled && objectState.paperFoldOverlay.speed > 0) {
+                    const timeSinceLastSwitch = timestamp - objectState.paperFoldOverlay.lastImageSwitchTime;
+                    const interval = 1000 / objectState.paperFoldOverlay.speed;
+                    if (timeSinceLastSwitch >= interval) {
+                        objectState.paperFoldOverlay.currentImageIndex = (objectState.paperFoldOverlay.currentImageIndex + 1) % loadedImages.length;
+                        objectState.paperFoldOverlay.lastImageSwitchTime = timestamp;
+                        hasChanged = true;
+                    }
+                }
+
+                if (hasChanged) { requestRedraw(); }
+            }
+
+            /**
+             * The main animation loop.
+             */
+            function animationLoop(timestamp = 0) {
+                updateMovement(timestamp);
+                updatePaperFoldOverlay(timestamp);
+                if (needsRedraw) {
+                    draw();
+                    needsRedraw = false;
+                }
+                animationFrameId = requestAnimationFrame(animationLoop);
+            }
+            
+            /**
+             * Sets the internal resolution of all canvases based on the current state.
+             */
+            function updateInternalCanvasResolution() {
+                const targetResolutionKey = state.canvasDisplayResolution.toString();
+                const aspectRatioKey = state.aspectRatio;
+                const dims = RESOLUTION_MAPS[targetResolutionKey]?.[aspectRatioKey];
+                let internalCanvasWidth, internalCanvasHeight;
+                if (dims) {
+                    internalCanvasWidth = dims.w;
+                    internalCanvasHeight = dims.h;
+                } else {
+                    const ratio = eval(aspectRatioKey);
+                    internalCanvasHeight = state.canvasDisplayResolution;
+                    internalCanvasWidth = internalCanvasHeight * ratio;
+                }
+                canvas.width = objectCanvas.width = finalObjectCanvas.width = Math.max(10, Math.round(internalCanvasWidth));
+                canvas.height = objectCanvas.height = finalObjectCanvas.height = Math.max(10, Math.round(internalCanvasHeight));
+                requestRedraw();
+            }
+
+            /**
+             * Adjusts the display size of the main canvas to fit its container while maintaining aspect ratio.
+             */
+            function updateCanvasDisplaySize() {
+                const containerStyle = window.getComputedStyle(canvasContainer);
+                const paddingX = parseFloat(containerStyle.paddingLeft) + parseFloat(containerStyle.paddingRight);
+                const paddingY = parseFloat(containerStyle.paddingTop) + parseFloat(containerStyle.paddingBottom);
+                let availableWidth = canvasContainer.offsetWidth - paddingX;
+                let availableHeight = canvasContainer.offsetHeight - paddingY;
+                
+                availableWidth = Math.max(10, availableWidth);
+                availableHeight = Math.max(10, availableHeight);
+
+                const canvasRatio = canvas.width / canvas.height;
+                let displayW = availableWidth;
+                let displayH = displayW / canvasRatio;
+
+                if (displayH > availableHeight) {
+                    displayH = availableHeight;
+                    displayW = displayH * canvasRatio;
+                }
+                canvas.style.width = `${Math.round(displayW)}px`;
+                canvas.style.height = `${Math.round(displayH)}px`;
+            }
+
+            /**
+             * A helper function to call both resolution and display size updates.
+             */
+            function resizeAndRedrawAll() {
+                updateInternalCanvasResolution();
+                updateCanvasDisplaySize();
+            }
+
+            /**
+             * Binds a slider and a number input together to update a single state value for the active object.
+             */
+            function syncSliderAndInput(sliderId, inputId, stateUpdater) {
+                const slider = document.getElementById(sliderId);
+                const input = document.getElementById(inputId);
+                if (!slider || !input) return;
+
+                function updateValue(value, trigger) {
+                    const min = parseFloat(slider.min);
+                    const max = parseFloat(slider.max);
+                    const step = parseFloat(slider.step) || 1;
+                    const decimalPlaces = (String(step).split('.')[1] || []).length;
+                    let valueToUpdate = parseFloat(value);
+                    let clampedValue = Math.max(min, Math.min(max, valueToUpdate || 0));
+                    
+                    if (trigger !== 'slider') slider.value = clampedValue;
+                    if (trigger !== 'input') input.value = clampedValue.toFixed(decimalPlaces);
+
+                    stateUpdater(clampedValue);
+                    requestRedraw();
+                }
+
+                slider.addEventListener('input', (e) => updateValue(e.target.value, 'slider'));
+                input.addEventListener('change', (e) => updateValue(e.target.value, 'input'));
+                input.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    const step = parseFloat(input.step) || 1;
+                    const direction = e.deltaY < 0 ? 1 : -1;
+                    const newValue = parseFloat(input.value) + (direction * step);
+                    input.value = newValue; 
+                    updateValue(newValue, 'input');
+                });
+            }
+
+            /**
+             * Binds a number input to update a state value for the active object.
+             */
+            function syncInputOnly(inputId, stateUpdater) {
+                const input = document.getElementById(inputId);
+                if (!input) return;
+                function updateValue(value) {
+                    const min = parseFloat(input.min) || -Infinity;
+                    const max = parseFloat(input.max) || Infinity;
+                    let clampedValue = Math.max(min, Math.min(max, parseFloat(value) || 0));
+                    input.value = clampedValue;
+                    stateUpdater(clampedValue);
+                    requestRedraw();
+                }
+                input.addEventListener('change', (e) => updateValue(e.target.value));
+                input.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    const step = parseFloat(input.step) || 1;
+                    const direction = e.deltaY < 0 ? 1 : -1;
+                    const newValue = parseFloat(input.value) + (direction * step);
+                    input.value = newValue; 
+                    updateValue(newValue);
+                });
+            }
+            
+            /**
+             * Handles an uploaded image file, reads it, and sets it to the correct state property.
+             */
+            function handleImageFile(file, target) {
+                if (!file || !file.type.startsWith('image/')) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        if (target === 'foreground') {
+							state.object.image.element = img;
+							state.object.image.file = file;
+                        } else if (target === 'background') {
+                            state.background.element = img;
+                            state.background.file = file;
+                        }
+                        updateUIFromState();
+                        requestRedraw();
+                    };
+                    img.onerror = () => { console.error(`Failed to load ${target} image file.`); };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            /**
+             * Updates all text elements in the UI to the selected language.
+             */
+            function updateUIText(lang) {
+                const translationMap = translations[lang] || translations['en'];
+                document.querySelectorAll('[data-translate-key]').forEach(el => {
+                    const key = el.dataset.translateKey;
+                    if (translationMap[key]) {
+                        if (key === 'dropImagePrompt' || key === 'creatorInfo2') {
+                           el.innerHTML = translationMap[key];
+                        } else {
+                           el.textContent = translationMap[key];
+                        }
+                    }
+                });
+                 document.querySelectorAll('[data-translate-key-title]').forEach(el => {
+                    const key = el.dataset.translateKeyTitle;
+                    if (translationMap[key]) {
+                        el.title = translationMap[key];
+                    }
+                });
+            }
+
+            /**
+             * Truncates a filename for display purposes.
+             */
+            function truncateFilename(filename, maxLength = 8) {
+                const lastDotIndex = filename.lastIndexOf('.');
+                if (lastDotIndex === -1) {
+                    return filename.length > maxLength ? filename.substring(0, maxLength) + '...' : filename;
+                }
+                const name = filename.substring(0, lastDotIndex);
+                const ext = filename.substring(lastDotIndex);
+                if (name.length > maxLength) {
+                    return name.substring(0, maxLength) + '...' + ext;
+                }
+                return filename;
+            }
+
+
+            /**
+             * Updates the entire UI to reflect the current state object.
+             */
+            function updateUIFromState() {
+                updateUIText(state.language);
+
+                // Get the currently active object's state
+                const activeObjectState = state.object;                
+
+                // Update object image controls based on the active object
+                const imageSpecificControls = document.getElementById('image-specific-controls');
+                const dropZonePrompt = document.getElementById('drop-zone-prompt');
+                const dropZoneFilenameContainer = document.getElementById('drop-zone-filename');
+                const deleteImageBtn = document.getElementById('delete-image-btn');
+                
+                if (activeObjectState.image.element) {
+                    imageSpecificControls.classList.remove('is-disabled');
+                    dropZonePrompt.classList.add('hidden');
+                    dropZoneFilenameContainer.classList.remove('hidden');
+                    if (dropZoneFilenameContainer.querySelector('p') && activeObjectState.image.file) {
+                        dropZoneFilenameContainer.querySelector('p').textContent = truncateFilename(activeObjectState.image.file.name);
+                    }
+                    deleteImageBtn.classList.remove('hidden');
+                } else {
+                    imageSpecificControls.classList.add('is-disabled');
+                    dropZonePrompt.classList.remove('hidden');
+                    dropZoneFilenameContainer.classList.add('hidden');
+                    deleteImageBtn.classList.add('hidden');
+                }
+
+                // Update background image controls
+                const backgroundColorControl = document.getElementById('background-color-control');
+                const backgroundDropZonePrompt = document.getElementById('background-drop-zone-prompt');
+                const backgroundDropZoneFilename = document.getElementById('background-drop-zone-filename');
+                const removeBackgroundImageBtn = document.getElementById('remove-background-image');
+                const bgDependentAccordions = ['background-transform-accordion', 'background-blur-accordion'];
+                
+                const hasBgImage = !!state.background.element;
+                bgDependentAccordions.forEach(id => {
+                    document.getElementById(id).classList.toggle('controls-disabled-for-bg', !hasBgImage);
+                });
+                
+                if (hasBgImage) {
+                    backgroundColorControl.classList.add('is-disabled');
+                    backgroundDropZonePrompt.classList.add('hidden');
+                    backgroundDropZoneFilename.classList.remove('hidden');
+                    if (backgroundDropZoneFilename.querySelector('p') && state.background.file) {
+                         backgroundDropZoneFilename.querySelector('p').textContent = truncateFilename(state.background.file.name);
+                    }
+                    removeBackgroundImageBtn.classList.remove('hidden');
+                } else {
+                    backgroundColorControl.classList.remove('is-disabled');
+                    backgroundDropZonePrompt.classList.remove('hidden');
+                    backgroundDropZoneFilename.classList.add('hidden');
+                    removeBackgroundImageBtn.classList.add('hidden');
+                }
+
+                // Update paper fold overlay controls
+                const paperFoldOverlayControls = document.getElementById('overlay-controls');
+                const anyOverlayImageLoaded = originalOverlayImages.length > 0 && originalOverlayImages.some(img => img !== null);
+                if (activeObjectState.paperFoldOverlay.enabled && anyOverlayImageLoaded) {
+                    paperFoldOverlayControls.classList.remove('controls-disabled-for-overlay');
+                } else {
+                    paperFoldOverlayControls.classList.add('controls-disabled-for-overlay');
+                }
+
+                // Sync all input values from state
+                document.getElementById('background-color').value = state.background.color;
+                document.querySelectorAll('#aspect-ratio-btns button').forEach(btn => btn.classList.toggle('active', btn.dataset.ratio === state.aspectRatio));
+                document.querySelectorAll('#canvas-resolution-btns button').forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.res) === state.canvasDisplayResolution));
+                
+                // This list now updates based on the ACTIVE OBJECT's state
+                const inputsToUpdate = [
+                    { id: 'background-size-input', value: state.background.transform.size },
+                    { id: 'background-offset-x-input', value: state.background.transform.offset.x },
+                    { id: 'background-offset-y-input', value: state.background.transform.offset.y },
+                    { id: 'background-color-hue-input', value: state.background.effects.colorCorrection.hue },
+                    { id: 'background-color-saturation-input', value: state.background.effects.colorCorrection.saturation },
+                    { id: 'background-color-brightness-input', value: state.background.effects.colorCorrection.brightness },
+                    { id: 'background-colorize-switch', checked: state.background.effects.colorCorrection.colorize },
+                    { id: 'background-blur-intensity-input', value: state.background.effects.blur.intensity },
+                    { id: 'background-vignette-opacity-input', value: state.background.effects.vignette.opacity },
+                    { id: 'background-vignette-radius-input', value: state.background.effects.vignette.radius },
+                    { id: 'background-vignette-feather-input', value: state.background.effects.vignette.feather },
+                    { id: 'background-vignette-color', value: state.background.effects.vignette.color },
+
+                    { id: 'image-size-input', value: activeObjectState.image.size },
+                    { id: 'image-offset-x-input', value: activeObjectState.image.offset.x },
+                    { id: 'image-offset-y-input', value: activeObjectState.image.offset.y },
+                    { id: 'stroke-width-input', value: activeObjectState.stroke.width },
+                    { id: 'stroke-roughness-input', value: activeObjectState.stroke.roughness },
+                    { id: 'stroke-detail-input', value: activeObjectState.stroke.detail * 1000 },
+                    { id: 'shadow-offset-x-input', value: activeObjectState.shadow.offsetX }, { id: 'shadow-offset-y-input', value: activeObjectState.shadow.offsetY },
+                    { id: 'shadow-blur-input', value: activeObjectState.shadow.blur },
+                    { id: 'shadow-opacity-input', value: activeObjectState.shadow.opacity },
+                    { id: 'shadow-color', value: activeObjectState.shadow.color },
+                    { id: 'color-hue-input', value: activeObjectState.color.hue },
+                    { id: 'color-saturation-input', value: activeObjectState.color.saturation },
+                    { id: 'color-brightness-input', value: activeObjectState.color.brightness },
+                    { id: 'colorize-switch', checked: activeObjectState.color.colorize },
+                    { id: 'movement-simpel-speed-input', value: activeObjectState.movement.simpelSpeed },
+                    { id: 'movement-simpel-strength-input', value: activeObjectState.movement.simpelStrength },
+                    { id: 'movement-rotation-speed-input', value: activeObjectState.movement.rotationSpeed },
+                    { id: 'movement-rotation-strength-input', value: activeObjectState.movement.rotationStrength },
+                    { id: 'movement-position-speed-x-input', value: activeObjectState.movement.positionSpeed.x },
+                    { id: 'movement-position-speed-y-input', value: activeObjectState.movement.positionSpeed.y },
+                    { id: 'movement-position-strength-x-input', value: activeObjectState.movement.positionStrength.x },
+                    { id: 'movement-position-strength-y-input', value: activeObjectState.movement.positionStrength.y },
+                    { id: 'overlay-opacity-input', value: activeObjectState.paperFoldOverlay.opacity },
+                    { id: 'overlay-speed-input', value: activeObjectState.paperFoldOverlay.speed },
+
+                    { id: 'export-duration-input', value: state.export.duration },
+                    { id: 'export-filename-input', value: state.export.filename },
+                ];
+                 inputsToUpdate.forEach(item => {
+                    const el = document.getElementById(item.id);
+                    const sliderEl = document.getElementById(item.id.replace('-input', ''));
+                    if (el) {
+                        if (el.type === 'checkbox') {
+                            el.checked = item.checked;
+                        } else if (item.value !== undefined) {
+                            el.value = item.value;
+                        }
+                    }
+                    if(sliderEl && sliderEl.type === 'range' && item.value !== undefined) sliderEl.value = item.value;
+                });
+                
+                document.querySelectorAll('#export-fps-btns button').forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.fps) === state.export.fps));
+
+                document.querySelectorAll('.accordion-section').forEach(section => {
+                    const switchInput = section.querySelector('.accordion-header .switch input');
+                    if (!switchInput) return;
+
+                    let isEnabled;
+                    const sectionId = section.id;
+                    if (sectionId.includes('foreground-stroke')) isEnabled = activeObjectState.stroke.enabled;
+                    else if(sectionId.includes('foreground-shadow')) isEnabled = activeObjectState.shadow.enabled;
+                    else if(sectionId.includes('foreground-color')) isEnabled = activeObjectState.color.enabled;
+                    else if(sectionId.includes('movement')) isEnabled = activeObjectState.movement.enabled;
+                    else if(sectionId.includes('background-color-correction')) isEnabled = state.background.effects.colorCorrection.enabled;
+                    else if(sectionId.includes('background-blur')) isEnabled = state.background.effects.blur.enabled;
+                    else if(sectionId.includes('background-vignette')) isEnabled = state.background.effects.vignette.enabled;
+                    else if(sectionId.includes('paper-fold-overlay')) isEnabled = activeObjectState.paperFoldOverlay.enabled;
+                    
+                    if(typeof isEnabled !== 'undefined') switchInput.checked = isEnabled;
+                });
+                
+                const isSimpelMode = activeObjectState.movement.mode === 'simpel';
+                document.getElementById('movement-controls-simpel').classList.toggle('hidden', !isSimpelMode);
+                document.getElementById('movement-controls-lengkap').classList.toggle('hidden', isSimpelMode);
+                document.querySelectorAll('#movement-mode-btns button').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === activeObjectState.movement.mode));
+
+                document.getElementById('color-correction-standard-controls').classList.remove('hidden');
+                document.getElementById('background-color-correction-standard-controls').classList.remove('hidden');
+
+                syncBackgroundTransformModeUI();
+                syncDisplayModeUI();
+                syncUISizeUI();
+                document.querySelectorAll('#language-btns button').forEach(button => {
+                    button.classList.toggle('active', button.dataset.lang === state.language);
+                });
+                showTab(state.activeTab);
+                requestRedraw();
+            }
+
+            /**
+             * Updates the UI for the background transform controls based on the selected mode ('fill' or 'stretch').
+             */
+            function syncBackgroundTransformModeUI() {
+                const isDisabled = state.background.transform.mode === 'stretch';
+                ['background-size-control', 'background-offset-x-control', 'background-offset-y-control'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.toggle('is-disabled', isDisabled);
+                });
+                document.querySelectorAll('#background-mode-btns button').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === state.background.transform.mode));
+            }
+
+            /**
+             * Updates the body class and UI to reflect the current display mode ('auto', 'mobile', 'desktop').
+             */
+            function syncDisplayModeUI() {
+                document.querySelectorAll('#display-mode-btns button').forEach(button => {
+                    button.classList.toggle('active', button.dataset.mode === state.displayMode);
+                });
+                const warningElement = document.getElementById('display-mode-warning');
+                if (warningElement) {
+                    warningElement.classList.toggle('hidden', state.displayMode === 'auto');
+                }
+                body.classList.remove('force-mobile', 'force-desktop');
+                if (state.displayMode === 'mobile') {
+                    body.classList.add('force-mobile');
+                } else if (state.displayMode === 'desktop') {
+                    body.classList.add('force-desktop');
+                }
+                resizeAndRedrawAll();
+            }
+            
+            /**
+             * Updates the body data-attribute and UI buttons for the current UI size.
+             */
+            function syncUISizeUI() {
+                body.dataset.uiSize = state.uiSize;
+                document.querySelectorAll('#ui-size-btns button').forEach(button => {
+                    button.classList.toggle('active', button.dataset.size === state.uiSize);
+                });
+            }
+            
+            /**
+             * Applies a new UI size and redraws the interface.
+             */
+            function applyUISize(size) {
+                state.uiSize = size;
+                syncUISizeUI();
+                resizeAndRedrawAll(); 
+            }
+
+            /**
+             * Resets all settings to their default values.
+             */
+            function resetSettings(deleteImages = false) {
+                const currentBgImg = state.background.element;
+                const currentBgFile = state.background.file;
+                
+                state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+                
+                if (!deleteImages) {
+                    state.background.element = currentBgImg;
+                    state.background.file = currentBgFile;
+                }
+                
+                const isCurrentlyMobile = !window.matchMedia('(min-width: 769px)').matches;
+                state.displayMode = 'auto';
+                state.uiSize = isCurrentlyMobile ? 'compact' : 'normal';
+
+                if (navigator.language.startsWith('id')) {
+                    state.language = 'id';
+                }
+
+                document.querySelectorAll('.accordion-section').forEach(section => {
+                    section.classList.remove('accordion-open');
+                    const body = section.querySelector('.accordion-body');
+                    if (body) body.classList.add('hidden');
+                });
+                const bgTransformAccordion = document.getElementById('background-transform-accordion');
+                if (bgTransformAccordion) {
+                    bgTransformAccordion.classList.add('accordion-open');
+                    bgTransformAccordion.querySelector('.accordion-body').classList.remove('hidden');
+                }
+                if (state.object.image.element) {
+                    const fgTransformAccordion = document.getElementById('foreground-transform-accordion');
+                    if(fgTransformAccordion) {
+                        fgTransformAccordion.classList.add('accordion-open');
+                        fgTransformAccordion.querySelector('.accordion-body').classList.remove('hidden');
+                    }
+                }
+
+                updateUIFromState();
+                resizeAndRedrawAll();
+            }
+            
+            /**
+             * Resets a specific section of the settings to its default value for the active object.
+             */
+            function resetSectionSettings(sectionKey) {
+                const defaultObjectState = DEFAULT_OBJECT_STATE;
+
+                // Cek sederhana: Apakah ini pengaturan milik objek?
+                if (sectionKey === 'image' || ['stroke', 'shadow', 'color', 'movement', 'paperFoldOverlay'].includes(sectionKey)) {
+                    // Langsung targetkan 'state.object', tidak perlu tahu indeks
+                    if (sectionKey === 'image') {
+                        state.object.image.size = defaultObjectState.image.size;
+                        state.object.image.offset = JSON.parse(JSON.stringify(defaultObjectState.image.offset));
+                    } else {
+                        state.object[sectionKey] = JSON.parse(JSON.stringify(defaultObjectState[sectionKey]));
+                    }
+                } else {
+                    // Logika untuk pengaturan global/latar belakang (tidak berubah)
+                    const keys = sectionKey.split('.');
+                    let defaultSection = DEFAULT_STATE;
+                    let currentSection = state;
+                    for (let i = 0; i < keys.length - 1; i++) {
+                        defaultSection = defaultSection[keys[i]];
+                        currentSection = currentSection[keys[i]];
+                    }
+                    const finalKey = keys[keys.length - 1];
+                    currentSection[finalKey] = JSON.parse(JSON.stringify(defaultSection[finalKey]));
+                }
+
+                updateUIFromState();
+                requestRedraw();
+            }
+
+            /**
+             * Shows a notification message at the top of the screen.
+             */
+            function showTopNotification(messageKey, duration = 3000) {
+                clearTimeout(notificationTimeout);
+                topNotificationMessage.textContent = translations[state.language][messageKey] || messageKey;
+                topNotificationPopup.classList.remove('hidden');
+                setTimeout(() => topNotificationPopup.classList.add('show'), 10);
+                notificationTimeout = setTimeout(() => {
+                    topNotificationPopup.classList.remove('show');
+                    setTimeout(() => topNotificationPopup.classList.add('hidden'), 300);
+                }, duration);
+            }
+
+            /**
+             * Shows a modal confirmation dialog.
+             */
+            function showConfirmationPopup(titleKey, messageKey, options = {}) {
+                return new Promise(resolve => {
+                    confirmationTitle.textContent = translations[state.language][titleKey] || titleKey;
+                    confirmationMessage.textContent = translations[state.language][messageKey] || messageKey;
+
+                    if (options.showDeleteImagesCheckbox) {
+                        resetImagesOption.style.display = 'flex';
+                        deleteImagesCheckbox.checked = false; 
+                    } else {
+                        resetImagesOption.style.display = 'none';
+                    }
+
+                    confirmationPopup.classList.remove('hidden');
+                    
+                    const handleConfirm = () => closeAndResolve(true);
+                    const handleCancel = () => closeAndResolve(false);
+                    
+                    function closeAndResolve(isConfirmed) {
+                        confirmationPopup.classList.add('hidden');
+                        confirmContinueBtn.removeEventListener('click', handleConfirm);
+                        confirmCancelBtn.removeEventListener('click', handleCancel);
+                        const result = {
+                            confirmed: isConfirmed,
+                            deleteImages: options.showDeleteImagesCheckbox ? deleteImagesCheckbox.checked : false
+                        };
+                        resolve(result);
+                    }
+
+                    confirmContinueBtn.addEventListener('click', handleConfirm, { once: true });
+                    confirmCancelBtn.addEventListener('click', handleCancel, { once: true });
+                });
+            }
+
+            /**
+             * Starts the video export process using CCapture.js.
+             */
+            async function startExport() {
+				const hasAnyImage = state.object.image.element || state.background.element;
+                if (!hasAnyImage) {
+                    showTopNotification("notificationWarnUpload");
+                    return;
+                }
+                const exportSettingsPopup = document.getElementById('export-settings-popup');
+                const exportProgressPopup = document.getElementById('export-progress-popup');
+                const progressBarFill = document.getElementById('progress-bar-fill');
+                
+                if (exportSettingsPopup) exportSettingsPopup.classList.add('hidden');
+                if (exportProgressPopup) {
+                    exportProgressPopup.classList.remove('hidden');
+                    exportProgressPopup.classList.add('flex');
+                }
+                cancelAnimationFrame(animationFrameId);
+                const originalCanvasWidth = canvas.width;
+                const originalCanvasHeight = canvas.height;
+                const finalExportDims = RESOLUTION_MAPS[state.canvasDisplayResolution.toString()]?.[state.aspectRatio];
+
+                if (!finalExportDims) { 
+                    console.error("Invalid export resolution."); 
+                    if (exportProgressPopup) {
+                        exportProgressPopup.classList.add('hidden');
+                        exportProgressPopup.classList.remove('flex');
+                    }
+                    animationLoop();
+                    return;
+                }
+
+                // Set canvas to final export dimensions and reset animation state for all objects
+                canvas.width = finalExportDims.w;
+                canvas.height = finalExportDims.h;
+				const obj = state.object; // Targetkan satu objek
+				obj.movement.lastRotationUpdateTime = 0;
+				obj.movement.lastPositionUpdateTime = { x: 0, y: 0 };
+				obj.movement.rotation = 0;
+				obj.movement.positionOffset = {x: 0, y: 0};
+				obj.paperFoldOverlay.lastImageSwitchTime = 0;
+				obj.paperFoldOverlay.currentImageIndex = 0;
+								
+                const DURATION_S = state.export.duration;
+                const FRAME_RATE = state.export.fps;
+                const FILENAME = state.export.filename || 'animasi-sobek';
+                const TOTAL_FRAMES = DURATION_S * FRAME_RATE;
+                const capturer = new CCapture({ format: 'webm', framerate: FRAME_RATE, quality: 95, name: FILENAME });
+                capturer.start();
+                // Loop through each frame, render it, and capture it
+                for (let i = 0; i <= TOTAL_FRAMES; i++) {
+                    const timestamp = (i / FRAME_RATE) * 1000;
+                    updateMovement(timestamp);
+                    updatePaperFoldOverlay(timestamp);
+                    draw();
+                    capturer.capture(canvas);
+                    const percentage = Math.round((i / TOTAL_FRAMES) * 100);
+                    if (progressBarFill) {
+                        progressBarFill.style.width = `${percentage}%`;
+                        progressBarFill.textContent = `${percentage}%`;
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 1)); // Small delay to allow UI to update
+                }
+                if (progressBarFill) progressBarFill.textContent = `${translations[state.language].completing}...`;
+                capturer.stop();
+                // Save the captured video
+                capturer.save(blob => {
+                    if (exportProgressPopup) {
+                        exportProgressPopup.classList.add('hidden');
+                        exportProgressPopup.classList.remove('flex');
+                    }
+                    // Restore original canvas size and restart animation loop
+                    canvas.width = originalCanvasWidth;
+                    canvas.height = originalCanvasHeight;
+                    resizeAndRedrawAll();
+                    animationFrameId = requestAnimationFrame(animationLoop);
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${FILENAME}.webm`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                });
+            }
+
+            /**
+             * Shows the content for a specific tab and updates the active state of tab buttons.
+             */
+            function showTab(tabName) {
+                const lang = state.language;
+                const tabTitles = {
+                    background: translations[lang].tabTitleBackground,
+                    object: translations[lang].tabTitleObject,
+                    info: translations[lang].tabTitleInfo
+                };
+                
+                const titleText = tabTitles[tabName] || translations[lang].settings;
+                document.getElementById('panel-title').textContent = titleText;
+                document.getElementById('mobile-panel-header').textContent = titleText.toUpperCase();
+
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+                document.querySelectorAll('.tab-handle').forEach(handle => handle.classList.remove('active'));
+                document.querySelectorAll('.mobile-tab-btn').forEach(handle => handle.classList.remove('active'));
+                document.getElementById(`${tabName}-tab-content`).classList.remove('hidden');
+                document.getElementById(`handle-${tabName}`)?.classList.add('active');
+                document.querySelector(`.mobile-tab-btn[data-tab="${tabName}"]`)?.classList.add('active');
+                state.activeTab = tabName;
+            }
+            
+            /**
+             * Toggles the settings panel open or closed, managing browser history for back button support.
+             */
+            function togglePanel() {
+                const isOpen = panelWrapper.classList.contains('panel-open');
+                if (isOpen) {
+                    if (history.state && history.state.panel === 'open') {
+                        history.back(); // Use history to close if opened via history
+                    } else {
+                        panelWrapper.classList.remove('panel-open');
+                    }
+                } else {
+                    history.pushState({ panel: 'open' }, 'Panel Open');
+                    panelWrapper.classList.add('panel-open');
+                }
+            }
+            
+            /**
+             * Initializes the application, sets up event listeners, and starts the animation loop.
+             */
+            function init() {
+                // Open panel by default on desktop
+                if (!window.matchMedia('(max-width: 768px)').matches) {
+                   panelWrapper.classList.add('panel-open');
+                }
+
+                // Set initial language based on browser setting
+                if (navigator.language.startsWith('id')) {
+                    state.language = 'id';
+                }
+                
+                // Set initial UI size and display mode
+                const isCurrentlyMobile = !window.matchMedia('(min-width: 769px)').matches;
+                state.displayMode = 'auto'; 
+                state.uiSize = isCurrentlyMobile ? 'compact' : 'normal';
+
+                resizeAndRedrawAll();
+                animationFrameId = requestAnimationFrame(animationLoop);
+                const bgTransformAccordion = document.getElementById('background-transform-accordion');
+                bgTransformAccordion.classList.add('accordion-open');
+                bgTransformAccordion.querySelector('.accordion-body').classList.remove('hidden');
+                // Load overlay images from URLs
+                let loadedOriginalOverlays = 0;
+                const totalOverlays = overlayImageUrls.length;
+                overlayImageUrls.forEach((url, index) => {
+                    const img = new Image();
+                    img.crossOrigin = "Anonymous"; 
+                    img.onload = () => {
+                        originalOverlayImages[index] = img;
+                        loadedOriginalOverlays++;
+                        if (loadedOriginalOverlays === totalOverlays) {
+                            updateUIFromState();
+                            requestRedraw();
+                        }
+                    };
+                    img.onerror = () => { console.error(`Failed to load overlay image from URL: ${url}`); };
+                    img.src = url;
+                });
+
+                // --- EVENT LISTENERS ---
+                window.addEventListener('resize', () => {
+                    if (state.displayMode === 'auto') {
+                         const isMobile = !window.matchMedia('(min-width: 769px)').matches;
+                         applyUISize(isMobile ? 'compact' : 'normal');
+                    }
+                    resizeAndRedrawAll();
+                });
+                panelHandle.addEventListener('click', togglePanel);
+                document.getElementById('mobile-export-btn').addEventListener('click', () => {
+                    document.getElementById('export-settings-popup').classList.remove('hidden');
+                    updateUIFromState();
+                });
+                window.addEventListener('popstate', (event) => {
+                    if (!event.state || event.state.panel !== 'open') {
+                        panelWrapper.classList.remove('panel-open');
+                    }
+                });
+                ['handle-background', 'handle-object', 'handle-info'].forEach(id => {
+                    document.getElementById(id).addEventListener('click', (e) => showTab(id.split('-')[1]));
+                });
+                document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        showTab(btn.dataset.tab);
+                    });
+                });
+
+                document.getElementById('reset-settings-btn').addEventListener('click', async () => {
+                    const { confirmed, deleteImages } = await showConfirmationPopup(
+                        "confirmResetTitle", 
+                        "confirmResetMessage",
+                        { showDeleteImagesCheckbox: true }
+                    );
+                    if (confirmed) {
+                        resetSettings(deleteImages);
+                    }
+                });
+
+                document.getElementById('export-video-btn-header').addEventListener('click', () => {
+                    document.getElementById('export-settings-popup').classList.remove('hidden');
+                    updateUIFromState();
+                });
+                document.getElementById('cancel-export-settings-btn').addEventListener('click', () => document.getElementById('export-settings-popup').classList.add('hidden'));
+                document.getElementById('start-export-with-settings-btn').addEventListener('click', startExport);
+                
+                document.getElementById('export-fps-btns').addEventListener('click', (e) => {
+                    const button = e.target.closest('button');
+                    if(button) {
+                        state.export.fps = parseInt(button.dataset.fps);
+                        updateUIFromState(); 
+                    }
+                });
+                document.getElementById('export-duration-input').addEventListener('change', (e) => {
+                    const val = parseInt(e.target.value, 10);
+                    const min = parseInt(e.target.min, 10);
+                    const max = parseInt(e.target.max, 10);
+                    state.export.duration = Math.max(min, Math.min(max, val || 1));
+                    e.target.value = state.export.duration;
+                });
+                 document.getElementById('export-filename-input').addEventListener('input', (e) => {
+                    state.export.filename = e.target.value.trim();
+                });
+
+                // Setup drag and drop zones
+                const setupDropZone = (zoneId, inputId, target) => {
+                    const dropZone = document.getElementById(zoneId);
+                    const input = document.getElementById(inputId);
+                    if(!dropZone || !input) return;
+                    input.addEventListener('change', (e) => handleImageFile(e.target.files[0], target));
+                    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                        dropZone.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); });
+                        document.body.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); });
+                    });
+                    ['dragenter', 'dragover'].forEach(eventName => dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-over')));
+                    ['dragleave', 'drop'].forEach(eventName => dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-over')));
+                    dropZone.addEventListener('drop', (e) => {
+                        handleImageFile(e.dataTransfer.files[0], target);
+                        input.files = e.dataTransfer.files; 
+                    });
+                };
+                setupDropZone('drop-zone', 'image-upload', 'foreground');
+                setupDropZone('background-drop-zone', 'background-image-upload', 'background');
+				document.getElementById('delete-image-btn').addEventListener('click', (e) => { 
+					e.stopPropagation(); 
+					state.object.image.element = null; 
+					state.object.image.file = null; 
+					document.getElementById('image-upload').value = ''; 
+					updateUIFromState(); 
+					requestRedraw(); // Tambahkan ini agar kanvas langsung update
+				});
+                document.getElementById('remove-background-image').addEventListener('click', (e) => { e.stopPropagation(); state.background.element = null; state.background.file = null; document.getElementById('background-image-upload').value = ''; updateUIFromState(); });
+                
+                // Accordion logic
+                document.querySelectorAll('.accordion-header').forEach(header => {
+                    header.addEventListener('click', (e) => {
+                        if (e.target.closest('.switch') || e.target.closest('.reset-section-btn')) return;
+                        
+                        const section = header.parentElement;
+                        
+                        if (section.classList.contains('controls-disabled-for-bg') && !section.id.includes('color-correction') && !section.id.includes('vignette')) {
+                            e.stopPropagation();
+                            showTopNotification("notificationWarnBg");
+                            return;
+                        }
+
+                        if (section.closest('#image-specific-controls')?.classList.contains('is-disabled')) {
+                             e.stopPropagation();
+                             showTopNotification("notificationWarnObject");
+                             return;
+                        }
+
+                        section.classList.toggle('accordion-open');
+                        const body = section.querySelector('.accordion-body');
+                        if (body) body.classList.toggle('hidden', !section.classList.contains('accordion-open'));
+                    });
+                });
+                
+                // Effect enable/disable switches
+                const effectSwitches = [
+                    { switchId: 'background-color-correction-enabled-switch', stateKey: 'background.effects.colorCorrection' },
+                    { switchId: 'background-blur-enabled-switch', stateKey: 'background.effects.blur' },
+                    { switchId: 'background-vignette-enabled-switch', stateKey: 'background.effects.vignette' },
+                    { switchId: 'stroke-enabled-switch', stateKey: 'stroke' },
+                    { switchId: 'shadow-enabled-switch', stateKey: 'shadow' },
+                    { switchId: 'color-enabled-switch', stateKey: 'color' },
+                    { switchId: 'movement-enabled-switch', stateKey: 'movement' },
+                    { switchId: 'paper-fold-overlay-enabled-switch', stateKey: 'paperFoldOverlay' },
+                ];
+                
+                effectSwitches.forEach(({ switchId, stateKey }) => {
+                    const switchEl = document.getElementById(switchId);
+                    if (switchEl) {
+                        switchEl.addEventListener('change', (e) => {
+                            const isObjectProperty = ['stroke', 'shadow', 'color', 'movement', 'paperFoldOverlay'].includes(stateKey);
+                            
+                            let sectionState;
+                            if (isObjectProperty) {
+                                sectionState = state.object;
+                                sectionState[stateKey].enabled = e.target.checked;
+                            } else {
+                                const keys = stateKey.split('.');
+                                sectionState = state;
+                                for (let i = 0; i < keys.length - 1; i++) {
+                                    sectionState = sectionState[keys[i]];
+                                }
+                                sectionState[keys[keys.length - 1]].enabled = e.target.checked;
+                            }
+
+                            const section = switchEl.closest('.accordion-section');
+                            const body = section.querySelector('.accordion-body');
+                            
+                            if (e.target.checked) {
+                                section.classList.add('accordion-open');
+                                if (body) body.classList.remove('hidden');
+                            } else {
+                                section.classList.remove('accordion-open');
+                                if (body) body.classList.add('hidden');
+                            }
+                            updateUIFromState(); 
+                            requestRedraw();
+                        });
+                    }
+                });
+
+                // Reset section buttons
+                document.querySelectorAll('.reset-section-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const sectionKey = btn.dataset.sectionKey;
+                        resetSectionSettings(sectionKey);
+                    });
+                });
+                
+                // --- BIND OBJECT CONTROLS ---
+                const getActiveObject = () => state.object;
+
+                syncSliderAndInput('image-size', 'image-size-input', (val) => getActiveObject().image.size = val);
+                syncSliderAndInput('image-offset-x', 'image-offset-x-input', (val) => getActiveObject().image.offset.x = val);
+                syncSliderAndInput('image-offset-y', 'image-offset-y-input', (val) => getActiveObject().image.offset.y = val);
+                syncSliderAndInput('stroke-width', 'stroke-width-input', (val) => getActiveObject().stroke.width = val);
+                syncSliderAndInput('stroke-roughness', 'stroke-roughness-input', (val) => getActiveObject().stroke.roughness = val);
+                syncSliderAndInput('stroke-detail', 'stroke-detail-input', (val) => getActiveObject().stroke.detail = val / 1000);
+                syncSliderAndInput('shadow-blur', 'shadow-blur-input', (val) => getActiveObject().shadow.blur = val);
+                syncSliderAndInput('shadow-opacity', 'shadow-opacity-input', (val) => getActiveObject().shadow.opacity = val);
+                syncInputOnly('shadow-offset-x-input', (val) => getActiveObject().shadow.offsetX = val);
+                syncInputOnly('shadow-offset-y-input', (val) => getActiveObject().shadow.offsetY = val);
+                document.getElementById('shadow-color').addEventListener('input', (e) => { getActiveObject().shadow.color = e.target.value; requestRedraw(); });
+                syncSliderAndInput('color-hue', 'color-hue-input', (val) => getActiveObject().color.hue = val);
+                syncSliderAndInput('color-saturation', 'color-saturation-input', (val) => getActiveObject().color.saturation = val);
+                syncSliderAndInput('color-brightness', 'color-brightness-input', (val) => getActiveObject().color.brightness = val);
+                document.getElementById('colorize-switch').addEventListener('change', (e) => { getActiveObject().color.colorize = e.target.checked; updateUIFromState(); });
+                
+                document.getElementById('movement-mode-btns').addEventListener('click', (e) => {
+                    const button = e.target.closest('button');
+                    if (button) { getActiveObject().movement.mode = button.dataset.mode; updateUIFromState(); }
+                });
+                syncSliderAndInput('movement-simpel-speed', 'movement-simpel-speed-input', (val) => getActiveObject().movement.simpelSpeed = val);
+                syncSliderAndInput('movement-simpel-strength', 'movement-simpel-strength-input', (val) => getActiveObject().movement.simpelStrength = val);
+                syncSliderAndInput('movement-rotation-speed', 'movement-rotation-speed-input', (val) => getActiveObject().movement.rotationSpeed = val);
+                syncSliderAndInput('movement-rotation-strength', 'movement-rotation-strength-input', (val) => getActiveObject().movement.rotationStrength = val);
+                syncSliderAndInput('movement-position-speed-x', 'movement-position-speed-x-input', (val) => getActiveObject().movement.positionSpeed.x = val);
+                syncSliderAndInput('movement-position-speed-y', 'movement-position-speed-y-input', (val) => getActiveObject().movement.positionSpeed.y = val);
+                syncSliderAndInput('movement-position-strength-x', 'movement-position-strength-x-input', (val) => getActiveObject().movement.positionStrength.x = val);
+                syncSliderAndInput('movement-position-strength-y', 'movement-position-strength-y-input', (val) => getActiveObject().movement.positionStrength.y = val);
+
+                syncSliderAndInput('overlay-opacity', 'overlay-opacity-input', (val) => { getActiveObject().paperFoldOverlay.opacity = val; });
+                syncSliderAndInput('overlay-speed', 'overlay-speed-input', (val) => getActiveObject().paperFoldOverlay.speed = val); 
+                
+                // --- BIND GLOBAL CONTROLS ---
+                document.getElementById('aspect-ratio-btns').addEventListener('click', (e) => {
+                    const button = e.target.closest('button');
+                    if (button) { state.aspectRatio = button.dataset.ratio; resizeAndRedrawAll(); updateUIFromState(); }
+                });
+                document.getElementById('canvas-resolution-btns').addEventListener('click', (e) => {
+                    const button = e.target.closest('button');
+                    if (button) { state.canvasDisplayResolution = parseInt(button.dataset.res); resizeAndRedrawAll(); updateUIFromState(); }
+                });
+                document.getElementById('background-color').addEventListener('input', (e) => { state.background.color = e.target.value; requestRedraw(); });
+                document.getElementById('background-mode-btns').addEventListener('click', (e) => {
+                    const button = e.target.closest('button');
+                    if (button) { state.background.transform.mode = button.dataset.mode; syncBackgroundTransformModeUI(); requestRedraw(); }
+                });
+                syncSliderAndInput('background-size', 'background-size-input', (val) => state.background.transform.size = val);
+                syncSliderAndInput('background-offset-x', 'background-offset-x-input', (val) => state.background.transform.offset.x = val);
+                syncSliderAndInput('background-offset-y', 'background-offset-y-input', (val) => state.background.transform.offset.y = val);
+                syncSliderAndInput('background-color-hue', 'background-color-hue-input', (val) => state.background.effects.colorCorrection.hue = val);
+                syncSliderAndInput('background-color-saturation', 'background-color-saturation-input', (val) => state.background.effects.colorCorrection.saturation = val);
+                syncSliderAndInput('background-color-brightness', 'background-color-brightness-input', (val) => state.background.effects.colorCorrection.brightness = val);
+                document.getElementById('background-colorize-switch').addEventListener('change', (e) => { state.background.effects.colorCorrection.colorize = e.target.checked; updateUIFromState(); });
+                syncSliderAndInput('background-blur-intensity', 'background-blur-intensity-input', (val) => state.background.effects.blur.intensity = val);
+                syncSliderAndInput('background-vignette-opacity', 'background-vignette-opacity-input', (val) => state.background.effects.vignette.opacity = val);
+                syncSliderAndInput('background-vignette-radius', 'background-vignette-radius-input', (val) => state.background.effects.vignette.radius = val);
+                syncSliderAndInput('background-vignette-feather', 'background-vignette-feather-input', (val) => state.background.effects.vignette.feather = val);
+                document.getElementById('background-vignette-color').addEventListener('input', (e) => { state.background.effects.vignette.color = e.target.value; requestRedraw(); });
+                
+                document.getElementById('display-mode-btns').addEventListener('click', (e) => {
+                    const button = e.target.closest('button');
+                    if (button) {
+                        state.displayMode = button.dataset.mode;
+                        if(state.displayMode === 'mobile') { applyUISize('compact'); } 
+                        else if(state.displayMode === 'desktop') { applyUISize('normal'); }
+                        syncDisplayModeUI();
+                    }
+                });
+
+                document.getElementById('ui-size-btns').addEventListener('click', (e) => {
+                    const button = e.target.closest('button');
+                    if (button && button.dataset.size) { applyUISize(button.dataset.size); }
+                });
+
+                document.getElementById('language-btns').addEventListener('click', (e) => {
+                    const button = e.target.closest('button');
+                    if (button && button.dataset.lang) {
+                        state.language = button.dataset.lang;
+                        updateUIFromState();
+                    }
+                });
+
+                topNotificationCloseBtn.addEventListener('click', () => {
+                    topNotificationPopup.classList.remove('show');
+                    clearTimeout(notificationTimeout);
+                    setTimeout(() => topNotificationPopup.classList.add('hidden'), 300);
+                });
+                
+
+                // Mobile panel resizer logic
+                const resizerMove = (e) => {
+                    e.preventDefault();
+                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    const totalHeight = window.innerHeight;
+                    const footerHeight = document.getElementById('mobile-footer').offsetHeight;
+
+                    let canvasHeight = clientY;
+                    let panelHeight = totalHeight - clientY;
+
+                    const minHeight = totalHeight * 0.20;
+
+                    canvasHeight = Math.max(minHeight, canvasHeight);
+                    canvasHeight = Math.min(totalHeight - minHeight - footerHeight, canvasHeight);
+                    panelHeight = totalHeight - canvasHeight;
+
+                    canvasContainer.style.flexBasis = `${canvasHeight}px`;
+                    panelWrapper.style.flexBasis = `${panelHeight}px`;
+                    
+                    requestAnimationFrame(updateCanvasDisplaySize);
+                };
+
+                const resizerStop = () => {
+                    document.removeEventListener('mousemove', resizerMove);
+                    document.removeEventListener('touchmove', resizerMove);
+                    document.removeEventListener('mouseup', resizerStop);
+                    document.removeEventListener('touchend', resizerStop);
+                    body.style.userSelect = '';
+                    resizeAndRedrawAll();
+                };
+                
+                mobilePanelHeader.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    body.style.userSelect = 'none';
+                    document.addEventListener('mousemove', resizerMove);
+                    document.addEventListener('mouseup', resizerStop);
+                });
+                mobilePanelHeader.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    body.style.userSelect = 'none';
+                    document.addEventListener('touchmove', resizerMove, { passive: false });
+                    document.addEventListener('touchend', resizerStop);
+                });
+
+
+                updateUIFromState();
+            }
+            init(); 
+        });
+    </script>
+</body>
+</html>
