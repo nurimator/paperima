@@ -73,7 +73,8 @@
         .main-handle { top: 0; }
         #handle-background { top: 63px; }
         #handle-object { top: 126px; }
-        #handle-info { top: 187px; }
+        #handle-animasi { top: 187px; }
+        #handle-info { top: 250px; }        
         .tab-handle { opacity: 0; pointer-events: none; transition: opacity 0.3s 0.1s, transform 0.3s ease-in-out; }
         #settings-panel-wrapper.panel-open .tab-handle { opacity: 1; pointer-events: auto; transition-delay: 0.1s; }
         .main-handle:hover, .tab-handle:hover { color: #FFFFFF; background-color: var(--bg-header); }
@@ -291,6 +292,47 @@
         .info-tooltip-trigger .info-tooltip { visibility: hidden; opacity: 0; transition: opacity 0.3s, visibility 0.3s; }
         .info-tooltip-trigger:hover .info-tooltip, .info-tooltip-trigger:focus .info-tooltip, .info-tooltip-trigger:active .info-tooltip { visibility: visible; opacity: 1; }
         .rounded-md, .rounded-lg, .rounded-full { border-radius: 0; }
+
+        /* Keyframes untuk Animasi Gerak (Move) */
+        @keyframes move-from-left {
+            from { transform: translateX(-100%); } to { transform: translateX(0); }
+        }
+        @keyframes move-to-left {
+            from { transform: translateX(0); } to { transform: translateX(-100%); }
+        }
+        @keyframes move-from-right {
+            from { transform: translateX(100%); } to { transform: translateX(0); }
+        }
+        @keyframes move-to-right {
+            from { transform: translateX(0); } to { transform: translateX(100%); }
+        }
+        @keyframes move-from-top {
+            from { transform: translateY(-100%); } to { transform: translateY(0); }
+        }
+        @keyframes move-to-top {
+            from { transform: translateY(0); } to { transform: translateY(-100%); }
+        }
+        @keyframes move-from-bottom {
+            from { transform: translateY(100%); } to { transform: translateY(0); }
+        }
+        @keyframes move-to-bottom {
+            from { transform: translateY(0); } to { transform: translateY(100%); }
+        }
+
+        /* Keyframes untuk Animasi Zoom */
+        @keyframes zoom-in {
+            from { transform: scale(var(--anim-scale-start, 0)); } to { transform: scale(1); }
+        }
+        @keyframes zoom-out {
+            from { transform: scale(1); } to { transform: scale(var(--anim-scale-end, 0)); }
+        }
+
+        /* Easing Functions */
+        .anim-linear { animation-timing-function: linear; }
+        .anim-ease-in { animation-timing-function: ease-in; }
+        .anim-ease-out { animation-timing-function: ease-out; }
+        .anim-back-in { animation-timing-function: cubic-bezier(0.36, 0, 0.66, -0.56); }
+        .anim-back-out { animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
     </style>
 </head>
 <body class="bg-slate-900 relative">
@@ -342,6 +384,9 @@
         </button>
         <button id="handle-object" class="tab-handle">
             <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.01 2.92007L18.91 5.54007C20.61 6.29007 20.61 7.53007 18.91 8.28007L13.01 10.9001C12.34 11.2001 11.24 11.2001 10.57 10.9001L4.67 8.28007C2.97 7.53007 2.97 6.29007 4.67 5.54007L10.57 2.92007C11.24 2.62007 12.34 2.62007 13.01 2.92007Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11C3 11.84 3.63 12.81 4.40 13.15L11.19 16.17C11.71 16.40 12.30 16.40 12.81 16.17L19.60 13.15C20.37 12.81 21 11.84 21 11" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 16C3 16.93 3.55 17.77 4.40 18.15L11.19 21.17C11.71 21.40 12.30 21.40 12.81 21.17L19.60 18.15C20.45 17.77 21 16.93 21 16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button id="handle-animasi" class="tab-handle">
+            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
         </button>
         <button id="handle-info" class="tab-handle">
             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1s1 .45 1 1v4c0 .55-.45 1-1 1zm1-8h-2V7h2v2z"/></svg>
@@ -764,6 +809,133 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="animasi-tab-content" class="tab-content hidden space-y-4 md:space-y-4">
+                    <h2 class="text-lg font-bold text-slate-300">Animasi Objek</h2>
+                    <div class="accordion-section border border-[var(--border-color)]" id="anim-in-accordion">
+                        <div class="accordion-header w-full flex items-center justify-between p-4 transition-colors duration-200 cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <svg class="accordion-chevron transition-transform duration-300 text-[var(--text-muted)]" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                                <h2 class="text-base font-semibold text-slate-300">Animasi In</h2>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button id="preview-anim-in-btn" class="p-1.5 text-xs bg-sky-500 hover:bg-sky-600 text-white font-semibold">Preview</button>
+                                <label class="switch"><input type="checkbox" id="anim-in-enabled-switch"><span class="toggle-slider"></span></label>
+                            </div>
+                        </div>
+                        <div class="accordion-body space-y-4 p-4 border-t border-[var(--border-color)] hidden">
+                            <div>
+                                <label class="text-sm font-medium text-[var(--text-muted)]">Tipe</label>
+                                <div id="anim-in-type-btns" class="grid grid-cols-2 gap-2 mt-2 btn-group-toggle">
+                                    <button data-type="move" class="p-2.5 text-sm active">Move</button>
+                                    <button data-type="zoom" class="p-2.5 text-sm">Zoom</button>
+                                </div>
+                            </div>
+                            <div id="anim-in-move-controls" class="space-y-4">
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)]">Arah</label>
+                                    <div id="anim-in-move-direction-btns" class="grid grid-cols-4 gap-2 mt-2 btn-group-toggle">
+                                        <button data-direction="left" class="p-2.5 text-sm active">→</button>
+                                        <button data-direction="right" class="p-2.5 text-sm">←</button>
+                                        <button data-direction="top" class="p-2.5 text-sm">↓</button>
+                                        <button data-direction="bottom" class="p-2.5 text-sm">↑</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block">Jarak (%)</label>
+                                    <div class="flex items-center gap-3"><input type="range" id="anim-in-move-distance" min="0" max="200" value="100" class="w-full slider"><input type="number" id="anim-in-move-distance-input" min="0" max="200" value="100" class="number-input-uniform"></div>
+                                </div>
+                            </div>
+                            <div id="anim-in-zoom-controls" class="space-y-4 hidden">
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block">Skala Awal (%)</label>
+                                    <div class="flex items-center gap-3"><input type="range" id="anim-in-zoom-scale" min="0" max="200" value="50" class="w-full slider"><input type="number" id="anim-in-zoom-scale-input" min="0" max="200" value="50" class="number-input-uniform"></div>
+                                </div>
+                            </div>
+                            <div class="space-y-4 pt-4 border-t border-slate-700">
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block">Durasi (detik)</label>
+                                    <div class="flex items-center gap-3"><input type="range" id="anim-in-duration" min="0" max="3" value="1" step="0.1" class="w-full slider"><input type="number" id="anim-in-duration-input" min="0" max="3" step="0.1" value="1" class="number-input-uniform"></div>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block">Mulai (detik ke-)</label>
+                                    <div class="flex items-center gap-3"><input type="range" id="anim-in-start" min="0" max="10" value="0" step="0.1" class="w-full slider"><input type="number" id="anim-in-start-input" min="0" max="10" step="0.1" value="0" class="number-input-uniform"></div>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)]">Easing</label>
+                                    <div id="anim-in-easing-btns" class="grid grid-cols-3 gap-2 mt-2 btn-group-toggle">
+                                        <button data-easing="linear" class="p-2.5 text-sm active">Linear</button>
+                                        <button data-easing="ease" class="p-2.5 text-sm">Ease In</button>
+                                        <button data-easing="back" class="p-2.5 text-sm">Back In</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-section border border-[var(--border-color)]" id="anim-out-accordion">
+                        <div class="accordion-header w-full flex items-center justify-between p-4 transition-colors duration-200 cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <svg class="accordion-chevron transition-transform duration-300 text-[var(--text-muted)]" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                                <h2 class="text-base font-semibold text-slate-300">Animasi Out</h2>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button id="preview-anim-out-btn" class="p-1.5 text-xs bg-sky-500 hover:bg-sky-600 text-white font-semibold">Preview</button>
+                                <label class="switch"><input type="checkbox" id="anim-out-enabled-switch"><span class="toggle-slider"></span></label>
+                            </div>
+                        </div>
+                        <div class="accordion-body space-y-4 p-4 border-t border-[var(--border-color)] hidden">
+                            <div>
+                                <label class="text-sm font-medium text-[var(--text-muted)]">Tipe</label>
+                                <div id="anim-out-type-btns" class="grid grid-cols-2 gap-2 mt-2 btn-group-toggle">
+                                    <button data-type="move" class="p-2.5 text-sm active">Move</button>
+                                    <button data-type="zoom" class="p-2.5 text-sm">Zoom</button>
+                                </div>
+                            </div>
+                            <div id="anim-out-move-controls" class="space-y-4">
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)]">Arah</label>
+                                    <div id="anim-out-move-direction-btns" class="grid grid-cols-4 gap-2 mt-2 btn-group-toggle">
+                                        <button data-direction="left" class="p-2.5 text-sm active">→</button>
+                                        <button data-direction="right" class="p-2.5 text-sm">←</button>
+                                        <button data-direction="top" class="p-2.5 text-sm">↓</button>
+                                        <button data-direction="bottom" class="p-2.5 text-sm">↑</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block">Jarak (%)</label>
+                                    <div class="flex items-center gap-3"><input type="range" id="anim-out-move-distance" min="0" max="200" value="100" class="w-full slider"><input type="number" id="anim-out-move-distance-input" min="0" max="200" value="100" class="number-input-uniform"></div>
+                                </div>
+                            </div>
+                            <div id="anim-out-zoom-controls" class="space-y-4 hidden">
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block">Skala Akhir (%)</label>
+                                    <div class="flex items-center gap-3"><input type="range" id="anim-out-zoom-scale" min="0" max="200" value="50" class="w-full slider"><input type="number" id="anim-out-zoom-scale-input" min="0" max="200" value="50" class="number-input-uniform"></div>
+                                </div>
+                            </div>
+                            <div class="space-y-4 pt-4 border-t border-slate-700">
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block">Durasi (detik)</label>
+                                    <div class="flex items-center gap-3"><input type="range" id="anim-out-duration" min="0" max="3" value="1" step="0.1" class="w-full slider"><input type="number" id="anim-out-duration-input" min="0" max="3" step="0.1" value="1" class="number-input-uniform"></div>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block">Mulai (detik ke-)</label>
+                                    <div class="flex items-center gap-3"><input type="range" id="anim-out-start" min="0" max="10" value="4" step="0.1" class="w-full slider"><input type="number" id="anim-out-start-input" min="0" max="10" step="0.1" value="4" class="number-input-uniform"></div>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-[var(--text-muted)]">Easing</label>
+                                    <div id="anim-out-easing-btns" class="grid grid-cols-3 gap-2 mt-2 btn-group-toggle">
+                                        <button data-easing="linear" class="p-2.5 text-sm active">Linear</button>
+                                        <button data-easing="ease" class="p-2.5 text-sm">Ease Out</button>
+                                        <button data-easing="back" class="p-2.5 text-sm">Back Out</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+
                 <!-- Info/Settings Tab Content -->
                 <div id="info-tab-content" class="tab-content hidden space-y-4 md:space-y-4 text-slate-300">
                      <div class="space-y-2 md:space-y-2">
@@ -821,6 +993,9 @@
         </button>
         <button id="mobile-tab-object" data-tab="object" class="mobile-tab-btn p-2 text-slate-300 hover:text-white">
             <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.01 2.92007L18.91 5.54007C20.61 6.29007 20.61 7.53007 18.91 8.28007L13.01 10.9001C12.34 11.2001 11.24 11.2001 10.57 10.9001L4.67 8.28007C2.97 7.53007 2.97 6.29007 4.67 5.54007L10.57 2.92007C11.24 2.62007 12.34 2.62007 13.01 2.92007Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11C3 11.84 3.63 12.81 4.40 13.15L11.19 16.17C11.71 16.40 12.30 16.40 12.81 16.17L19.60 13.15C20.37 12.81 21 11.84 21 11" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 16C3 16.93 3.55 17.77 4.40 18.15L11.19 21.17C11.71 21.40 12.30 21.40 12.81 21.17L19.60 18.15C20.45 17.77 21 16.93 21 16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button id="mobile-tab-animasi" data-tab="animasi" class="mobile-tab-btn p-2 text-slate-300 hover:text-white">
+            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
         </button>
         <button id="mobile-tab-info" data-tab="info" class="mobile-tab-btn p-2 text-slate-300 hover:text-white">
             <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1s1 .45 1 1v4c0 .55-.45 1-1 1zm1-8h-2V7h2v2z"/></svg>
@@ -967,7 +1142,37 @@
                     speed: 4,
                     blendMode: 'multiply',
                     lastImageSwitchTime: 0
-                }
+                },
+                animation: {
+                    in: {
+                        enabled: false,
+                        type: 'move', // 'move' atau 'zoom'
+                        duration: 1,
+                        startTime: 0,
+                        easing: 'linear', // 'linear', 'ease', 'back'
+                        move: {
+                            direction: 'left', // 'left', 'right', 'top', 'bottom'
+                            distance: 100
+                        },
+                        zoom: {
+                            scale: 50
+                        }
+                    },
+                    out: {
+                        enabled: false,
+                        type: 'move',
+                        duration: 1,
+                        startTime: 4,
+                        easing: 'linear',
+                        move: {
+                            direction: 'left',
+                            distance: 100
+                        },
+                        zoom: {
+                            scale: 50
+                        }
+                    }
+                }                
             };
 
             // Default state for the entire application
@@ -1000,6 +1205,17 @@
                 '720': { '16/9': { w: 1280, h: 720 }, '9/16': { w: 720, h: 1280 }, '4/3': { w: 960, h: 720 }, '3/4': { w: 720, h: 960 }, '1/1': { w: 720, h: 720 } },
                 '1080': { '16/9': { w: 1920, h: 1080 }, '9/16': { w: 1080, h: 1920 }, '4/3': { w: 1440, h: 1080 }, '3/4': { w: 1080, h: 1440 }, '1/1': { w: 1080, h: 1080 } },
                 '1440': { '16/9': { w: 2560, h: 1440 }, '9/16': { w: 1440, h: 2560 }, '4/3': { w: 1920, h: 1440 }, '3/4': { w: 1440, h: 1920 }, '1/1': { w: 1440, h: 1440 } }
+            };
+
+            const EASING = {
+                linear: t => t,
+                easeIn: t => t * t,
+                easeOut: t => t * (2 - t),
+                backIn: t => t * t * t - t * Math.sin(t * Math.PI),
+                backOut: t => {
+                    const f = (1 - t);
+                    return 1 - (f * f * f - f * Math.sin(f * Math.PI));
+                }
             };
 
             // Language translations
@@ -1037,7 +1253,7 @@
                     notificationWarnUpload: 'Please upload an image first!',
                     notificationWarnBg: 'Upload a background image first to adjust its settings.',
                     notificationWarnObject: 'Upload an object image first to adjust its settings.',
-                    tabTitleBackground: 'Background Settings', tabTitleObject: 'Object Settings', tabTitleInfo: 'Preferences',
+                    tabTitleBackground: 'Background Settings', tabTitleObject: 'Object Settings', tabTitleAnimasi: 'Animation Settings', tabTitleInfo: 'Preferences',
                     activeObject: 'Active Object'
                 },
                 'id': {
@@ -1073,7 +1289,7 @@
                     notificationWarnUpload: 'Silakan masukan gambar terlebih dahulu!',
                     notificationWarnBg: 'Masukan gambar latar terlebih dahulu untuk mengaturnya.',
                     notificationWarnObject: 'Masukan gambar objek terlebih dahulu untuk mengaturnya.',
-                    tabTitleBackground: 'Pengaturan Latar', tabTitleObject: 'Pengaturan Objek', tabTitleInfo: 'Preferensi',
+                    tabTitleBackground: 'Pengaturan Latar', tabTitleObject: 'Pengaturan Objek', tabTitleAnimasi: 'Pengaturan Animasi', tabTitleInfo: 'Preferensi',
                     activeObject: 'Objek Aktif'
                 }
             };
@@ -1099,7 +1315,7 @@
             /**
              * The main drawing function. Renders the background, all objects, and all effects onto the canvas.
              */
-            function draw() {
+            function draw(timestamp = performance.now()) { // Tambahkan parameter timestamp
                 ctx.save();
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
@@ -1158,7 +1374,7 @@
                 // --- DRAW ALL OBJECTS ---
                 const objectState = state.object; // Ambil objek tunggal
                 if (objectState.image.element) {
-                    
+
 					const canvasAspect = canvas.width / canvas.height;
 					const imageAspect = objectState.image.element.width / objectState.image.element.height;
 					let baseScale = (canvasAspect > imageAspect) ? canvas.height / objectState.image.element.height : canvas.width / objectState.image.element.width;
@@ -1166,6 +1382,54 @@
 					const finalScale = baseScale * userScale;
 					const imgW = objectState.image.element.width * finalScale;
 					const imgH = objectState.image.element.height * finalScale;
+
+                    let animOffsetX = 0;
+                    let animOffsetY = 0;
+                    let animScale = 1.0;
+                    const timeInSeconds = timestamp / 1000;
+
+                    const applyAnimation = (animType) => {
+                        const anim = objectState.animation[animType];
+                        if (!anim.enabled || timeInSeconds < anim.startTime || timeInSeconds > anim.startTime + anim.duration) {
+                            return;
+                        }
+
+                        const progress = (timeInSeconds - anim.startTime) / anim.duration;
+                        const easingFunc = EASING[anim.easing.replace('-in', 'In').replace('-out', 'Out')] || EASING.linear;
+                        const easedProgress = easingFunc(progress);
+
+                        if (anim.type === 'move') {
+                            const distanceX = (canvas.width / 2 + imgW / 2) * (anim.move.distance / 100);
+                            const distanceY = (canvas.height / 2 + imgH / 2) * (anim.move.distance / 100);
+
+                            let startX = 0, startY = 0, endX = 0, endY = 0;
+                            if(anim.move.direction === 'left') { startX = -distanceX; }
+                            if(anim.move.direction === 'right') { startX = distanceX; }
+                            if(anim.move.direction === 'top') { startY = -distanceY; }
+                            if(anim.move.direction === 'bottom') { startY = distanceY; }
+
+                            if(animType === 'in') {
+                                animOffsetX = startX * (1 - easedProgress);
+                                animOffsetY = startY * (1 - easedProgress);
+                            } else { // 'out'
+                                animOffsetX = startX * easedProgress;
+                                animOffsetY = startY * easedProgress;
+                            }
+                        } else if (anim.type === 'zoom') {
+                            const startScale = anim.zoom.scale / 100;
+                            const endScale = 1.0;
+
+                            if(animType === 'in') {
+                                animScale = startScale + (endScale - startScale) * easedProgress;
+                            } else { // 'out'
+                                animScale = endScale - (endScale - startScale) * easedProgress;
+                            }
+                        }
+                    };
+
+                    // Terapkan animasi Out terlebih dahulu, lalu In (jika ada tumpang tindih)
+                    applyAnimation('out');
+                    applyAnimation('in');                    
 
 					const compositedObjectCanvas = finalObjectCanvas;
 					const compositedObjectCtx = finalObjectCtx;
@@ -1545,10 +1809,25 @@
                 return filename;
             }
 
+            // Tambahkan fungsi pembantu ini di mana saja (misal, di atas `updateUIFromState`)
+            function updateAnimationPanels(type) {
+                const animState = state.object.animation[type];
+                const isMove = animState.type === 'move';
+                document.getElementById(`anim-${type}-move-controls`).classList.toggle('hidden', !isMove);
+                document.getElementById(`anim-${type}-zoom-controls`).classList.toggle('hidden', isMove);
 
-            /**
-             * Updates the entire UI to reflect the current state object.
-             */
+                // Update tombol aktif
+                document.querySelectorAll(`#anim-${type}-type-btns button`).forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.type === animState.type);
+                });
+                document.querySelectorAll(`#anim-${type}-move-direction-btns button`).forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.direction === animState.move.direction);
+                });
+                document.querySelectorAll(`#anim-${type}-easing-btns button`).forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.easing === animState.easing);
+                });
+            }
+
             function updateUIFromState() {
                 updateUIText(state.language);
 
@@ -1709,6 +1988,8 @@
                 });
                 showTab(state.activeTab);
                 requestRedraw();
+                updateAnimationPanels('in');
+                updateAnimationPanels('out');
             }
 
             /**
@@ -1984,6 +2265,7 @@
                 const tabTitles = {
                     background: translations[lang].tabTitleBackground,
                     object: translations[lang].tabTitleObject,
+                    animasi: translations[lang].tabTitleAnimasi,
                     info: translations[lang].tabTitleInfo
                 };
                 
@@ -2016,7 +2298,48 @@
                     panelWrapper.classList.add('panel-open');
                 }
             }
-            
+            function previewAnimation(type) { // type adalah 'in' atau 'out'
+                const canvasEl = document.getElementById('main-canvas');
+                const anim = state.object.animation[type];
+
+                if (!anim.enabled || !state.object.image.element) {
+                    showTopNotification("notificationWarnObject");
+                    return;
+                }
+
+                // Hapus kelas animasi sebelumnya jika ada
+                canvasEl.className = canvasEl.className.replace(/\banim-.*\b/g, '');
+
+                let animClass = '';
+                let easingClass = '';
+
+                if (anim.type === 'move') {
+                    const direction = anim.move.direction;
+                    animClass = type === 'in' ? `move-from-${direction}` : `move-to-${direction}`;
+                } else { // type === 'zoom'
+                    animClass = `zoom-${type}`;
+                    const scaleVar = type === 'in' ? '--anim-scale-start' : '--anim-scale-end';
+                    canvasEl.style.setProperty(scaleVar, anim.zoom.scale / 100);
+                }
+
+                if(anim.easing === 'ease') easingClass = `anim-ease-${type}`;
+                if(anim.easing === 'back') easingClass = `anim-back-${type}`;
+                if(anim.easing === 'linear') easingClass = 'anim-linear';
+
+                // Terapkan durasi dan kelas animasi
+                canvasEl.style.animationDuration = `${anim.duration}s`;
+                canvasEl.style.animationName = animClass;
+                canvasEl.classList.add(easingClass);
+
+                // Hapus kelas setelah animasi selesai
+                canvasEl.addEventListener('animationend', () => {
+                    canvasEl.style.animationDuration = '';
+                    canvasEl.style.animationName = '';
+                    canvasEl.classList.remove(easingClass);
+                    canvasEl.style.removeProperty('--anim-scale-start');
+                    canvasEl.style.removeProperty('--anim-scale-end');
+                }, { once: true });
+            }            
             /**
              * Initializes the application, sets up event listeners, and starts the animation loop.
              */
@@ -2077,7 +2400,7 @@
                         panelWrapper.classList.remove('panel-open');
                     }
                 });
-                ['handle-background', 'handle-object', 'handle-info'].forEach(id => {
+                ['handle-background', 'handle-object', 'handle-animasi', 'handle-info'].forEach(id => {
                     document.getElementById(id).addEventListener('click', (e) => showTab(id.split('-')[1]));
                 });
                 document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
@@ -2367,6 +2690,60 @@
                     document.addEventListener('touchmove', resizerMove, { passive: false });
                     document.addEventListener('touchend', resizerStop);
                 });
+
+                // --- BIND ANIMATION CONTROLS ---
+
+                function setupAnimationControls(type) { // type adalah 'in' atau 'out'
+                    // Toggle utama
+                    document.getElementById(`anim-${type}-enabled-switch`).addEventListener('change', (e) => {
+                        getActiveObject().animation[type].enabled = e.target.checked;
+                        requestRedraw();
+                    });
+
+                    // Toggle antara Move dan Zoom
+                    const typeBtns = document.getElementById(`anim-${type}-type-btns`);
+                    typeBtns.addEventListener('click', (e) => {
+                        const btn = e.target.closest('button');
+                        if (!btn) return;
+                        getActiveObject().animation[type].type = btn.dataset.type;
+                        updateUIFromState(); // Panggil ini untuk menampilkan/menyembunyikan panel yg sesuai
+                        requestRedraw();
+                    });
+
+                    // Kontrol Durasi & Waktu Mulai
+                    syncSliderAndInput(`anim-${type}-duration`, `anim-${type}-duration-input`, (val) => getActiveObject().animation[type].duration = val);
+                    syncSliderAndInput(`anim-${type}-start`, `anim-${type}-start-input`, (val) => getActiveObject().animation[type].startTime = val);
+
+                    // Kontrol Arah Gerak (Move)
+                    document.getElementById(`anim-${type}-move-direction-btns`).addEventListener('click', (e) => {
+                        const btn = e.target.closest('button');
+                        if (!btn) return;
+                        getActiveObject().animation[type].move.direction = btn.dataset.direction;
+                        updateUIFromState();
+                        requestRedraw();
+                    });
+                    syncSliderAndInput(`anim-${type}-move-distance`, `anim-${type}-move-distance-input`, (val) => getActiveObject().animation[type].move.distance = val);
+
+                    // Kontrol Skala (Zoom)
+                    syncSliderAndInput(`anim-${type}-zoom-scale`, `anim-${type}-zoom-scale-input`, (val) => getActiveObject().animation[type].zoom.scale = val);
+
+                    // Kontrol Easing
+                    document.getElementById(`anim-${type}-easing-btns`).addEventListener('click', (e) => {
+                        const btn = e.target.closest('button');
+                        if (!btn) return;
+                        getActiveObject().animation[type].easing = btn.dataset.easing;
+                        updateUIFromState();
+                        requestRedraw();
+                    });
+
+                    document.getElementById(`preview-anim-${type}-btn`).addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        previewAnimation(type);
+                    });
+                }
+
+                setupAnimationControls('in');
+                setupAnimationControls('out');
 
 
                 updateUIFromState();
