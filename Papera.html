@@ -1528,7 +1528,7 @@
                                 simpleAnimStatus.frame = Math.min(4, Math.floor(timeInSeconds / frameDuration));
                             }
                             const closeAnimStartTime = totalDuration - animDuration;
-                            if (animState.simple.close && timeInSeconds >= closeAnimStartTime && timeInSeconds < totalDuration) {
+                            if (animState.simple.close && timeInSeconds >= closeAnimStartTime && timeInSeconds <= totalDuration) {
                                 simpleAnimStatus.isActive = true;
                                 const timeIntoClose = timeInSeconds - closeAnimStartTime;
                                 const frameIndex = Math.min(4, Math.floor(timeIntoClose / frameDuration));
