@@ -1025,17 +1025,19 @@
                 'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper4.webp'
             ];
             const MASK_IMAGE_URLS = [
-                'https://raw.githubusercontent.com/nurimator/paperimator/main/img/mask-1.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/main/img/mask-2.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/main/img/mask-3.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/main/img/mask-4.webp'
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask-0.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask-1.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask-2.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask-3.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask-4.webp'
             ];
 
             const LAYER_IMAGE_URLS = [
-                'https://raw.githubusercontent.com/nurimator/paperimator/main/img/layer-1.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/main/img/layer-2.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/main/img/layer-3.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/main/img/layer-4.webp'
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/Layer-0.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/Layer-1.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/Layer-2.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/Layer-3.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/Layer-4.webp'
             ];
 
             let maskImages = [];
@@ -1309,6 +1311,96 @@
                 return `rgba(${r},${g},${b},${opacity})`;
             }
 
+            // +++ TAMBAHKAN DUA FUNGSI HELPER INI +++
+
+            // Fungsi ini berisi logika keyframe yang sudah ada sebelumnya
+            function getAdvancedTransform(timeInSeconds, objectState) {
+                const keyframes = [...objectState.animation.keyframes].sort((a, b) => a.time - b.time);
+                let currentTransform = { x: objectState.image.offset.x, y: objectState.image.offset.y, scale: objectState.image.size };
+
+                if (keyframes.length > 0) {
+                    let prevKeyframe = keyframes[0];
+                    let nextKeyframe = keyframes[keyframes.length - 1];
+
+                    for (let i = 0; i < keyframes.length; i++) {
+                        if (keyframes[i].time <= timeInSeconds) prevKeyframe = keyframes[i];
+                        if (keyframes[i].time > timeInSeconds) {
+                            nextKeyframe = keyframes[i];
+                            break;
+                        }
+                    }
+                    
+                    if (prevKeyframe === nextKeyframe) {
+                        currentTransform = { x: prevKeyframe.x, y: prevKeyframe.y, scale: prevKeyframe.scale };
+                    } else {
+                        if (prevKeyframe.easing === 'instant') {
+                            currentTransform = { x: nextKeyframe.x, y: nextKeyframe.y, scale: nextKeyframe.scale };
+                        } else {
+                            const segmentDuration = nextKeyframe.time - prevKeyframe.time;
+                            const timeIntoSegment = timeInSeconds - prevKeyframe.time;
+                            let progress = (segmentDuration > 0) ? timeIntoSegment / segmentDuration : 1;
+                            progress = Math.max(0, Math.min(1, progress));
+
+                            const easingFunc = EASING[prevKeyframe.easing] || EASING.linear;
+                            const easedProgress = easingFunc(progress);
+
+                            currentTransform.x = lerp(prevKeyframe.x, nextKeyframe.x, easedProgress);
+                            currentTransform.y = lerp(prevKeyframe.y, nextKeyframe.y, easedProgress);
+                            currentTransform.scale = lerp(prevKeyframe.scale, nextKeyframe.scale, easedProgress);
+                        }
+                    }
+                }
+                return currentTransform;
+            }
+
+
+            // Fungsi ini berisi logika penggambaran akhir (shadow, color, dll.) yang sudah ada
+            function drawFinalObject(objectState, imgW, imgH, totalOffsetX, totalOffsetY, tornEdgesEnabled) {
+                // ... (Salin semua kode gambar dari `compositedObjectCtx.clearRect` hingga `ctx.restore()` terakhir di dalam blok `if (objectState.image.element)`)
+                // Kode ini SAMA PERSIS dengan yang sudah Anda miliki untuk menggambar bayangan, warna, paper overlay, dll.
+                // Mulai dari sini:
+                const compositedObjectCanvas = finalObjectCanvas;
+                const compositedObjectCtx = finalObjectCtx;
+                compositedObjectCtx.clearRect(0, 0, compositedObjectCanvas.width, compositedObjectCanvas.height);
+                let fgColorFilterString = '';
+                if (objectState.color.enabled) { let filterParts = []; if (objectState.color.colorize) { filterParts.push('sepia(1)'); } filterParts.push(`hue-rotate(${objectState.color.hue}deg)`); filterParts.push(`saturate(${100 + objectState.color.saturation}%)`); filterParts.push(`brightness(${100 + objectState.color.brightness}%)`); fgColorFilterString = filterParts.join(' '); }
+                if (objectState.paperFoldOverlay.enabled) {
+                    objectCtx.save();
+                    objectCtx.clearRect(0, 0, objectCanvas.width, objectCanvas.height);
+                    objectCtx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + totalOffsetY);
+                    if (objectState.movement.enabled) { objectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
+                    objectCtx.filter = fgColorFilterString;
+                    objectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
+                    const overlayImage = originalOverlayImages[objectState.paperFoldOverlay.currentImageIndex];
+                    if (overlayImage && overlayImage.complete && overlayImage.naturalWidth > 0) { objectCtx.save(); const effectStrength = objectState.paperFoldOverlay.opacity; const overlayW = imgW * 1.25; const overlayH = imgH * 1.25; objectCtx.globalCompositeOperation = objectState.paperFoldOverlay.blendMode; const tempCanvas = document.createElement('canvas'); tempCanvas.width = overlayImage.width; tempCanvas.height = overlayImage.height; const tempCtx = tempCanvas.getContext('2d'); tempCtx.drawImage(overlayImage, 0, 0); const imageData = tempCtx.getImageData(0, 0, overlayImage.width, overlayImage.height); const data = imageData.data; const strength = (100 - effectStrength) / 100; for (let i = 0; i < data.length; i += 4) { data[i] = data[i] + (255 - data[i]) * strength; data[i + 1] = data[i + 1] + (255 - data[i + 1]) * strength; data[i + 2] = data[i + 2] + (255 - data[i + 2]) * strength; } tempCtx.putImageData(imageData, 0, 0); objectCtx.drawImage(tempCanvas, -overlayW / 2, -overlayH / 2, overlayW, overlayH); objectCtx.restore(); }
+                    objectCtx.restore();
+                    compositedObjectCtx.save();
+                    let tornFilterString = '';
+                    if (tornEdgesEnabled && objectState.stroke.width > 0) { tornDilate.setAttribute('radius', objectState.stroke.width); tornDisplacement.setAttribute('scale', objectState.stroke.roughness); tornTurbulence.setAttribute('baseFrequency', objectState.stroke.detail); tornFlood.setAttribute('flood-color', '#FFFFFF'); tornFilterString = `url(#combined-filter)`; }
+                    compositedObjectCtx.filter = tornFilterString;
+                    compositedObjectCtx.translate(compositedObjectCanvas.width / 2 + totalOffsetX, compositedObjectCanvas.height / 2 + totalOffsetY);
+                    if (objectState.movement.enabled) { compositedObjectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
+                    compositedObjectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
+                    compositedObjectCtx.restore();
+                    compositedObjectCtx.save();
+                    compositedObjectCtx.globalCompositeOperation = 'source-in';
+                    compositedObjectCtx.drawImage(objectCanvas, 0, 0);
+                    compositedObjectCtx.restore();
+                } else {
+                    compositedObjectCtx.save();
+                    let tornFilterString = '';
+                    if (tornEdgesEnabled && objectState.stroke.width > 0) { tornDilate.setAttribute('radius', objectState.stroke.width); tornDisplacement.setAttribute('scale', objectState.stroke.roughness); tornTurbulence.setAttribute('baseFrequency', objectState.stroke.detail); tornFlood.setAttribute('flood-color', '#FFFFFF'); tornFilterString = `url(#combined-filter)`; }
+                    compositedObjectCtx.filter = [fgColorFilterString, tornFilterString].filter(Boolean).join(' ');
+                    compositedObjectCtx.translate(compositedObjectCanvas.width / 2 + totalOffsetX, compositedObjectCanvas.height / 2 + totalOffsetY);
+                    if (objectState.movement.enabled) { compositedObjectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
+                    compositedObjectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
+                    compositedObjectCtx.restore();
+                }
+                ctx.save();
+                if (objectState.shadow.enabled) { ctx.shadowColor = hexToRgba(objectState.shadow.color, objectState.shadow.opacity / 100); ctx.shadowBlur = objectState.shadow.blur; ctx.shadowOffsetX = objectState.shadow.offsetX; ctx.shadowOffsetY = objectState.shadow.offsetY; }
+                ctx.drawImage(compositedObjectCanvas, 0, 0);
+                ctx.restore();
+            }            
             /**
              * Sets a flag to indicate that the canvas needs to be redrawn in the next animation frame.
              */
@@ -1376,143 +1468,140 @@
                 // --- DRAW ALL OBJECTS ---
                 const objectState = state.object; // Ambil objek tunggal
                 if (objectState.image.element) {
+                    const animState = objectState.animation;
+                    const isSimpleMode = animState.mode === 'simple';
+                    const totalDuration = state.export.duration;
+
+                    // Tentukan waktu saat ini untuk animasi
                     const currentTimeSource = isExporting ? timestamp : performance.now();
                     let timeInSeconds;
-
-                    if (state.object.animation.previewTime !== null) {
-                        // Jika ada waktu pratinjau, gunakan itu dan jangan update otomatis
-                        timeInSeconds = state.object.animation.previewTime;
+                    if (animState.previewTime !== null) {
+                        timeInSeconds = animState.previewTime;
+                    } else if (isExporting) {
+                        timeInSeconds = timestamp / 1000;
                     } else {
-                        // Jika tidak, gunakan waktu normal untuk animasi
-                        timeInSeconds = currentTimeSource / 1000;
-                    }                    
-                    // 1. Dapatkan keyframe yang sudah diurutkan
-                    const keyframes = [...state.object.animation.keyframes].sort((a, b) => a.time - b.time);
-
-                    let currentTransform = { x: 0, y: 0, scale: 100 };
-
-                    if (keyframes.length > 0) {
-                        // 2. Tentukan posisi objek berdasarkan waktu saat ini
-                        let prevKeyframe = keyframes[0];
-                        let nextKeyframe = keyframes[keyframes.length - 1];
-
-                        // Cari keyframe sebelum dan sesudah waktu saat ini
-                        for (let i = 0; i < keyframes.length; i++) {
-                            if (keyframes[i].time <= timeInSeconds) {
-                                prevKeyframe = keyframes[i];
-                            }
-                            if (keyframes[i].time > timeInSeconds) {
-                                nextKeyframe = keyframes[i];
-                                break;
-                            }
-                        }
-                        
-                        // 3. Hitung interpolasi
-                        if (prevKeyframe === nextKeyframe) {
-                            // Jika waktu berada di luar jangkauan (sebelum awal atau setelah akhir), gunakan properti keyframe terdekat
-                            currentTransform = { x: prevKeyframe.x, y: prevKeyframe.y, scale: prevKeyframe.scale };
-                        } else {
-                            // +++ TAMBAHKAN PENGECEKAN UNTUK EASING INSTANT DI SINI +++
-                            if (prevKeyframe.easing === 'instant') {
-                                currentTransform = { x: nextKeyframe.x, y: nextKeyframe.y, scale: nextKeyframe.scale };
-                            } else {
-                            // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                                // Hitung progress (0.0 - 1.0) antara dua keyframe
-                                const segmentDuration = nextKeyframe.time - prevKeyframe.time;
-                                const timeIntoSegment = timeInSeconds - prevKeyframe.time;
-                                let progress = (segmentDuration > 0) ? timeIntoSegment / segmentDuration : 1;
-                                progress = Math.max(0, Math.min(1, progress));
-
-                                // Terapkan easing dari keyframe sebelumnya
-                                const easingFunc = EASING[prevKeyframe.easing] || EASING.linear;
-                                const easedProgress = easingFunc(progress);
-
-                                // Interpolasi properti
-                                currentTransform.x = lerp(prevKeyframe.x, nextKeyframe.x, easedProgress);
-                                currentTransform.y = lerp(prevKeyframe.y, nextKeyframe.y, easedProgress);
-                                currentTransform.scale = lerp(prevKeyframe.scale, nextKeyframe.scale, easedProgress);
-                            
-                            // +++ TAMBAHKAN KURUNG PENUTUP UNTUK BLOK ELSE +++
-                            } 
-                        }
-                    } else {
-                        // Jika tidak ada keyframe, gunakan nilai dari state gambar statis
-                        currentTransform = { x: objectState.image.offset.x, y: objectState.image.offset.y, scale: objectState.image.size };
+                        // Untuk pratinjau live, kita modulus waktu agar animasi idle terus berulang
+                        timeInSeconds = (currentTimeSource / 1000) % totalDuration;
                     }
 
+                    // 1. Tentukan sumber transformasi berdasarkan mode animasi
+                    let transform;
+                    if (isSimpleMode) {
+                        // Jika mode simpel, SELALU gunakan nilai dari kontrol di tab Objek.
+                        transform = {
+                            x: objectState.image.offset.x,
+                            y: objectState.image.offset.y,
+                            scale: objectState.image.size
+                        };
+                    } else {
+                        // Jika mode advanced, gunakan nilai dari keyframe.
+                        transform = getAdvancedTransform(timeInSeconds, objectState);
+                    }
 
-                    // 4. Terapkan transformasi yang telah dihitung
+                    // 2. Hitung semua nilai transformasi final berdasarkan sumber yang benar
                     const canvasAspect = canvas.width / canvas.height;
                     const imageAspect = objectState.image.element.width / objectState.image.element.height;
                     const baseScale = (canvasAspect > imageAspect) ? canvas.height / objectState.image.element.height : canvas.width / objectState.image.element.width;
-                    
-                    // Skala dari keyframe menggantikan ukuran gambar statis
-                    const finalScale = baseScale * (currentTransform.scale / 100); 
-
-                    const imgW = objectState.image.element.width * finalScale;
-                    const imgH = objectState.image.element.height * finalScale;
-
-                    // Offset dari keyframe menggantikan offset gambar statis
-                    const imgBaseOffsetX = (canvas.width * currentTransform.x) / 100;
-                    const imgBaseOffsetY = (canvas.height * currentTransform.y) / 100;
-
+                    const finalScale = baseScale * (transform.scale / 100);
+                    const finalW = objectState.image.element.width * finalScale;
+                    const finalH = objectState.image.element.height * finalScale;
+                    const imgBaseOffsetX = (canvas.width * transform.x) / 100;
+                    const imgBaseOffsetY = (canvas.height * transform.y) / 100;
                     const totalOffsetX = imgBaseOffsetX + objectState.movement.positionOffset.x;
                     const totalOffsetY = imgBaseOffsetY + objectState.movement.positionOffset.y;
 
-                    // Sisa kode untuk menggambar objek ke kanvas (tidak ada perubahan)
-                    const compositedObjectCanvas = finalObjectCanvas;
-                    const compositedObjectCtx = finalObjectCtx;
-                    // ... (Salin semua sisa kode gambar dari `compositedObjectCtx.clearRect` hingga `ctx.restore()` terakhir di dalam blok if)
-                    compositedObjectCtx.clearRect(0, 0, compositedObjectCanvas.width, compositedObjectCanvas.height);
-                    let fgColorFilterString = '';
-                    if (objectState.color.enabled) { let filterParts = []; if (objectState.color.colorize) { filterParts.push('sepia(1)'); } filterParts.push(`hue-rotate(${objectState.color.hue}deg)`); filterParts.push(`saturate(${100 + objectState.color.saturation}%)`); filterParts.push(`brightness(${100 + objectState.color.brightness}%)`); fgColorFilterString = filterParts.join(' '); }
-                    if (objectState.paperFoldOverlay.enabled) {
-                        objectCtx.save();
-                        objectCtx.clearRect(0, 0, objectCanvas.width, objectCanvas.height);
-                        objectCtx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + totalOffsetY);
-                        if (objectState.movement.enabled) { objectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
-                        objectCtx.filter = fgColorFilterString;
-                        objectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
-                        const overlayImage = originalOverlayImages[objectState.paperFoldOverlay.currentImageIndex];
-                        if (overlayImage && overlayImage.complete && overlayImage.naturalWidth > 0) { objectCtx.save(); const effectStrength = objectState.paperFoldOverlay.opacity; const overlayW = imgW * 1.25; const overlayH = imgH * 1.25; objectCtx.globalCompositeOperation = objectState.paperFoldOverlay.blendMode; const tempCanvas = document.createElement('canvas'); tempCanvas.width = overlayImage.width; tempCanvas.height = overlayImage.height; const tempCtx = tempCanvas.getContext('2d'); tempCtx.drawImage(overlayImage, 0, 0); const imageData = tempCtx.getImageData(0, 0, overlayImage.width, overlayImage.height); const data = imageData.data; const strength = (100 - effectStrength) / 100; for (let i = 0; i < data.length; i += 4) { data[i] = data[i] + (255 - data[i]) * strength; data[i + 1] = data[i + 1] + (255 - data[i + 1]) * strength; data[i + 2] = data[i + 2] + (255 - data[i + 2]) * strength; } tempCtx.putImageData(imageData, 0, 0); objectCtx.drawImage(tempCanvas, -overlayW / 2, -overlayH / 2, overlayW, overlayH); objectCtx.restore(); }
-                        objectCtx.restore();
-                        compositedObjectCtx.save();
-                        let tornFilterString = '';
-                        if (objectState.stroke.enabled && objectState.stroke.width > 0) { tornDilate.setAttribute('radius', objectState.stroke.width); tornDisplacement.setAttribute('scale', objectState.stroke.roughness); tornTurbulence.setAttribute('baseFrequency', objectState.stroke.detail); tornFlood.setAttribute('flood-color', '#FFFFFF'); tornFilterString = `url(#combined-filter)`; }
-                        compositedObjectCtx.filter = tornFilterString;
-                        compositedObjectCtx.translate(compositedObjectCanvas.width / 2 + totalOffsetX, compositedObjectCanvas.height / 2 + totalOffsetY);
-                        if (objectState.movement.enabled) { compositedObjectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
-                        compositedObjectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
-                        compositedObjectCtx.restore();
-                        compositedObjectCtx.save();
-                        compositedObjectCtx.globalCompositeOperation = 'source-in';
-                        compositedObjectCtx.drawImage(objectCanvas, 0, 0);
-                        compositedObjectCtx.restore();
-                    } else {
-                        compositedObjectCtx.save();
-                        let tornFilterString = '';
-                        if (objectState.stroke.enabled && objectState.stroke.width > 0) { tornDilate.setAttribute('radius', objectState.stroke.width); tornDisplacement.setAttribute('scale', objectState.stroke.roughness); tornTurbulence.setAttribute('baseFrequency', objectState.stroke.detail); tornFlood.setAttribute('flood-color', '#FFFFFF'); tornFilterString = `url(#combined-filter)`; }
-                        compositedObjectCtx.filter = [fgColorFilterString, tornFilterString].filter(Boolean).join(' ');
-                        compositedObjectCtx.translate(compositedObjectCanvas.width / 2 + totalOffsetX, compositedObjectCanvas.height / 2 + totalOffsetY);
-                        if (objectState.movement.enabled) { compositedObjectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
-                        compositedObjectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
-                        compositedObjectCtx.restore();
+                    // 3. Cek apakah animasi buka/tutup sedang berjalan
+                    let simpleAnimStatus = { isActive: false, frame: 0 };
+                    const animDuration = 1.0;
+                    const frameDuration = 0.2;
+                    if (isSimpleMode) {
+                        if (animState.simple.previewing) {
+                             const timeSincePreviewStart = (currentTimeSource - animState.simple.previewStartTime) / 1000;
+                             if (timeSincePreviewStart < animDuration) {
+                                 simpleAnimStatus.isActive = true;
+                                 let frameIndex = Math.min(4, Math.floor(timeSincePreviewStart / frameDuration));
+                                 simpleAnimStatus.frame = (animState.simple.previewing === 'close') ? 4 - frameIndex : frameIndex;
+                             }
+                        } else {
+                            if (animState.simple.open && timeInSeconds >= 0 && timeInSeconds < animDuration) {
+                                simpleAnimStatus.isActive = true;
+                                simpleAnimStatus.frame = Math.min(4, Math.floor(timeInSeconds / frameDuration));
+                            }
+                            const closeAnimStartTime = totalDuration - animDuration;
+                            if (animState.simple.close && timeInSeconds >= closeAnimStartTime && timeInSeconds < totalDuration) {
+                                simpleAnimStatus.isActive = true;
+                                const timeIntoClose = timeInSeconds - closeAnimStartTime;
+                                const frameIndex = Math.min(4, Math.floor(timeIntoClose / frameDuration));
+                                simpleAnimStatus.frame = 4 - frameIndex;
+                            }
+                        }
                     }
-                    ctx.save();
-                    if (objectState.shadow.enabled) { ctx.shadowColor = hexToRgba(objectState.shadow.color, objectState.shadow.opacity / 100); ctx.shadowBlur = objectState.shadow.blur; ctx.shadowOffsetX = objectState.shadow.offsetX; ctx.shadowOffsetY = objectState.shadow.offsetY; }
-                    ctx.drawImage(compositedObjectCanvas, 0, 0);
-                    ctx.restore();
+                    
+// 4. Lakukan penggambaran
+                    if (isSimpleMode && simpleAnimStatus.isActive) {
+                        // KASUS KHUSUS: Animasi buka/tutup kertas sedang berjalan
+                        const mask = maskImages[simpleAnimStatus.frame];
+                        const layer = layerImages[simpleAnimStatus.frame];
+
+                        // Langkah 1: Buat objek yang terpotong oleh mask di kanvas terpisah (offscreen)
+                        finalObjectCtx.clearRect(0, 0, finalObjectCanvas.width, finalObjectCanvas.height);
+                        if (mask) {
+                            finalObjectCtx.save();
+                            
+                            // Terapkan semua transformasi (posisi, rotasi, skala) ke kanvas offscreen
+                            finalObjectCtx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + totalOffsetY);
+                            if (objectState.movement.enabled) { finalObjectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
+                            
+                            // Gambar BENTUK MASK terlebih dahulu, dengan ukuran yang sama dengan objek
+                            finalObjectCtx.drawImage(mask, -finalW / 2, -finalH / 2, finalW, finalH);
+                            
+                            // Atur mode composite agar gambar berikutnya (objek) hanya digambar di dalam mask
+                            finalObjectCtx.globalCompositeOperation = 'source-in';
+                            
+                            // Gambar OBJEK di atasnya. Ini akan memotong objek sesuai bentuk mask.
+                            finalObjectCtx.drawImage(objectState.image.element, -finalW / 2, -finalH / 2, finalW, finalH);
+                            
+                            finalObjectCtx.restore();
+                        }
+
+                        // Langkah 2: Gambar hasil dari kanvas offscreen (objek termask + bayangan) ke kanvas utama
+                        ctx.save();
+                        if (objectState.shadow.enabled) {
+                            ctx.shadowColor = hexToRgba(objectState.shadow.color, objectState.shadow.opacity / 100);
+                            ctx.shadowBlur = objectState.shadow.blur;
+                            ctx.shadowOffsetX = objectState.shadow.offsetX;
+                            ctx.shadowOffsetY = objectState.shadow.offsetY;
+                        }
+                        ctx.drawImage(finalObjectCanvas, 0, 0);
+                        ctx.restore();
+
+                        // Langkah 3: Gambar LAYER di atas segalanya, dengan transformasi yang SAMA PERSIS
+                        if (layer) {
+                            ctx.save();
+                            // Terapkan lagi semua transformasi ke kanvas utama
+                            ctx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + totalOffsetY);
+                            if (objectState.movement.enabled) { ctx.rotate(objectState.movement.rotation * Math.PI / 180); }
+                            
+                            // Gambar LAYER dengan ukuran yang sama dengan objek
+                            ctx.drawImage(layer, -finalW / 2, -finalH / 2, finalW, finalH);
+                            ctx.restore();
+                        }
+
+                    } else {
+                        // KASUS NORMAL: Animasi idle (mode simple) atau animasi advanced
+                        const isTornEdgesEnabled = objectState.stroke.enabled;
+                        drawFinalObject(objectState, finalW, finalH, totalOffsetX, totalOffsetY, isTornEdgesEnabled);
+                    }
+                ctx.restore();
                 }
             }
-
-
             /**
             * The main animation loop.
             */
             function animationLoop(timestamp = 0) {
                 updateMovement(timestamp);
                 updatePaperFoldOverlay(timestamp);
-                
+
                 // Hentikan pratinjau animasi simpel setelah 1 detik
                 const simpleAnimState = state.object.animation.simple;
                 if (simpleAnimState.previewing && (timestamp - simpleAnimState.previewStartTime > 1000)) {
@@ -1991,7 +2080,7 @@
                     dropZonePrompt.classList.remove('hidden');
                     dropZoneFilenameContainer.classList.add('hidden');
                     deleteImageBtn.classList.add('hidden');
-                }
+                }             
 
                 // Update background image controls
                 const backgroundColorControl = document.getElementById('background-color-control');
@@ -2350,6 +2439,7 @@
 				obj.movement.positionOffset = {x: 0, y: 0};
 				obj.paperFoldOverlay.lastImageSwitchTime = 0;
 				obj.paperFoldOverlay.currentImageIndex = 0;
+                obj.animation.simple.previewing = null;
 								
                 const DURATION_S = state.export.duration;
                 const FRAME_RATE = state.export.fps;
@@ -2884,6 +2974,20 @@
                         }
                     }
                 });
+
+                document.getElementById('preview-simple-open').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    state.object.animation.simple.previewing = 'open';
+                    state.object.animation.simple.previewStartTime = performance.now();
+                    requestRedraw();
+                });
+
+                document.getElementById('preview-simple-close').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    state.object.animation.simple.previewing = 'close';
+                    state.object.animation.simple.previewStartTime = performance.now();
+                    requestRedraw();
+                });                
                 updateUIFromState();
             }
             init(); 
