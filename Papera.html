@@ -1099,7 +1099,8 @@
                             x: 0,           // Offset X (%)
                             y: 0,           // Offset Y (%)
                             scale: 20,      // Ukuran (%) - sama dengan ukuran default gambar
-                            easing: 'linear'// Easing ke keyframe berikutnya
+                            easing: 'linear',// Easing ke keyframe berikutnya
+                            paperAnim: 'none'
                         },
                         {
                             id: Date.now() + 1,
@@ -1107,7 +1108,8 @@
                             x: 0,
                             y: 0,
                             scale: 80,
-                            easing: 'linear'
+                            easing: 'linear',
+                            paperAnim: 'none'
                         }
                     ]
                 }             
@@ -1311,19 +1313,42 @@
                 return `rgba(${r},${g},${b},${opacity})`;
             }
 
-            // +++ TAMBAHKAN DUA FUNGSI HELPER INI +++
+            function getVisualStateAtTime(timeInSeconds, keyframes) {
+                const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
+                let currentState = 'open'; // Asumsi awal, objek selalu terbuka
+
+                for (const kf of sortedKeyframes) {
+                    if (kf.time < timeInSeconds) {
+                        if (kf.paperAnim === 'open') {
+                            currentState = 'open';
+                        } else if (kf.paperAnim === 'close') {
+                            currentState = 'closed';
+                        }
+                        // Jika 'none', state tidak berubah dari sebelumnya.
+                    } else {
+                        break;
+                    }
+                }
+                return currentState;
+            }
 
             // Fungsi ini berisi logika keyframe yang sudah ada sebelumnya
             function getAdvancedTransform(timeInSeconds, objectState) {
                 const keyframes = [...objectState.animation.keyframes].sort((a, b) => a.time - b.time);
                 let currentTransform = { x: objectState.image.offset.x, y: objectState.image.offset.y, scale: objectState.image.size };
 
+                // Deklarasikan variabel di sini agar selalu ada
+                let prevKeyframe, nextKeyframe;
+
                 if (keyframes.length > 0) {
-                    let prevKeyframe = keyframes[0];
-                    let nextKeyframe = keyframes[keyframes.length - 1];
+                    // Beri nilai awal
+                    prevKeyframe = keyframes[0];
+                    nextKeyframe = keyframes[keyframes.length - 1];
 
                     for (let i = 0; i < keyframes.length; i++) {
-                        if (keyframes[i].time <= timeInSeconds) prevKeyframe = keyframes[i];
+                        if (keyframes[i].time <= timeInSeconds) {
+                            prevKeyframe = keyframes[i];
+                        }
                         if (keyframes[i].time > timeInSeconds) {
                             nextKeyframe = keyframes[i];
                             break;
@@ -1350,9 +1375,9 @@
                         }
                     }
                 }
-                return currentTransform;
+                // Return ini sekarang aman, bahkan jika tidak ada keyframe
+                return { transform: currentTransform, prevKeyframe, nextKeyframe };
             }
-
 
             // Fungsi ini berisi logika penggambaran akhir (shadow, color, dll.) yang sudah ada
             function drawFinalObject(objectState, imgW, imgH, totalOffsetX, totalOffsetY, tornEdgesEnabled) {
@@ -1409,11 +1434,14 @@
             /**
              * The main drawing function. Renders the background, all objects, and all effects onto the canvas.
              */
-            function draw(timestamp = performance.now()) { // Tambahkan parameter timestamp
+            function draw(timestamp = performance.now()) {
+                // SAVE #1: Simpan kondisi awal kanvas di awal fungsi
                 ctx.save();
+
+                // Hapus semua yang ada di kanvas
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                // --- DRAW BACKGROUND ---
+
+                // --- 1. GAMBAR BACKGROUND ---
                 let bgFilterString = '';
                 const bgCC = state.background.effects.colorCorrection;
                 if (bgCC.enabled) {
@@ -1434,6 +1462,8 @@
                 const bgOffsetY = (canvas.height * state.background.transform.offset.y) / 100;
 
                 if (state.background.element) {
+                    // Simpan state khusus untuk transformasi background
+                    ctx.save();
                     if (state.background.transform.mode === 'fill') {
                         ctx.translate(canvas.width / 2 + bgOffsetX, canvas.height / 2 + bgOffsetY);
                         const userScale = state.background.transform.size / 100;
@@ -1445,19 +1475,23 @@
                     } else if (state.background.transform.mode === 'stretch') {
                         ctx.drawImage(state.background.element, 0, 0, canvas.width, canvas.height);
                     }
+                    // Kembalikan state setelah transformasi background
+                    ctx.restore();
                 } else {
                     ctx.fillStyle = state.background.color;
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                 }
-                ctx.restore();
+                
+                // Set filter kembali ke normal sebelum menggambar vignette
+                ctx.filter = 'none';
 
-                // Draw background vignette if enabled
+                // Gambar vignette jika aktif
                 if (state.background.effects.vignette.enabled) {
                     ctx.save();
                     const gradient = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, Math.max(canvas.width, canvas.height) / 2);
                     const vignetteColor = hexToRgba(state.background.effects.vignette.color, state.background.effects.vignette.opacity / 100);
                     const normalizedRadius = state.background.effects.vignette.radius / 100;
-                    const normalizedFeather = state.background.effects.vignette.feather / 100; 
+                    const normalizedFeather = state.background.effects.vignette.feather / 100;
                     gradient.addColorStop(normalizedRadius, 'rgba(0,0,0,0)');
                     gradient.addColorStop(Math.min(1, normalizedRadius + normalizedFeather), vignetteColor);
                     ctx.fillStyle = gradient;
@@ -1465,14 +1499,15 @@
                     ctx.restore();
                 }
 
-                // --- DRAW ALL OBJECTS ---
-                const objectState = state.object; // Ambil objek tunggal
+
+                // --- 2. GAMBAR OBJEK ---
+                const objectState = state.object;
                 if (objectState.image.element) {
                     const animState = objectState.animation;
                     const isSimpleMode = animState.mode === 'simple';
                     const totalDuration = state.export.duration;
 
-                    // Tentukan waktu saat ini untuk animasi
+                    // Tentukan waktu animasi saat ini
                     const currentTimeSource = isExporting ? timestamp : performance.now();
                     let timeInSeconds;
                     if (animState.previewTime !== null) {
@@ -1480,25 +1515,71 @@
                     } else if (isExporting) {
                         timeInSeconds = timestamp / 1000;
                     } else {
-                        // Untuk pratinjau live, kita modulus waktu agar animasi idle terus berulang
                         timeInSeconds = (currentTimeSource / 1000) % totalDuration;
                     }
 
-                    // 1. Tentukan sumber transformasi berdasarkan mode animasi
+                    // Langkah A: Tentukan state animasi (transformasi dan status animasi kertas)
                     let transform;
+                    let isPaperAnimActive = false;
+                    let paperFrameIndex = 0;
+
                     if (isSimpleMode) {
-                        // Jika mode simpel, SELALU gunakan nilai dari kontrol di tab Objek.
                         transform = {
                             x: objectState.image.offset.x,
                             y: objectState.image.offset.y,
                             scale: objectState.image.size
                         };
-                    } else {
-                        // Jika mode advanced, gunakan nilai dari keyframe.
-                        transform = getAdvancedTransform(timeInSeconds, objectState);
+                        const animDuration = 1.0;
+                        const frameDuration = 0.2;
+                        if (animState.simple.previewing) {
+                            const timeSincePreviewStart = (currentTimeSource - animState.simple.previewStartTime) / 1000;
+                            if (timeSincePreviewStart < animDuration) {
+                                isPaperAnimActive = true;
+                                let frameIndex = Math.min(4, Math.floor(timeSincePreviewStart / frameDuration));
+                                paperFrameIndex = (animState.simple.previewing === 'close') ? 4 - frameIndex : frameIndex;
+                            }
+                        } else {
+                            if (animState.simple.open && timeInSeconds >= 0 && timeInSeconds < animDuration) {
+                                isPaperAnimActive = true;
+                                paperFrameIndex = Math.min(4, Math.floor(timeInSeconds / frameDuration));
+                            }
+                            const closeAnimStartTime = totalDuration - animDuration;
+                            if (animState.simple.close && timeInSeconds >= closeAnimStartTime && timeInSeconds <= totalDuration) {
+                                isPaperAnimActive = true;
+                                const timeIntoClose = timeInSeconds - closeAnimStartTime;
+                                const frameIndex = Math.min(4, Math.floor(timeIntoClose / frameDuration));
+                                paperFrameIndex = 4 - frameIndex;
+                            }
+                        }
+                    } else { // Mode Advanced
+                        const { transform: advTransform, prevKeyframe, nextKeyframe } = getAdvancedTransform(timeInSeconds, objectState);
+                        transform = advTransform;
+
+                        // Hanya jalankan logika animasi kertas jika keyframe valid
+                        if (prevKeyframe && nextKeyframe) {
+                            const paperAnimType = prevKeyframe.paperAnim;
+                            const segmentDuration = nextKeyframe.time - prevKeyframe.time;
+
+                            if (paperAnimType && paperAnimType !== 'none' && segmentDuration > 0) {
+                                isPaperAnimActive = true;
+                                const progress = (timeInSeconds - prevKeyframe.time) / segmentDuration;
+                                let frameIndex = Math.floor(progress * MASK_IMAGE_URLS.length);
+                                paperFrameIndex = Math.max(0, Math.min(MASK_IMAGE_URLS.length - 1, frameIndex));
+                                if (paperAnimType === 'close') {
+                                    paperFrameIndex = (MASK_IMAGE_URLS.length - 1) - paperFrameIndex;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Safety check untuk mencegah crash
+                    if (!transform) {
+                        console.error("Gagal menentukan transformasi objek. Proses gambar dihentikan.");
+                        ctx.restore(); // Kembalikan state sebelum keluar dari fungsi
+                        return;
                     }
 
-                    // 2. Hitung semua nilai transformasi final berdasarkan sumber yang benar
+                    // Langkah B: Hitung dimensi dan posisi akhir untuk digambar
                     const canvasAspect = canvas.width / canvas.height;
                     const imageAspect = objectState.image.element.width / objectState.image.element.height;
                     const baseScale = (canvasAspect > imageAspect) ? canvas.height / objectState.image.element.height : canvas.width / objectState.image.element.width;
@@ -1509,62 +1590,23 @@
                     const imgBaseOffsetY = (canvas.height * transform.y) / 100;
                     const totalOffsetX = imgBaseOffsetX + objectState.movement.positionOffset.x;
                     const totalOffsetY = imgBaseOffsetY + objectState.movement.positionOffset.y;
-
-                    // 3. Cek apakah animasi buka/tutup sedang berjalan
-                    let simpleAnimStatus = { isActive: false, frame: 0 };
-                    const animDuration = 1.0;
-                    const frameDuration = 0.2;
-                    if (isSimpleMode) {
-                        if (animState.simple.previewing) {
-                             const timeSincePreviewStart = (currentTimeSource - animState.simple.previewStartTime) / 1000;
-                             if (timeSincePreviewStart < animDuration) {
-                                 simpleAnimStatus.isActive = true;
-                                 let frameIndex = Math.min(4, Math.floor(timeSincePreviewStart / frameDuration));
-                                 simpleAnimStatus.frame = (animState.simple.previewing === 'close') ? 4 - frameIndex : frameIndex;
-                             }
-                        } else {
-                            if (animState.simple.open && timeInSeconds >= 0 && timeInSeconds < animDuration) {
-                                simpleAnimStatus.isActive = true;
-                                simpleAnimStatus.frame = Math.min(4, Math.floor(timeInSeconds / frameDuration));
-                            }
-                            const closeAnimStartTime = totalDuration - animDuration;
-                            if (animState.simple.close && timeInSeconds >= closeAnimStartTime && timeInSeconds <= totalDuration) {
-                                simpleAnimStatus.isActive = true;
-                                const timeIntoClose = timeInSeconds - closeAnimStartTime;
-                                const frameIndex = Math.min(4, Math.floor(timeIntoClose / frameDuration));
-                                simpleAnimStatus.frame = 4 - frameIndex;
-                            }
-                        }
-                    }
                     
-// 4. Lakukan penggambaran
-                    if (isSimpleMode && simpleAnimStatus.isActive) {
-                        // KASUS KHUSUS: Animasi buka/tutup kertas sedang berjalan
-                        const mask = maskImages[simpleAnimStatus.frame];
-                        const layer = layerImages[simpleAnimStatus.frame];
+                    // Langkah C: Gambar objek berdasarkan state animasinya
+                    if (isPaperAnimActive) {
+                        const mask = maskImages[paperFrameIndex];
+                        const layer = layerImages[paperFrameIndex];
 
-                        // Langkah 1: Buat objek yang terpotong oleh mask di kanvas terpisah (offscreen)
                         finalObjectCtx.clearRect(0, 0, finalObjectCanvas.width, finalObjectCanvas.height);
                         if (mask) {
                             finalObjectCtx.save();
-                            
-                            // Terapkan semua transformasi (posisi, rotasi, skala) ke kanvas offscreen
                             finalObjectCtx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + totalOffsetY);
                             if (objectState.movement.enabled) { finalObjectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
-                            
-                            // Gambar BENTUK MASK terlebih dahulu, dengan ukuran yang sama dengan objek
                             finalObjectCtx.drawImage(mask, -finalW / 2, -finalH / 2, finalW, finalH);
-                            
-                            // Atur mode composite agar gambar berikutnya (objek) hanya digambar di dalam mask
                             finalObjectCtx.globalCompositeOperation = 'source-in';
-                            
-                            // Gambar OBJEK di atasnya. Ini akan memotong objek sesuai bentuk mask.
                             finalObjectCtx.drawImage(objectState.image.element, -finalW / 2, -finalH / 2, finalW, finalH);
-                            
                             finalObjectCtx.restore();
                         }
 
-                        // Langkah 2: Gambar hasil dari kanvas offscreen (objek termask + bayangan) ke kanvas utama
                         ctx.save();
                         if (objectState.shadow.enabled) {
                             ctx.shadowColor = hexToRgba(objectState.shadow.color, objectState.shadow.opacity / 100);
@@ -1575,25 +1617,61 @@
                         ctx.drawImage(finalObjectCanvas, 0, 0);
                         ctx.restore();
 
-                        // Langkah 3: Gambar LAYER di atas segalanya, dengan transformasi yang SAMA PERSIS
                         if (layer) {
                             ctx.save();
-                            // Terapkan lagi semua transformasi ke kanvas utama
                             ctx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + totalOffsetY);
                             if (objectState.movement.enabled) { ctx.rotate(objectState.movement.rotation * Math.PI / 180); }
-                            
-                            // Gambar LAYER dengan ukuran yang sama dengan objek
                             ctx.drawImage(layer, -finalW / 2, -finalH / 2, finalW, finalH);
                             ctx.restore();
                         }
-
                     } else {
-                        // KASUS NORMAL: Animasi idle (mode simple) atau animasi advanced
-                        const isTornEdgesEnabled = objectState.stroke.enabled;
-                        drawFinalObject(objectState, finalW, finalH, totalOffsetX, totalOffsetY, isTornEdgesEnabled);
+                        // --- BLOK INI YANG DIUBAH ---
+                        // Ini adalah kasus untuk 'none' atau kondisi idle (diam)
+                        const stateBefore = getVisualStateAtTime(timeInSeconds, animState.keyframes);
+
+                        if (stateBefore === 'closed' && !isSimpleMode) {
+                            // Jika state sebelumnya tertutup, gambar objek dalam kondisi tertutup (frame 0)
+                            const mask = maskImages[0];
+                            const layer = layerImages[0];
+                            
+                            finalObjectCtx.clearRect(0, 0, finalObjectCanvas.width, finalObjectCanvas.height);
+                            if (mask) {
+                                finalObjectCtx.save();
+                                finalObjectCtx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + totalOffsetY);
+                                if (objectState.movement.enabled) { finalObjectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
+                                finalObjectCtx.drawImage(mask, -finalW / 2, -finalH / 2, finalW, finalH);
+                                finalObjectCtx.globalCompositeOperation = 'source-in';
+                                finalObjectCtx.drawImage(objectState.image.element, -finalW / 2, -finalH / 2, finalW, finalH);
+                                finalObjectCtx.restore();
+                            }
+
+                            ctx.save();
+                            if (objectState.shadow.enabled) {
+                                ctx.shadowColor = hexToRgba(objectState.shadow.color, objectState.shadow.opacity / 100);
+                                ctx.shadowBlur = objectState.shadow.blur;
+                                ctx.shadowOffsetX = objectState.shadow.offsetX;
+                                ctx.shadowOffsetY = objectState.shadow.offsetY;
+                            }
+                            ctx.drawImage(finalObjectCanvas, 0, 0);
+                            ctx.restore();
+
+                            if (layer) {
+                                ctx.save();
+                                ctx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + totalOffsetY);
+                                if (objectState.movement.enabled) { ctx.rotate(objectState.movement.rotation * Math.PI / 180); }
+                                ctx.drawImage(layer, -finalW / 2, -finalH / 2, finalW, finalH);
+                                ctx.restore();
+                            }
+                        } else {
+                            // Jika state sebelumnya terbuka, gambar objek utuh seperti biasa
+                            const isTornEdgesEnabled = objectState.stroke.enabled;
+                            drawFinalObject(objectState, finalW, finalH, totalOffsetX, totalOffsetY, isTornEdgesEnabled);
+                        }
                     }
-                ctx.restore();
                 }
+
+                // RESTORE #1: Kembalikan kondisi awal kanvas di akhir fungsi
+                ctx.restore();
             }
             /**
             * The main animation loop.
@@ -1955,14 +2033,24 @@
             function renderKeyframeProperties() {
                 const panel = document.getElementById('keyframe-properties-panel');
                 const activeKeyframeId = state.object.animation.activeKeyframeId;
-                const keyframe = state.object.animation.keyframes.find(kf => kf.id === activeKeyframeId);
+                const keyframes = state.object.animation.keyframes;
+                const keyframe = keyframes.find(kf => kf.id === activeKeyframeId);
 
                 if (!keyframe) {
                     panel.innerHTML = '';
                     panel.classList.add('hidden');
                     return;
                 }
+                // 1. Dapatkan index dan state sebelum keyframe ini
+                const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
+                const currentIndex = sortedKeyframes.findIndex(kf => kf.id === activeKeyframeId);
+                const timeBefore = (currentIndex > 0) ? sortedKeyframes[currentIndex - 1].time : -1;
+                const stateBefore = getVisualStateAtTime(keyframe.time, keyframes);
 
+                // 2. Tentukan apakah tombol harus dinonaktifkan
+                const isOpenDisabled = !(stateBefore === 'closed' || currentIndex === 0);
+                const isCloseDisabled = !(stateBefore === 'open');
+                
                 panel.classList.remove('hidden');
                 panel.innerHTML = `
                     <div class="accordion-section border border-[var(--border-color)] accordion-open">
@@ -2007,6 +2095,13 @@
                                     <button data-easing="backInOut" title="Back In Out" class="${keyframe.easing === 'backInOut' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">Back In-Out</button>
                                 </div>
                             </div>
+                            <div class="pt-4 border-t border-slate-700">
+                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block">Animasi Kertas</label>
+                                <div id="kf-paper-anim-btns" class="grid grid-cols-3 gap-2 btn-group-toggle">
+                                    <button data-anim="none" class="${keyframe.paperAnim === 'none' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">Tidak Ada</button>
+                                    <button data-anim="open" class="${keyframe.paperAnim === 'open' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" ${isOpenDisabled ? 'disabled' : ''}>Buka</button>
+                                    <button data-anim="close" class="${keyframe.paperAnim === 'close' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" ${isCloseDisabled ? 'disabled' : ''}>Tutup</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2023,6 +2118,14 @@
                     if (btn) {
                         keyframe.easing = btn.dataset.easing;
                         renderKeyframeProperties(); // Render ulang untuk menunjukkan tombol aktif
+                        requestRedraw();
+                    }
+                });
+                document.getElementById('kf-paper-anim-btns').addEventListener('click', e => {
+                    const btn = e.target.closest('button');
+                    if (btn && !btn.disabled) { // Tambahkan pengecekan !btn.disabled
+                        keyframe.paperAnim = btn.dataset.anim;
+                        renderKeyframeProperties(); 
                         requestRedraw();
                     }
                 });
@@ -2926,7 +3029,8 @@
                         x: lastProps.x,
                         y: lastProps.y,
                         scale: lastProps.scale,
-                        easing: 'linear'
+                        easing: 'linear',
+                        paperAnim: 'none'
                     };
                     keyframes.push(newKeyframe);
                     state.object.animation.activeKeyframeId = newKeyframe.id; // Langsung aktifkan keyframe baru
