@@ -360,7 +360,7 @@
     </svg>
 
     <!-- Main container for the canvas -->
-    <main id="canvas-container" class="w-screen h-screen flex items-center justify-center p-0">
+    <main id="canvas-container" class="w-screen h-screen flex items-center justify-center p-10">
         <canvas id="main-canvas" class="shadow-lg"></canvas>
     </main>
 
@@ -416,15 +416,6 @@
                             <button data-ratio="4/3" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-xs font-medium transition-all duration-150">4:3</button>
                             <button data-ratio="3/4" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-xs font-medium transition-all duration-150">3:4</button>
                             <button data-ratio="1/1" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-xs font-medium transition-all duration-150">1:1</button>
-                        </div>
-                    </div>
-                    <!-- Resolution Controls -->
-                    <div>
-                        <label class="block text-sm font-medium text-[var(--text-muted)] mb-2" data-translate-key="canvasResolution"></label>
-                        <div id="canvas-resolution-btns" class="grid grid-cols-3 gap-2 md:gap-2 btn-group-toggle">
-                            <button data-res="720" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)] active">720p</button>
-                            <button data-res="1080" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">1080p</button>
-                            <button data-res="1440" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">1440p</button>
                         </div>
                     </div>
                     <!-- Solid Background Color -->
@@ -640,7 +631,7 @@
                             <div class="accordion-body space-y-4 md:space-y-4 p-4 md:p-4 border-t border-[var(--border-color)]">
                                 <div>
                                     <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="thickness"></label>
-                                    <div class="flex items-center gap-3 md:gap-3"><input type="range" id="stroke-width" min="0" max="50" value="10" class="w-full slider"><input type="number" id="stroke-width-input" min="0" max="50" value="10" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
+                                    <div class="flex items-center gap-3 md:gap-3"><input type="range" id="stroke-width" min="0" max="100" value="10" class="w-full slider"><input type="number" id="stroke-width-input" min="0" max="50" value="10" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm"></div>
                                 </div>
                                 <div>
                                     <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="roughness"></label>
@@ -938,6 +929,14 @@
             <h3 class="text-xl font-bold mb-6 text-slate-100" data-translate-key="exportSettings"></h3>
             <div class="space-y-4 md:space-y-4">
                 <div>
+                    <label class="block text-sm font-medium text-[var(--text-muted)] mb-2" data-translate-key="canvasResolution"></label>
+                    <div id="canvas-resolution-btns" class="grid grid-cols-3 gap-2 md:gap-2 btn-group-toggle">
+                        <button data-res="720" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">720p</button>
+                        <button data-res="1080" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">1080p</button>
+                        <button data-res="1440" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">1440p</button>
+                    </div>
+                </div>
+                <div>
                     <label class="block text-sm font-medium text-[var(--text-muted)] mb-2" data-translate-key="fps"></label>
                     <div id="export-fps-btns" class="grid grid-cols-3 gap-2 md:gap-2 btn-group-toggle">
                         <button data-fps="24" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">24</button>
@@ -1019,25 +1018,25 @@
 
             // URLs for overlay images from GitHub repository.
             const overlayImageUrls = [
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper1.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper2.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper3.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper4.webp'
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper_1.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper_2.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper_3.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper_4.webp'
             ];
             const MASK_IMAGE_URLS = [
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask-0.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask-1.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask-2.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask-3.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask-4.webp'
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask_stage_0.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask_stage_1.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask_stage_2.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask_stage_3.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask_stage_4.webp'
             ];
 
             const LAYER_IMAGE_URLS = [
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/Layer-0.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/Layer-1.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/Layer-2.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/Layer-3.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/Layer-4.webp'
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/layer_stage_0.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/layer_stage_1.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/layer_stage_2.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/layer_stage_3.webp',
+                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/layer_stage_4.webp'
             ];
 
             let maskImages = [];
@@ -1063,8 +1062,8 @@
             // Default state for a single object
             const DEFAULT_OBJECT_STATE = {
                 image: { element: null, size: 80, offset: { x: 0, y: 0 }, file: null },
-                stroke: { enabled: true, width: 10, roughness: 25, detail: 0.020 },
-                shadow: { enabled: true, offsetX: 5, offsetY: 5, blur: 5, color: '#000000', opacity: 50 },
+                stroke: { enabled: true, width: 25, roughness: 25, detail: 0.020, seed: 0 },
+                shadow: { enabled: true, offsetX: 5, offsetY: -5, blur: 5, color: '#000000', opacity: 50 },
                 color: { enabled: false, hue: 0, saturation: 0, brightness: 0, colorize: false },
                 movement: { 
                     enabled: true, 
@@ -1132,7 +1131,7 @@
                     effects: {
                         colorCorrection: { enabled: false, hue: 0, saturation: 0, brightness: 0, colorize: false },
                         blur: { enabled: false, intensity: 10 },
-                        vignette: { enabled: false, opacity: 100, radius: 0, feather: 100, color: '#000000' }
+                        vignette: { enabled: false, opacity: 100, radius: 50, feather: 100, color: '#000000' }
                     }
                 },
                 aspectRatio: '16/9',
@@ -1145,8 +1144,9 @@
 
             let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
             
-            // Maps for calculating canvas dimensions based on resolution and aspect ratio
             const RESOLUTION_MAPS = {
+                '360': { '16/9': { w: 640, h: 360 }, '9/16': { w: 360, h: 640 }, '4/3': { w: 480, h: 360 }, '3/4': { w: 360, h: 480 }, '1/1': { w: 360, h: 360 } },
+                '540': { '16/9': { w: 960, h: 540 }, '9/16': { w: 540, h: 960 }, '4/3': { w: 720, h: 540 }, '3/4': { w: 540, h: 720 }, '1/1': { w: 540, h: 540 } },
                 '720': { '16/9': { w: 1280, h: 720 }, '9/16': { w: 720, h: 1280 }, '4/3': { w: 960, h: 720 }, '3/4': { w: 720, h: 960 }, '1/1': { w: 720, h: 720 } },
                 '1080': { '16/9': { w: 1920, h: 1080 }, '9/16': { w: 1080, h: 1920 }, '4/3': { w: 1440, h: 1080 }, '3/4': { w: 1080, h: 1440 }, '1/1': { w: 1080, h: 1080 } },
                 '1440': { '16/9': { w: 2560, h: 1440 }, '9/16': { w: 1440, h: 2560 }, '4/3': { w: 1920, h: 1440 }, '3/4': { w: 1440, h: 1920 }, '1/1': { w: 1440, h: 1440 } }
@@ -1384,21 +1384,21 @@
                 return { transform: currentTransform, prevKeyframe, nextKeyframe };
             }
 
+            // GANTI SELURUH FUNGSI INI
             function drawFinalObject(objectState, imgW, imgH, totalOffsetX, totalOffsetY, tornEdgesEnabled, layerImage = null, maskImage = null) {
                 // Pastikan semua kanvas sementara bersih sebelum digunakan
                 objectCtx.clearRect(0, 0, objectCanvas.width, objectCanvas.height);
                 contentCtx.clearRect(0, 0, contentCanvas.width, contentCanvas.height);
                 finalObjectCtx.clearRect(0, 0, finalObjectCanvas.width, finalObjectCanvas.height);
 
-                // =========================================================================
-                // TAHAP 1: Siapkan konten visual gabungan di `contentCanvas`
-                // =========================================================================
-                
-                // 1a. Gambar objek dasar dengan filter warnanya
+                const centerX = objectCanvas.width / 2;
+                const centerY = objectCanvas.height / 2;
+
+                // TAHAP 1: Siapkan konten visual gabungan (objek + warna + tekstur)
                 let fgColorFilterString = '';
                 if (objectState.color.enabled) {
                     let filterParts = [];
-                    if (objectState.color.colorize) { filterParts.push('sepia(1)'); }
+                    if (objectState.color.colorize) filterParts.push('sepia(1)');
                     filterParts.push(`hue-rotate(${objectState.color.hue}deg)`);
                     filterParts.push(`saturate(${100 + objectState.color.saturation}%)`);
                     filterParts.push(`brightness(${100 + objectState.color.brightness}%)`);
@@ -1406,93 +1406,89 @@
                 }
                 contentCtx.save();
                 contentCtx.filter = fgColorFilterString;
-                contentCtx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + totalOffsetY);
-                if (objectState.movement.enabled) { contentCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
+                contentCtx.translate(centerX, centerY); // Gambar di tengah
                 contentCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
                 contentCtx.restore();
 
-                // 1b. Timpa dengan tekstur kertas jika aktif
-                if (objectState.paperFoldOverlay.enabled) {
-                    const overlayImage = originalOverlayImages[objectState.paperFoldOverlay.currentImageIndex];
-                    if (overlayImage && overlayImage.complete && overlayImage.naturalWidth > 0) {
-                        
-                        // --- KODE YANG DIPERBAIKI ---
-                        // Hapus `const tempCanvas = ...` dan gunakan `tempOverlayCanvas` secara konsisten.
-                        const tempCtx = tempOverlayCanvas.getContext('2d');
-                        tempOverlayCanvas.width = overlayImage.naturalWidth;
-                        tempOverlayCanvas.height = overlayImage.naturalHeight;
-                        tempCtx.drawImage(overlayImage, 0, 0);
-                        
-                        // Gunakan dimensi dari `tempOverlayCanvas` yang benar.
-                        const imageData = tempCtx.getImageData(0, 0, tempOverlayCanvas.width, tempOverlayCanvas.height);
-                        const data = imageData.data;
-                        const effectStrength = objectState.paperFoldOverlay.opacity;
-                        const strength = (100 - effectStrength) / 100;
+                const overlayImage = originalOverlayImages[objectState.paperFoldOverlay.currentImageIndex];
+                if (overlayImage && overlayImage.complete && overlayImage.naturalWidth > 0) {
+                    const tempCtx = tempOverlayCanvas.getContext('2d');
+                    tempOverlayCanvas.width = overlayImage.naturalWidth;
+                    tempOverlayCanvas.height = overlayImage.naturalHeight;
+                    tempCtx.drawImage(overlayImage, 0, 0);
+                    const imageData = tempCtx.getImageData(0, 0, tempOverlayCanvas.width, tempOverlayCanvas.height);
+                    const data = imageData.data;
+                    
+                    // Jika toggle 'enabled' aktif, gunakan opacity dari slider. Jika tidak, paksa opacity jadi 0.
+                    const effectStrength = objectState.paperFoldOverlay.enabled ? objectState.paperFoldOverlay.opacity : 0;
+                    const strength = (100 - effectStrength) / 100;
 
-                        for (let i = 0; i < data.length; i += 4) {
-                            data[i] = data[i] + (255 - data[i]) * strength;
-                            data[i + 1] = data[i + 1] + (255 - data[i + 1]) * strength;
-                            data[i + 2] = data[i + 2] + (255 - data[i + 2]) * strength;
-                        }
-                        
-                        tempCtx.putImageData(imageData, 0, 0);
-
-                        // Gambar hasil (yang sudah diproses) ke kanvas konten utama
-                        contentCtx.save();
-                        contentCtx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + totalOffsetY);
-                        if (objectState.movement.enabled) { contentCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
-                        contentCtx.globalCompositeOperation = objectState.paperFoldOverlay.blendMode;
-                        contentCtx.drawImage(tempOverlayCanvas, -imgW / 2, -imgH / 2, imgW, imgH);
-                        contentCtx.restore();
+                    for (let i = 0; i < data.length; i += 4) {
+                        data[i] += (255 - data[i]) * strength;
+                        data[i + 1] += (255 - data[i + 1]) * strength;
+                        data[i + 2] += (255 - data[i + 2]) * strength;
                     }
+                    tempCtx.putImageData(imageData, 0, 0);
+
+                    contentCtx.save();
+                    contentCtx.translate(centerX, centerY);
+                    contentCtx.globalCompositeOperation = objectState.paperFoldOverlay.blendMode;
+                    contentCtx.drawImage(tempOverlayCanvas, -imgW / 2, -imgH / 2, imgW, imgH);
+                    contentCtx.restore();
                 }
 
-                // 1c. Timpa lagi dengan layer animasi jika ada
                 if (layerImage) {
                     contentCtx.save();
-                    contentCtx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + totalOffsetY);
-                    if (objectState.movement.enabled) { contentCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
+                    contentCtx.translate(centerX, centerY); // Terapkan juga di tengah
                     contentCtx.drawImage(layerImage, -imgW / 2, -imgH / 2, imgW, imgH);
                     contentCtx.restore();
                 }
 
-                // =========================================================================
                 // TAHAP 2: Buat bentuk sobekan dan potong konten
-                // =========================================================================
-
                 if (tornEdgesEnabled && objectState.stroke.width > 0) {
-                    // Buat BENTUK SOBEKAN di `objectCanvas`
-                    tornDilate.setAttribute('radius', objectState.stroke.width);
-                    tornDisplacement.setAttribute('scale', objectState.stroke.roughness);
-                    tornTurbulence.setAttribute('baseFrequency', objectState.stroke.detail);
-                    tornFlood.setAttribute('flood-color', '#FFFFFF');
+                    // JIKA TORN EDGES AKTIF: Lakukan logika sobekan yang sudah ada.
+                    const BASE_RENDER_WIDTH = 1080.0;
+                    const renderScaleFactor = imgW / BASE_RENDER_WIDTH;
+                    const adjustedStrokeWidth = objectState.stroke.width * renderScaleFactor;
+                    const adjustedRoughness = objectState.stroke.roughness * renderScaleFactor;
+                    const canvasResolutionScale = canvas.height / 720.0;
+                    const adjustedDetail = objectState.stroke.detail / canvasResolutionScale;
                     
+                    tornDilate.setAttribute('radius', adjustedStrokeWidth);
+                    tornDisplacement.setAttribute('scale', adjustedRoughness);
+                    tornTurbulence.setAttribute('baseFrequency', adjustedDetail);
+                    tornTurbulence.setAttribute('seed', objectState.stroke.seed);
+                    tornFlood.setAttribute('flood-color', '#FFFFFF');
+
                     objectCtx.save();
                     objectCtx.filter = 'url(#combined-filter)';
-                    objectCtx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + totalOffsetY);
-                    if (objectState.movement.enabled) { objectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
-                    
-                    // Langsung gambar elemen gambar objek (yang sudah punya padding bawaan)
+                    objectCtx.translate(centerX, centerY);
                     objectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
-                    objectCtx.restore(); 
-                    
-                    // Potong `contentCanvas` menggunakan BENTUK SOBEKAN
+                    objectCtx.restore();
+
+                    contentCtx.save();
+                    contentCtx.globalCompositeOperation = 'destination-in';
+                    contentCtx.drawImage(objectCanvas, 0, 0);
+                    contentCtx.restore();
+                } else {
+                    // JIKA TORN EDGES MATI: Lakukan pemotongan sesuai bentuk gambar asli.
+                    // 1. Gambar bentuk asli objek ke kanvas sementara (objectCtx) untuk membuat mask.
+                    objectCtx.save();
+                    objectCtx.translate(centerX, centerY);
+                    objectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
+                    objectCtx.restore();
+
+                    // 2. Gunakan mask tersebut untuk memotong contentCtx.
                     contentCtx.save();
                     contentCtx.globalCompositeOperation = 'destination-in';
                     contentCtx.drawImage(objectCanvas, 0, 0);
                     contentCtx.restore();
                 }
-                
-                // =========================================================================
-                // TAHAP 3: Terapkan mask animasi dan gambar ke kanvas utama
-                // =========================================================================
-                let finalSourceCanvas = contentCanvas; // Secara default, sumber akhir adalah konten yang sudah disobek
-
+                // TAHAP 3: Terapkan mask animasi
+                let finalSourceCanvas = contentCanvas;
                 if (maskImage) {
-                    // Jika ada mask animasi, gunakan untuk memotong hasil dari `contentCanvas`
                     finalObjectCtx.save();
-                    finalObjectCtx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + totalOffsetY);
-                    if (objectState.movement.enabled) { finalObjectCtx.rotate(objectState.movement.rotation * Math.PI / 180); }
+                    finalObjectCtx.translate(centerX, centerY); // Terapkan mask di tengah
                     finalObjectCtx.drawImage(maskImage, -imgW / 2, -imgH / 2, imgW, imgH);
                     finalObjectCtx.restore();
                     
@@ -1501,35 +1497,18 @@
                     finalObjectCtx.drawImage(contentCanvas, 0, 0);
                     finalObjectCtx.restore();
 
-                    finalSourceCanvas = finalObjectCanvas; // Sumber akhir sekarang adalah hasil masking
+                    finalSourceCanvas = finalObjectCanvas;
                 }
-                
-                // TAHAP FINAL: Gambar hasil akhir ke kanvas utama dengan bayangan
-                ctx.save();
-                if (objectState.shadow.enabled) {
-                    ctx.shadowColor = hexToRgba(objectState.shadow.color, objectState.shadow.opacity / 100);
-                    ctx.shadowBlur = objectState.shadow.blur;
-                    ctx.shadowOffsetX = objectState.shadow.offsetX;
-                    ctx.shadowOffsetY = objectState.shadow.offsetY;
-                }
-                ctx.drawImage(finalSourceCanvas, 0, 0);
-                ctx.restore();
+
+                return finalSourceCanvas; 
             }
-
-
             function requestRedraw() { needsRedraw = true; }
             
-            /**
-             * The main drawing function. Renders the background, all objects, and all effects onto the canvas.
-             */
             function draw(timestamp = performance.now()) {
-                // SAVE #1: Simpan kondisi awal kanvas di awal fungsi
                 ctx.save();
-
-                // Hapus semua yang ada di kanvas
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // --- 1. GAMBAR BACKGROUND ---
+                // --- 1. GAMBAR BACKGROUND --- (Logika ini tidak berubah)
                 let bgFilterString = '';
                 const bgCC = state.background.effects.colorCorrection;
                 if (bgCC.enabled) {
@@ -1540,17 +1519,14 @@
                     filterParts.push(`brightness(${100 + bgCC.brightness}%)`);
                     bgFilterString = filterParts.join(' ');
                 }
-
                 if (state.background.effects.blur.enabled && state.background.effects.blur.intensity > 0) {
                     bgFilterString += ` blur(${state.background.effects.blur.intensity}px)`;
                 }
                 ctx.filter = bgFilterString.trim();
-
+                // PERUBAHAN 1: Balik arah Y untuk offset latar belakang
                 const bgOffsetX = (canvas.width * state.background.transform.offset.x) / 100;
-                const bgOffsetY = (canvas.height * state.background.transform.offset.y) / 100;
-
+                const bgOffsetY = (canvas.height * (state.background.transform.offset.y * -1)) / 100;
                 if (state.background.element) {
-                    // Simpan state khusus untuk transformasi background
                     ctx.save();
                     if (state.background.transform.mode === 'fill') {
                         ctx.translate(canvas.width / 2 + bgOffsetX, canvas.height / 2 + bgOffsetY);
@@ -1563,64 +1539,65 @@
                     } else if (state.background.transform.mode === 'stretch') {
                         ctx.drawImage(state.background.element, 0, 0, canvas.width, canvas.height);
                     }
-                    // Kembalikan state setelah transformasi background
                     ctx.restore();
                 } else {
                     ctx.fillStyle = state.background.color;
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                 }
-                
-                // Set filter kembali ke normal sebelum menggambar vignette
                 ctx.filter = 'none';
-
-                // Gambar vignette jika aktif
                 if (state.background.effects.vignette.enabled) {
                     ctx.save();
-                    const gradient = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, Math.max(canvas.width, canvas.height) / 2);
+
+                    const centerX = canvas.width / 2;
+                    const centerY = canvas.height / 2;
+
+                    // Peningkatan 1: Menangani canvas non-persegi dengan benar.
+                    // Radius luar dihitung ke sudut kanvas untuk memastikan cakupan penuh.
+                    const outerRadius = 1.5 * Math.sqrt(centerX * centerX + centerY * centerY);
+
+                    const gradient = ctx.createRadialGradient(
+                        centerX, centerY, 0,
+                        centerX, centerY, outerRadius
+                    );
+
                     const vignetteColor = hexToRgba(state.background.effects.vignette.color, state.background.effects.vignette.opacity / 100);
-                    const normalizedRadius = state.background.effects.vignette.radius / 100;
-                    const normalizedFeather = state.background.effects.vignette.feather / 100;
-                    gradient.addColorStop(normalizedRadius, 'rgba(0,0,0,0)');
-                    gradient.addColorStop(Math.min(1, normalizedRadius + normalizedFeather), vignetteColor);
+
+                    // Peningkatan 1: Logika baru untuk radius dan feather.
+                    const midPoint = state.background.effects.vignette.radius / 100;
+                    const halfFeather = (state.background.effects.vignette.feather / 100) / 2;
+
+                    // Hitung posisi stop dengan clamping (Math.max/min) untuk keamanan.
+                    const stop1 = Math.max(0, midPoint - halfFeather);
+                    const stop2 = Math.min(1, midPoint + halfFeather);
+
+                    gradient.addColorStop(stop1, 'rgba(0,0,0,0)'); // Area transparan
+                    gradient.addColorStop(stop2, vignetteColor);    // Akhir dari transisi feather
+                    gradient.addColorStop(1, vignetteColor);         // Memastikan tepi luar selalu solid
+
                     ctx.fillStyle = gradient;
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
                     ctx.restore();
                 }
-
 
                 // --- 2. GAMBAR OBJEK ---
                 const objectState = state.object;
                 if (objectState.image.element) {
+                    // Kalkulasi animasi dan transformasi (Logika ini tetap sama)
                     const animState = objectState.animation;
                     const isSimpleMode = animState.mode === 'simple';
                     const totalDuration = state.export.duration;
-
-                    // Tentukan waktu animasi saat ini
                     const currentTimeSource = isExporting ? timestamp : performance.now();
                     let timeInSeconds;
-                    if (animState.previewTime !== null) {
-                        timeInSeconds = animState.previewTime;
-                    } else if (isExporting) {
-                        timeInSeconds = timestamp / 1000;
-                    } else {
-                        timeInSeconds = (currentTimeSource / 1000) % totalDuration;
-                    }
+                    if (animState.previewTime !== null) { timeInSeconds = animState.previewTime; } 
+                    else if (isExporting) { timeInSeconds = timestamp / 1000; } 
+                    else { timeInSeconds = (currentTimeSource / 1000) % totalDuration; }
 
-                    // Tentukan state animasi (transformasi, gambar mask & layer)
-                    let transform;
-                    let isPaperAnimActive = false;
-                    let paperFrameIndex = 0;
-                    let currentLayer = null;
-                    let currentMask = null;
-
+                    let transform, isPaperAnimActive = false, paperFrameIndex = 0, currentLayer = null, currentMask = null;
                     if (isSimpleMode) {
-                        transform = {
-                            x: objectState.image.offset.x,
-                            y: objectState.image.offset.y,
-                            scale: objectState.image.size
-                        };
-                        const animDuration = 1.0;
-                        const frameDuration = 0.2; // 1 detik / 5 frame
+                        transform = { x: objectState.image.offset.x, y: objectState.image.offset.y, scale: objectState.image.size };
+                        // Logika animasi simpel...
+                        const animDuration = 1.0, frameDuration = 0.2;
                         if (animState.simple.previewing) {
                             const timeSincePreviewStart = (currentTimeSource - animState.simple.previewStartTime) / 1000;
                             if (timeSincePreviewStart < animDuration) {
@@ -1658,19 +1635,12 @@
                             }
                         }
                     }
-
-                    // Ambil gambar layer dan mask jika animasi aktif
                     if (isPaperAnimActive) {
                         currentLayer = layerImages[paperFrameIndex];
                         currentMask = maskImages[paperFrameIndex];
                     }
+                    if (!transform) { console.error("Gagal menentukan transformasi objek."); ctx.restore(); return; }
 
-                    // Hitung dimensi dan posisi final
-                    if (!transform) {
-                        console.error("Gagal menentukan transformasi objek.");
-                        ctx.restore();
-                        return;
-                    }
                     const canvasAspect = canvas.width / canvas.height;
                     const imageAspect = objectState.image.element.width / objectState.image.element.height;
                     const baseScale = (canvasAspect > imageAspect) ? canvas.height / objectState.image.element.height : canvas.width / objectState.image.element.width;
@@ -1681,20 +1651,38 @@
                     const imgBaseOffsetY = (canvas.height * transform.y) / 100;
                     const totalOffsetX = imgBaseOffsetX + objectState.movement.positionOffset.x;
                     const totalOffsetY = imgBaseOffsetY + objectState.movement.positionOffset.y;
-
-                    // Panggil satu fungsi render utama dengan semua parameter yang diperlukan
+                    
                     const isTornEdgesEnabled = objectState.stroke.enabled;
                     const stateBefore = getVisualStateAtTime(timeInSeconds, animState.keyframes);
 
+                    // Panggil drawFinalObject dan TANGKAP HASILNYA di variabel finalStampSource.
+                    let finalStampSource;
                     if (!isSimpleMode && !isPaperAnimActive && stateBefore === 'closed') {
-                        // Objek dalam kondisi tertutup (diam)
-                        drawFinalObject(objectState, finalW, finalH, totalOffsetX, totalOffsetY, isTornEdgesEnabled, layerImages[0], maskImages[0]);
+                        finalStampSource = drawFinalObject(objectState, finalW, finalH, totalOffsetX, totalOffsetY, isTornEdgesEnabled, layerImages[0], maskImages[0]);
                     } else {
-                        // Objek dalam kondisi terbuka (diam) atau sedang beranimasi
-                        drawFinalObject(objectState, finalW, finalH, totalOffsetX, totalOffsetY, isTornEdgesEnabled, currentLayer, currentMask);
+                        finalStampSource = drawFinalObject(objectState, finalW, finalH, totalOffsetX, totalOffsetY, isTornEdgesEnabled, currentLayer, currentMask);
                     }
+
+                    // Ambil "stempel" yang sudah jadi dan gambar ke kanvas utama dengan transformasi
+                    ctx.save();
+                    if (objectState.shadow.enabled) {
+                        const baseResolution = 720;
+                        const currentResolution = canvas.height;
+                        const resolutionScaleFactor = currentResolution / baseResolution;
+                        ctx.shadowColor = hexToRgba(objectState.shadow.color, objectState.shadow.opacity / 100);
+                        ctx.shadowBlur = objectState.shadow.blur * resolutionScaleFactor;
+                        ctx.shadowOffsetX = objectState.shadow.offsetX * resolutionScaleFactor;
+                        ctx.shadowOffsetY = (objectState.shadow.offsetY * -1) * resolutionScaleFactor;
+                    }
+
+                    ctx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + (totalOffsetY * -1));
+                    if (objectState.movement.enabled) {
+                        ctx.rotate(objectState.movement.rotation * Math.PI / 180);
+                    }
+
+                    ctx.drawImage(finalStampSource, -finalStampSource.width / 2, -finalStampSource.height / 2);
+                    ctx.restore();
                 }
-                // RESTORE #1: Kembalikan kondisi awal kanvas di akhir fungsi
                 ctx.restore();
             }
             /**
@@ -1739,6 +1727,14 @@
                     const isSimpelMode = objectState.movement.mode === 'simpel';
                     const speedMultiplier = isSimpelMode ? objectState.movement.simpelSpeed : 1;
                     const strengthMultiplier = isSimpelMode ? objectState.movement.simpelStrength : 1;
+                    
+                    const canvasWidth = canvas.offsetWidth;
+                    const canvasHeight = canvas.offsetHeight;
+                    
+                    // Skalakan kekuatan gerakan berdasarkan ukuran kanvas (misalnya, 5% dari lebar/tinggi kanvas)
+                    const strengthScaleX = (canvasWidth / 100) * objectState.movement.positionStrength.x * strengthMultiplier;
+                    const strengthScaleY = (canvasHeight / 100) * objectState.movement.positionStrength.y * strengthMultiplier;                    
+                    
                     const effectiveRotationSpeed = objectState.movement.rotationSpeed * speedMultiplier;
                     const effectiveRotationStrength = objectState.movement.rotationStrength * strengthMultiplier;
                     const effectivePositionSpeedX = objectState.movement.positionSpeed.x * speedMultiplier;
@@ -1760,7 +1756,7 @@
                     if (effectivePositionSpeedX > 0 && effectivePositionStrengthX > 0) {
                         const positionIntervalX = 1000 / effectivePositionSpeedX;
                         if (timestamp - objectState.movement.lastPositionUpdateTime.x > positionIntervalX) {
-                            objectState.movement.positionOffset.x = (Math.random() - 0.5) * 2 * effectivePositionStrengthX;
+                            objectState.movement.positionOffset.x = (Math.random() - 0.5) * effectivePositionStrengthX;
                             objectState.movement.lastPositionUpdateTime.x = timestamp;
                             hasChanged = true;
                         }
@@ -1771,7 +1767,7 @@
                     if (effectivePositionSpeedY > 0 && effectivePositionStrengthY > 0) {
                         const positionIntervalY = 1000 / effectivePositionSpeedY;
                         if (timestamp - objectState.movement.lastPositionUpdateTime.y > positionIntervalY) {
-                            objectState.movement.positionOffset.y = (Math.random() - 0.5) * 2 * effectivePositionStrengthY;
+                            objectState.movement.positionOffset.y = (Math.random() - 0.5) * effectivePositionStrengthY;
                             objectState.movement.lastPositionUpdateTime.y = timestamp;
                             hasChanged = true;
                         }
@@ -1791,13 +1787,17 @@
                 if (loadedImages.length === 0) return;
 
                 let hasChanged = false;
-                const objectState = state.object; // Ganti dari forEach ke referensi langsung
+                const objectState = state.object;
 
                 if (objectState.paperFoldOverlay.enabled && objectState.paperFoldOverlay.speed > 0) {
                     const timeSinceLastSwitch = timestamp - objectState.paperFoldOverlay.lastImageSwitchTime;
                     const interval = 1000 / objectState.paperFoldOverlay.speed;
                     if (timeSinceLastSwitch >= interval) {
                         objectState.paperFoldOverlay.currentImageIndex = (objectState.paperFoldOverlay.currentImageIndex + 1) % loadedImages.length;
+                        
+                        // Ganti nilai seed agar tekstur sobekan juga berubah. Kita putar dari 0-99.
+                        objectState.stroke.seed = (objectState.stroke.seed + 1) % 100;
+                        
                         objectState.paperFoldOverlay.lastImageSwitchTime = timestamp;
                         hasChanged = true;
                     }
@@ -1822,26 +1822,34 @@
             }
             
             function updateInternalCanvasResolution() {
-                const targetResolutionKey = state.canvasDisplayResolution.toString();
+                const PREVIEW_RESOLUTION_KEY = '360';
                 const aspectRatioKey = state.aspectRatio;
-                const dims = RESOLUTION_MAPS[targetResolutionKey]?.[aspectRatioKey];
-                let internalCanvasWidth, internalCanvasHeight;
-                if (dims) {
-                    internalCanvasWidth = dims.w;
-                    internalCanvasHeight = dims.h;
-                } else {
-                    const ratio = eval(aspectRatioKey);
-                    internalCanvasHeight = state.canvasDisplayResolution;
-                    internalCanvasWidth = internalCanvasHeight * ratio;
+                const dims = RESOLUTION_MAPS[PREVIEW_RESOLUTION_KEY]?.[aspectRatioKey];
+
+                if (!dims) {
+                    console.error("Dimensi pratinjau tidak ditemukan!");
+                    return;
                 }
-                canvas.width = objectCanvas.width = finalObjectCanvas.width = contentCanvas.width = Math.max(10, Math.round(internalCanvasWidth));
-                canvas.height = objectCanvas.height = finalObjectCanvas.height = contentCanvas.height = Math.max(10, Math.round(internalCanvasHeight));
+
+                const internalCanvasWidth = dims.w;
+                const internalCanvasHeight = dims.h;
+
+                const imageSizeSlider = document.getElementById('image-size');
+                const maxScalePercent = imageSizeSlider ? parseFloat(imageSizeSlider.max) : 200;
+                const offscreenMultiplier = (maxScalePercent / 100.0) + 0.1; // Tambahan 0.2 untuk buffer efek sobekan
+
+                const offscreenCanvasWidth = Math.round(internalCanvasWidth * offscreenMultiplier);
+                const offscreenCanvasHeight = Math.round(internalCanvasHeight * offscreenMultiplier);               
+
+                canvas.width = internalCanvasWidth;
+                canvas.height = internalCanvasHeight;
+
+                objectCanvas.width = contentCanvas.width = finalObjectCanvas.width = offscreenCanvasWidth;
+                objectCanvas.height = contentCanvas.height = finalObjectCanvas.height = offscreenCanvasHeight;
+                
                 requestRedraw();
             }
 
-            /**
-             * Adjusts the display size of the main canvas to fit its container while maintaining aspect ratio.
-             */
             function updateCanvasDisplaySize() {
                 const containerStyle = window.getComputedStyle(canvasContainer);
                 const paddingX = parseFloat(containerStyle.paddingLeft) + parseFloat(containerStyle.paddingRight);
@@ -1864,17 +1872,11 @@
                 canvas.style.height = `${Math.round(displayH)}px`;
             }
 
-            /**
-             * A helper function to call both resolution and display size updates.
-             */
             function resizeAndRedrawAll() {
                 updateInternalCanvasResolution();
                 updateCanvasDisplaySize();
             }
 
-            /**
-             * Binds a slider and a number input together to update a single state value for the active object.
-             */
             function syncSliderAndInput(sliderId, inputId, stateUpdater) {
                 const slider = document.getElementById(sliderId);
                 const input = document.getElementById(inputId);
@@ -1907,9 +1909,6 @@
                 });
             }
 
-            /**
-             * Binds a number input to update a state value for the active object.
-             */
             function syncInputOnly(inputId, stateUpdater) {
                 const input = document.getElementById(inputId);
                 if (!input) return;
@@ -1932,20 +1931,14 @@
                 });
             }
             
-            /**
-             * Handles an uploaded image file, reads it, and sets it to the correct state property.
-             */
             function handleImageFile(file, target) {
                 if (!file || !file.type.startsWith('image/')) return;
 
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const img = new Image();
-                    // >>> GANTI BAGIAN img.onload DENGAN INI <<<
                     img.onload = () => {
                         if (target === 'foreground') {
-                            // --- IDE ANDA DITERAPKAN DI SINI ---
-                            
                             // 1. Tentukan ukuran padding (misalnya 25% dari dimensi asli)
                             const paddingX = img.width * 0.25;
                             const paddingY = img.height * 0.25;
@@ -2553,9 +2546,10 @@
              */
             async function startExport() {
                 isExporting = true;
-				const hasAnyImage = state.object.image.element || state.background.element;
+                const hasAnyImage = state.object.image.element || state.background.element;
                 if (!hasAnyImage) {
                     showTopNotification("notificationWarnUpload");
+                    isExporting = false; // Pastikan untuk mereset flag
                     return;
                 }
                 const exportSettingsPopup = document.getElementById('export-settings-popup');
@@ -2568,39 +2562,51 @@
                     exportProgressPopup.classList.add('flex');
                 }
                 cancelAnimationFrame(animationFrameId);
+
+                // Simpan resolusi pratinjau saat ini untuk pemulihan
                 const originalCanvasWidth = canvas.width;
                 const originalCanvasHeight = canvas.height;
+                
                 const finalExportDims = RESOLUTION_MAPS[state.canvasDisplayResolution.toString()]?.[state.aspectRatio];
 
-                if (!finalExportDims) { 
-                    console.error("Invalid export resolution."); 
+                if (!finalExportDims) {
+                    console.error("Invalid export resolution.");
                     if (exportProgressPopup) {
                         exportProgressPopup.classList.add('hidden');
                         exportProgressPopup.classList.remove('flex');
                     }
+                    isExporting = false;
                     animationLoop();
                     return;
                 }
 
-                // Set canvas to final export dimensions and reset animation state for all objects
-                canvas.width = finalExportDims.w;
-                canvas.height = finalExportDims.h;
-				const obj = state.object; // Targetkan satu objek
-				obj.movement.lastRotationUpdateTime = 0;
-				obj.movement.lastPositionUpdateTime = { x: 0, y: 0 };
-				obj.movement.rotation = 0;
-				obj.movement.positionOffset = {x: 0, y: 0};
-				obj.paperFoldOverlay.lastImageSwitchTime = 0;
-				obj.paperFoldOverlay.currentImageIndex = 0;
+                // === PERBAIKAN UTAMA DI SINI ===
+                // Set SEMUA kanvas ke resolusi ekspor final
+                const exportW = finalExportDims.w;
+                const exportH = finalExportDims.h;
+                canvas.width = objectCanvas.width = finalObjectCanvas.width = contentCanvas.width = exportW;
+                canvas.height = objectCanvas.height = finalObjectCanvas.height = contentCanvas.height = exportH;
+                // === AKHIR DARI PERBAIKAN ===
+
+                // Reset state animasi objek untuk memulai dari awal
+                const obj = state.object;
+                obj.movement.lastRotationUpdateTime = 0;
+                obj.movement.lastPositionUpdateTime = { x: 0, y: 0 };
+                obj.movement.rotation = 0;
+                obj.movement.positionOffset = { x: 0, y: 0 };
+                obj.paperFoldOverlay.lastImageSwitchTime = 0;
+                obj.paperFoldOverlay.currentImageIndex = 0;
                 obj.animation.simple.previewing = null;
-								
+
                 const DURATION_S = state.export.duration;
                 const FRAME_RATE = state.export.fps;
                 const FILENAME = state.export.filename || 'animasi-sobek';
                 const TOTAL_FRAMES = DURATION_S * FRAME_RATE;
                 const capturer = new CCapture({ format: 'webm', framerate: FRAME_RATE, quality: 95, name: FILENAME });
+                
                 capturer.start();
-                // Loop through each frame, render it, and capture it
+
+                // Loop perekaman frame
                 for (let i = 0; i <= TOTAL_FRAMES; i++) {
                     const timestamp = (i / FRAME_RATE) * 1000;
                     updateMovement(timestamp);
@@ -2612,23 +2618,27 @@
                         progressBarFill.style.width = `${percentage}%`;
                         progressBarFill.textContent = `${percentage}%`;
                     }
-                    await new Promise(resolve => setTimeout(resolve, 1)); // Small delay to allow UI to update
+                    await new Promise(resolve => setTimeout(resolve, 1));
                 }
+
                 if (progressBarFill) progressBarFill.textContent = `${translations[state.language].completing}...`;
+                
                 capturer.stop();
-                // Save the captured video
+
+                // Simpan video hasil rekaman
                 capturer.save(blob => {
                     if (exportProgressPopup) {
                         exportProgressPopup.classList.add('hidden');
                         exportProgressPopup.classList.remove('flex');
                     }
-                    canvas.width = originalCanvasWidth;
-                    canvas.height = originalCanvasHeight;
+
+                    // Kembalikan ukuran kanvas ke resolusi pratinjau
+                    // Fungsi resizeAndRedrawAll() akan menangani semua kanvas
                     resizeAndRedrawAll();
                     
-                    isExporting = false; // <-- KEMBALIKAN JADI FALSE SAAT SELESAI
-                    
+                    isExporting = false;
                     animationFrameId = requestAnimationFrame(animationLoop);
+                    
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
@@ -2639,11 +2649,18 @@
                     window.URL.revokeObjectURL(url);
                 });
             }
-
             /**
              * Shows the content for a specific tab and updates the active state of tab buttons.
              */
+            const tabScrollPositions = {};
+            const controlsPanel = document.querySelector('.controls-panel');            
             function showTab(tabName) {
+                // Simpan posisi scroll tab saat ini sebelum beralih
+                const currentActiveTab = state.activeTab;
+                if (controlsPanel) {
+                    tabScrollPositions[currentActiveTab] = controlsPanel.scrollTop;
+                }
+
                 state.object.animation.previewTime = null;
                 const lang = state.language;
                 const tabTitles = {
@@ -2660,12 +2677,21 @@
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
                 document.querySelectorAll('.tab-handle').forEach(handle => handle.classList.remove('active'));
                 document.querySelectorAll('.mobile-tab-btn').forEach(handle => handle.classList.remove('active'));
-                document.getElementById(`${tabName}-tab-content`).classList.remove('hidden');
+                
+                const newTabContent = document.getElementById(`${tabName}-tab-content`);
+                if (newTabContent) {
+                    newTabContent.classList.remove('hidden');
+                }
+                
                 document.getElementById(`handle-${tabName}`)?.classList.add('active');
                 document.querySelector(`.mobile-tab-btn[data-tab="${tabName}"]`)?.classList.add('active');
                 state.activeTab = tabName;
-            }
-            
+
+                // Kembalikan posisi scroll untuk tab yang baru ditampilkan
+                if (controlsPanel) {
+                    controlsPanel.scrollTop = tabScrollPositions[tabName] || 0;
+                }
+            }            
             /**
              * Toggles the settings panel open or closed, managing browser history for back button support.
              */
@@ -2952,7 +2978,10 @@
                 });
                 document.getElementById('canvas-resolution-btns').addEventListener('click', (e) => {
                     const button = e.target.closest('button');
-                    if (button) { state.canvasDisplayResolution = parseInt(button.dataset.res); resizeAndRedrawAll(); updateUIFromState(); }
+                    if (button) {
+                        state.canvasDisplayResolution = parseInt(button.dataset.res);
+                        updateUIFromState();
+                    }
                 });
                 document.getElementById('background-color').addEventListener('input', (e) => { state.background.color = e.target.value; requestRedraw(); });
                 document.getElementById('background-mode-btns').addEventListener('click', (e) => {
