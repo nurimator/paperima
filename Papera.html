@@ -97,9 +97,6 @@
         [data-ui-size="compact"] .accordion-section .accordion-header { padding: 0.6rem; }
         [data-ui-size="compact"] .accordion-section .accordion-body { padding: 0.6rem; }
         [data-ui-size="compact"] #drop-zone, [data-ui-size="compact"] #background-drop-zone { height: 90px; }
-        [data-ui-size="compact"] #drop-zone-prompt svg, [data-ui-size="compact"] #background-drop-zone-prompt svg { display: none; }
-        [data-ui-size="compact"] #drop-zone-prompt .flex-col, [data-ui-size="compact"] #background-drop-zone-prompt .flex-col { gap: 0.1rem; }
-        [data-ui-size="compact"] .overlay-drop-zone { height: 60px; }
         [data-ui-size="compact"] .drop-zone-delete-btn { top: 0.25rem; right: 0.25rem; padding: 0.125rem; }
         [data-ui-size="compact"] #export-settings-popup > div, [data-ui-size="compact"] #confirmation-popup > div { padding: 1.5rem; }
         [data-ui-size="compact"] #export-progress-popup h3 { font-size: 1.25rem; margin-bottom: 0.75rem; }
@@ -235,6 +232,9 @@
             body:not(.force-desktop) #mobile-footer {
                 display: var(--mobile-footer-display);
             }
+            .desktop-only {
+                display: none;
+            }            
         }
         body.force-mobile {
             display: flex;
@@ -857,7 +857,7 @@
                              <button data-lang="en" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150">English</button>
                              <button data-lang="id" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150">Indonesia</button>
                          </div>
-                 </div>
+                    </div>
                     <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
                         <h2 class="text-lg font-bold text-slate-300" data-translate-key="displayMode"></h2>
                         <div id="display-mode-btns" class="flex flex-col gap-2 mt-2 btn-group-toggle">
@@ -894,6 +894,8 @@
                 <!-- Reset All Settings Button -->
                 <div class="space-y-4 md:space-y-4 pt-4 border-t border-[var(--border-color)] mt-4">
                     <button id="reset-settings-btn" class="flex items-center justify-center gap-2 md:gap-2 w-full px-5 py-3 bg-[var(--danger-color)] text-white text-sm font-semibold hover:bg-[var(--danger-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="resetAll"></button>
+
+                    <button id="reset-preferences-btn" class="hidden flex items-center justify-center gap-2 md:gap-2 w-full px-5 py-3 bg-[var(--danger-color)] text-white text-sm font-semibold hover:bg-[var(--danger-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="resetPreferences"></button>
                 </div>
             </div>
         </aside>
@@ -1178,7 +1180,7 @@
                 'en': {
                     settings: 'Settings', export: 'Export', canvas: 'Canvas', previewAspectRatio: 'Aspect Ratio',
                     canvasResolution: 'Resolution', solidBackgroundColor: 'Solid Background Color', backgroundImage: 'Background Image',
-                    dropImagePrompt: 'Drop Image Here<br>- or -<br>Click to Upload', backgroundTransform: 'Background Transform',
+                    dropImagePrompt: '<span class="desktop-only">Drop Image Here<br>- or -<br></span>Click to Import Image', backgroundTransform: 'Background Transform',
                     resetBackgroundTransformTitle: 'Reset Background Transform', backgroundMode: 'Background Mode', fill: 'Fill',
                     stretch: 'Stretch', backgroundSize: 'Background Size (%)', offsetX: 'Offset X (%)', offsetY: 'Offset Y (%)',
                     backgroundColorCorrection: 'Background Color Correction', resetBackgroundColorCorrectionTitle: 'Reset Background Color Correction',
@@ -1237,12 +1239,15 @@
                     simple: 'Simple',
                     advanced: 'Advanced',
                     openAnim: 'Opening Animation',
-                    closeAnim: 'Closing Animation'                  
+                    closeAnim: 'Closing Animation',
+                    resetPreferences: 'Reset Preferences',
+                    confirmResetPrefsTitle: 'Confirm Preferences Reset',
+                    confirmResetPrefsMessage: 'Are you sure you want to reset language, display mode, and UI size to their defaults?'                    
                 },
                 'id': {
                     settings: 'Pengaturan', export: 'Ekspor', canvas: 'Kanvas', previewAspectRatio: 'Aspek Rasio',
                     canvasResolution: 'Resolusi', solidBackgroundColor: 'Warna Latar Belakang Solid', backgroundImage: 'Gambar Latar Belakang',
-                    dropImagePrompt: 'Jatuhkan Gambar Disini<br>- atau -<br>Klik untuk Upload', backgroundTransform: 'Transformasi Latar',
+                    dropImagePrompt: '<span class="desktop-only">Jatuhkan Gambar Disini<br>- atau -<br></span>Tekan untuk Impor Gambar', backgroundTransform: 'Transformasi Latar',
                     resetBackgroundTransformTitle: 'Reset Transformasi Latar', backgroundMode: 'Mode Latar', fill: 'Isi',
                     stretch: 'Regangkan', backgroundSize: 'Ukuran Latar (%)', offsetX: 'Offset X (%)', offsetY: 'Offset Y (%)',
                     backgroundColorCorrection: 'Koreksi Warna Latar', resetBackgroundColorCorrectionTitle: 'Reset Koreksi Warna Latar',
@@ -1301,7 +1306,10 @@
                     simple: 'Simpel',
                     advanced: 'Lanjutan',
                     openAnim: 'Animasi Terbuka',
-                    closeAnim: 'Animasi Tertutup'                       
+                    closeAnim: 'Animasi Tertutup',
+                    resetPreferences: 'Reset Preferensi',
+                    confirmResetPrefsTitle: 'Konfirmasi Reset Preferensi',
+                    confirmResetPrefsMessage: 'Apakah Anda yakin ingin mereset bahasa, mode tampilan, dan ukuran UI ke nilai default?'
                 }
             };
             
@@ -2359,6 +2367,28 @@
                 document.querySelectorAll('#language-btns button').forEach(button => {
                     button.classList.toggle('active', button.dataset.lang === state.language);
                 });
+                document.querySelectorAll('.accordion-section').forEach(section => {
+                    const body = section.querySelector('.accordion-body');
+                    const isEnabledBySwitch = section.querySelector('.switch input')?.checked ?? true;
+
+                    // Logika khusus untuk membuka akordeon Transform saat reset
+                    let shouldBeOpenByDefault = false;
+                    if (section.id === 'background-transform-accordion' && !state.background.element) {
+                        // Jangan buka jika tidak ada gambar latar
+                    } else if (section.id === 'background-transform-accordion' || (section.id === 'foreground-transform-accordion' && activeObjectState.image.element)) {
+                        // Buka akordeon transform latar, atau transform objek jika ada gambar
+                        shouldBeOpenByDefault = true;
+                    }
+                    
+                    // Tentukan apakah akordeon harus terbuka
+                    const isOpen = isEnabledBySwitch || section.classList.contains('accordion-open');
+                    
+                    // Terapkan kelas untuk visual (ikon chevron, dll.)
+                    section.classList.toggle('accordion-open', isOpen);
+                    if (body) {
+                        body.classList.toggle('hidden', !isOpen);
+                    }
+                });                
                 showTab(state.activeTab);
                 requestRedraw();
                 renderKeyframeList();
@@ -2414,47 +2444,62 @@
                 syncUISizeUI();
                 resizeAndRedrawAll(); 
             }
+                
+            function resetPreferences() {
+                // Tentukan nilai default berdasarkan browser/perangkat
+                const isCurrentlyMobile = !window.matchMedia('(min-width: 769px)').matches;
+                const defaultLang = navigator.language.startsWith('id') ? 'id' : 'en';
+
+                // Reset hanya properti state yang relevan
+                state.language = defaultLang;
+                state.displayMode = 'auto';
+                state.uiSize = isCurrentlyMobile ? 'compact' : 'normal';
+                
+                // Panggil fungsi-fungsi update secara eksplisit untuk memastikan UI berubah.
+                // Ini adalah kunci perbaikannya.
+                syncDisplayModeUI(); // Fungsi ini juga memanggil resizeAndRedrawAll
+                syncUISizeUI();
+                updateUIText(state.language);
+                updateUIFromState(); // Panggil ini di akhir untuk sinkronisasi final
+            }
 
             /**
-             * Resets all settings to their default values.
+             * DIUBAH: Fungsi ini sekarang hanya mereset pengaturan utama (Latar, Objek, Animasi).
+             * Logika ini memastikan tampilan drop-zone juga ikut ter-reset.
              */
-            function resetSettings(deleteImages = false) {
+            function resetMainSettings(deleteImages = false) {
+                // Simpan preferensi saat ini agar tidak ikut ter-reset
+                const currentPreferences = {
+                    language: state.language,
+                    displayMode: state.displayMode,
+                    uiSize: state.uiSize
+                };
+
+                // Simpan gambar yang ada saat ini JIKA kita tidak ingin menghapusnya
                 const currentBgImg = state.background.element;
                 const currentBgFile = state.background.file;
-                
+                const currentObjectImg = state.object.image.element;
+                const currentObjectFile = state.object.image.file;
+
+                // Reset seluruh state ke nilai default dari konstanta
                 state = JSON.parse(JSON.stringify(DEFAULT_STATE));
-                
+
+                // Kembalikan preferensi yang tadi disimpan
+                state.language = currentPreferences.language;
+                state.displayMode = currentPreferences.displayMode;
+                state.uiSize = currentPreferences.uiSize;
+
+                // Kembalikan gambar jika checkbox "delete images" TIDAK dicentang
                 if (!deleteImages) {
                     state.background.element = currentBgImg;
                     state.background.file = currentBgFile;
+                    state.object.image.element = currentObjectImg;
+                    state.object.image.file = currentObjectFile;
                 }
+                // Jika deleteImages true, state gambar akan tetap null dari DEFAULT_STATE.
                 
-                const isCurrentlyMobile = !window.matchMedia('(min-width: 769px)').matches;
-                state.displayMode = 'auto';
-                state.uiSize = isCurrentlyMobile ? 'compact' : 'normal';
-
-                if (navigator.language.startsWith('id')) {
-                    state.language = 'id';
-                }
-
-                document.querySelectorAll('.accordion-section').forEach(section => {
-                    section.classList.remove('accordion-open');
-                    const body = section.querySelector('.accordion-body');
-                    if (body) body.classList.add('hidden');
-                });
-                const bgTransformAccordion = document.getElementById('background-transform-accordion');
-                if (bgTransformAccordion) {
-                    bgTransformAccordion.classList.add('accordion-open');
-                    bgTransformAccordion.querySelector('.accordion-body').classList.remove('hidden');
-                }
-                if (state.object.image.element) {
-                    const fgTransformAccordion = document.getElementById('foreground-transform-accordion');
-                    if(fgTransformAccordion) {
-                        fgTransformAccordion.classList.add('accordion-open');
-                        fgTransformAccordion.querySelector('.accordion-body').classList.remove('hidden');
-                    }
-                }
-
+                // Perbarui seluruh UI berdasarkan state yang baru.
+                // Panggilan ini akan membersihkan tampilan drop-zone.
                 updateUIFromState();
                 resizeAndRedrawAll();
             }
@@ -2674,6 +2719,21 @@
                 document.getElementById('panel-title').textContent = titleText;
                 document.getElementById('mobile-panel-header').textContent = titleText.toUpperCase();
 
+                // DIUBAH: Logika untuk menampilkan/menyembunyikan tombol reset
+                const resetButton = document.getElementById('reset-settings-btn');
+                const resetPrefsButton = document.getElementById('reset-preferences-btn');
+
+                if (tabName === 'info') {
+                    resetButton.classList.add('hidden');
+                    resetPrefsButton.classList.remove('hidden');
+                } else {
+                    resetButton.classList.remove('hidden');
+                    resetPrefsButton.classList.add('hidden');
+                }
+                
+                document.getElementById('panel-title').textContent = titleText;
+                document.getElementById('mobile-panel-header').textContent = titleText.toUpperCase();
+
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
                 document.querySelectorAll('.tab-handle').forEach(handle => handle.classList.remove('active'));
                 document.querySelectorAll('.mobile-tab-btn').forEach(handle => handle.classList.remove('active'));
@@ -2790,6 +2850,7 @@
                     });
                 });
 
+                // DIUBAH: Event listener untuk tombol Reset All
                 document.getElementById('reset-settings-btn').addEventListener('click', async () => {
                     const { confirmed, deleteImages } = await showConfirmationPopup(
                         "confirmResetTitle", 
@@ -2797,7 +2858,19 @@
                         { showDeleteImagesCheckbox: true }
                     );
                     if (confirmed) {
-                        resetSettings(deleteImages);
+                        resetMainSettings(deleteImages); // Panggil fungsi reset yang baru
+                    }
+                });
+
+                // BARU: Event listener untuk tombol Reset Preferensi
+                document.getElementById('reset-preferences-btn').addEventListener('click', async () => {
+                    const { confirmed } = await showConfirmationPopup(
+                        "confirmResetPrefsTitle", 
+                        "confirmResetPrefsMessage"
+                        // Tidak perlu checkbox untuk hapus gambar di sini
+                    );
+                    if (confirmed) {
+                        resetPreferences(); // Panggil fungsi reset preferensi
                     }
                 });
 
