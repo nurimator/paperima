@@ -30,7 +30,7 @@
             background-color: var(--bg-dark);
             color: var(--text-secondary);
             overflow: hidden;
-            --panel-width: 24rem;
+            --panel-width: 25vw;
             --panel-handle-display: flex;
             --mobile-footer-display: none;
             --export-header-btn-display: flex;
@@ -40,7 +40,27 @@
         .controls-panel::-webkit-scrollbar-track { background: transparent; }
         .controls-panel::-webkit-scrollbar-thumb { background: var(--border-color-light); }
         .slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; background: var(--border-color); outline: none; transition: background 0.3s; pointer-events: none; }
-        .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background: var(--text-primary); cursor: pointer; border: 3px solid var(--accent-color); box-shadow: 0 0 8px rgba(59, 130, 246, 0.5); border-radius: 50%; pointer-events: auto; }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--text-primary);
+            cursor: pointer;
+            border: 3px solid var(--accent-color);
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+            border-radius: 0; /* Ubah dari 50% menjadi 0 untuk bentuk kotak */
+            pointer-events: auto;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--text-primary);
+            cursor: pointer;
+            border: 3px solid var(--accent-color);
+            border-radius: 0; /* Bentuk kotak untuk Firefox */
+        }
         .is-disabled, .controls-disabled-for-bg, .controls-disabled-for-overlay { opacity: 0.5; pointer-events: none; user-select: none; }
         .drag-over { border-color: var(--accent-color) !important; background-color: rgba(59, 130, 246, 0.1); }
         .number-input-uniform { width: 5rem; text-align: center; }
@@ -63,6 +83,10 @@
         .btn-group-toggle button { border-radius: 0; }
         .btn-group-toggle button:hover { border-color: var(--accent-color); color: var(--text-primary); }
         .btn-group-toggle .active { border-color: var(--accent-color); color: var(--accent-color); background-color: rgba(59, 130, 246, 0.1); }
+        #canvas-wrapper {
+            line-height: 0; /* Mencegah spasi ekstra di bawah kanvas */
+            box-sizing: border-box; /* Penting! Agar border masuk ke dalam ukuran */
+        }
         #main-canvas { display: block; width: 100%; height: 100%; object-fit: contain; cursor: default; border-radius: 0; }
         .drop-zone-delete-btn { position: absolute; top: 0.5rem; right: 0.5rem; z-index: 10; padding: 0.25rem; background-color: rgba(239, 68, 68, 0.8); color: white; transition: background-color 0.15s ease-in-out; line-height: 1; border-radius: 0; }
         .drop-zone-delete-btn svg { width: 1rem; height: 1rem; }
@@ -175,6 +199,25 @@
             flex-shrink: 0;
             cursor: ns-resize;
         }
+
+        @media (max-width: 480px) {
+            #export-settings-popup .info-tooltip {
+                /* Tetap muncul di atas ikon */
+                bottom: 100%;
+                top: auto;
+                margin-bottom: 0.5rem;
+                
+                /* Atur lebar agar cukup dan tidak melebihi layar */
+                width: 280px; /* Beri lebar yang cukup */
+                max-width: 90vw; /* Batasi agar tidak keluar dari layar */
+
+                /* BARU: Posisikan rata kiri dari ikon, bukan di tengahnya */
+                left: 0;
+                transform: translateX(0);
+            }
+        }
+        
+        
         @media (max-width: 768px) {
             body:not(.force-desktop) {
                 display: flex;
@@ -234,7 +277,12 @@
             }
             .desktop-only {
                 display: none;
-            }            
+            }
+            .number-input-uniform {
+                width: 4rem;      
+                flex-shrink: 0; 
+            }
+                   
         }
         body.force-mobile {
             display: flex;
@@ -289,8 +337,19 @@
         #top-notification-popup.show { opacity: 1; visibility: visible; }
         #top-notification-popup .close-btn { background: none; border: none; color: var(--red-accent-text); font-size: 1.25rem; line-height: 1; cursor: pointer; padding: 0.25rem; margin-left: 1rem; border-radius: 0; }
         #top-notification-popup .close-btn:hover { background-color: rgba(239, 68, 68, 0.1); }
-        .info-tooltip-trigger .info-tooltip { visibility: hidden; opacity: 0; transition: opacity 0.3s, visibility 0.3s; }
-        .info-tooltip-trigger:hover .info-tooltip, .info-tooltip-trigger:focus .info-tooltip, .info-tooltip-trigger:active .info-tooltip { visibility: visible; opacity: 1; }
+        .info-tooltip-trigger .info-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease, visibility 0.3s;
+            pointer-events: none; /* Kembali ke none secara default */
+        }
+
+        /* Kelas baru untuk menampilkan tooltip via JavaScript */
+        .info-tooltip.tooltip-visible {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+        }
         .rounded-md, .rounded-lg, .rounded-full { border-radius: 0; }
 
         /* Keyframes untuk Animasi Gerak (Move) */
@@ -326,6 +385,71 @@
         @keyframes zoom-out {
             from { transform: scale(1); } to { transform: scale(var(--anim-scale-end, 0)); }
         }
+        .timeline-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            height: 20px;
+        }
+
+        #timeline-slider {
+            /* Slider adalah lapisan interaktif kita. Posisikan di bawah marker. */
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            z-index: 1; 
+        }
+
+        #keyframe-markers-container {
+            /* Kontainer untuk marker sekarang berada di lapisan atas */
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 2;
+            /* Penting: Agar kita tetap bisa mengklik slider di bawahnya */
+            pointer-events: none;
+        }
+
+        .keyframe-marker {
+            position: absolute;
+            top: 50%;
+            width: 22px;
+            height: 22px;
+            background: transparent;
+            border: 1.5px solid var(--accent-color);
+            border-radius: 0; /* Ubah dari 50% menjadi 0 untuk bentuk kotak */           
+            left: calc(10px + (var(--kf-pos) * (100% - 20px)));
+            transform: translate(-50%, -50%);
+        }
+        /* Kontainer untuk bar durasi simple mode */
+        #simple-anim-markers-container {
+            /* Posisikan agar sejajar dengan garis slider */
+            left: 10px;
+            right: 10px;
+            top: 0;
+            bottom: 0;
+            z-index: 1; /* Lapisan paling bawah, di atas garis, di bawah semua marker/thumb */
+            pointer-events: none;
+        }
+
+        .simple-anim-marker {
+            /* Gaya ini meniru .keyframe-marker */
+            position: absolute;
+            top: 50%;
+            height: 22px; /* Samakan tinggi dengan keyframe-marker */
+            background: transparent;
+            border: 1.5px solid var(--accent-color);
+            border-radius: 0;
+            transform: translateY(-50%);
+            box-sizing: border-box;
+        }
+
+        #timeline-slider {
+            z-index: 1; /* Thumb slider di paling atas */
+        }
 
         /* Easing Functions */
         .anim-linear { animation-timing-function: linear; }
@@ -333,6 +457,46 @@
         .anim-ease-out { animation-timing-function: ease-out; }
         .anim-back-in { animation-timing-function: cubic-bezier(0.36, 0, 0.66, -0.56); }
         .anim-back-out { animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+        #canvas-container {
+            /* Transisi agar perubahan lebar terlihat mulus */
+            transition: width 0.3s ease-out;
+        }
+        body.desktop-panel-open:not(.force-mobile) #canvas-container {
+            width: calc(100vw - var(--panel-width));
+        }
+
+        .desktop-only {
+            display: none;
+        }
+        @media (min-width: 769px) {
+            .desktop-only {
+                display: inline;
+            }
+        }
+        #debug-screen {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background-color: rgba(15, 23, 42, 0.85); /* --bg-dark dengan transparansi */
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            z-index: 9999;
+            pointer-events: none; /* Penting agar bisa klik menembus elemen ini */
+            white-space: pre;     /* Agar format teks dengan newline terjaga */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        #debug-screen:not(.hidden) {
+            opacity: 1;
+            visibility: visible;
+        }        
+        
     </style>
 </head>
 <body class="bg-slate-900 relative">
@@ -361,7 +525,9 @@
 
     <!-- Main container for the canvas -->
     <main id="canvas-container" class="w-screen h-screen flex items-center justify-center p-10">
-        <canvas id="main-canvas" class="shadow-lg"></canvas>
+        <div id="canvas-wrapper" class="shadow-lg border-4 border-[var(--border-color)]">
+            <canvas id="main-canvas"></canvas>
+        </div>        
     </main>
 
     <!-- Settings panel wrapper -->
@@ -472,6 +638,13 @@
                                 <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="offsetY"></label>
                                 <div class="flex items-center gap-3 md:gap-3"><input type="range" id="background-offset-y" min="-150" max="150" value="0" class="w-full slider"><input type="number" id="background-offset-y-input" min="-150" max="150" value="0" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)]"></div>
                             </div>
+                            <div id="background-rotation-control">
+                                <label id="background-rotation-label" class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="rotation">Rotasi</label>
+                                <div class="flex items-center gap-3 md:gap-3">
+                                    <input type="range" id="background-rotation" min="-180" max="180" value="0" step="1" class="w-full slider">
+                                    <input type="number" id="background-rotation-input" value="0" step="1" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
+                                </div>
+                            </div>                            
                         </div>
                     </div>
                     <!-- Background Blur Accordion -->
@@ -612,6 +785,13 @@
                                     <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="offsetY"></label>
                                     <div class="flex items-center gap-3 md:gap-3"><input type="range" id="image-offset-y" min="-150" max="150" value="0" class="w-full slider"><input type="number" id="image-offset-y-input" min="-150" max="150" value="0" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)]"></div>
                                 </div>
+                                <div>
+                                    <label id="image-rotation-label" class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="rotation">Rotasi</label>
+                                    <div class="flex items-center gap-3 md:gap-3">
+                                        <input type="range" id="image-rotation" min="-180" max="180" value="0" step="1" class="w-full slider">
+                                        <input type="number" id="image-rotation-input" value="0" step="1" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
+                                    </div>
+                                </div>                                
                             </div>
                         </div>
                         <!-- Torn Edges (Stroke) Accordion -->
@@ -804,7 +984,30 @@
                 <div id="animasi-tab-content" class="tab-content hidden space-y-4 md:space-y-4">
                     <div class="space-y-4 md:space-y-4">
                         <h2 class="text-lg font-bold text-slate-300" data-translate-key="animationObject"></h2>
-
+                        <div id="animation-timeline" class="space-y-2 pt-4 border-t border-slate-700">
+                            <div class="flex items-center justify-between">
+                                <label for="timeline-slider" class="text-sm font-medium text-[var(--text-muted)]" data-translate-key="timeline"></label>
+                                <div class="flex items-center gap-2">
+                                    <span id="timeline-current-time" class="text-sm text-slate-300 font-mono">0.00s</span>
+                                    <span class="text-sm text-slate-500">/</span>
+                                    <input type="number" id="timeline-duration-input" min="1" max="300" step="0.1" value="5.0" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <button id="play-pause-btn" class="p-1.5 text-slate-300 hover:text-white bg-slate-700 hover:bg-slate-600 transition-colors">
+                                    <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5zm4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5z"/>
+                                    </svg>
+                                    <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="hidden" viewBox="0 0 16 16">
+                                        <path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+                                    </svg>
+                                </button>                                
+                                <div class="relative w-full h-5 flex items-center timeline-wrapper">
+                                    <input type="range" id="timeline-slider" min="0" max="5" step="0.01" value="0" class="slider">
+                                    <div id="keyframe-markers-container" class="absolute w-full h-full pointer-events-none"></div>
+                                </div>
+                            </div>
+                        </div>
                         <div>
                             <label class="text-sm font-medium text-[var(--text-muted)]" data-translate-key="controlMode"></label>
                             <div id="animation-mode-btns" class="grid grid-cols-2 gap-2 md:gap-2 mt-2 btn-group-toggle">
@@ -812,24 +1015,22 @@
                                 <button data-mode="advanced" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="advanced"></button>
                             </div>
                         </div>
-                        
-                        <div id="animation-simple-controls" class="space-y-2 pt-4 border-t border-slate-700">
-                            <div class="flex items-center justify-between p-2 bg-slate-800/50 border border-slate-700">
-                                <div class="flex items-center gap-3">
-                                    <label class="switch"><input type="checkbox" id="simple-anim-open-switch"><span class="toggle-slider"></span></label>
-                                    <span class="text-sm font-medium text-slate-300" data-translate-key="openAnim">Animasi Kertas Terbuka</span>
-                                </div>
-                                <button id="preview-simple-open" class="px-2.5 py-1.5 bg-[var(--accent-color)] text-white text-xs font-semibold hover:bg-[var(--accent-color-hover)] transition-all" data-translate-key="preview"></button>
+                        <div id="animation-simple-controls" class="space-y-4 pt-4 border-t border-slate-700">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-slate-300" data-translate-key="openAnim">Animasi Kertas Terbuka</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="simple-anim-open-switch">
+                                    <span class="toggle-slider"></span>
+                                </label>
                             </div>
-                            <div class="flex items-center justify-between p-2 bg-slate-800/50 border border-slate-700">
-                                <div class="flex items-center gap-3">
-                                    <label class="switch"><input type="checkbox" id="simple-anim-close-switch"><span class="toggle-slider"></span></label>
-                                    <span class="text-sm font-medium text-slate-300" data-translate-key="closeAnim">Animasi Kertas Tertutup</span>
-                                </div>
-                                <button id="preview-simple-close" class="px-2.5 py-1.5 bg-[var(--accent-color)] text-white text-xs font-semibold hover:bg-[var(--accent-color-hover)] transition-all" data-translate-key="preview"></button>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-slate-300" data-translate-key="closeAnim">Animasi Kertas Tertutup</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="simple-anim-close-switch">
+                                    <span class="toggle-slider"></span>
+                                </label>
                             </div>
                         </div>
-
                         <div id="animation-advanced-controls" class="hidden">
                             <div class="space-y-4 pt-4 border-t border-slate-700">
                                 <div class="flex justify-end">
@@ -875,6 +1076,23 @@
                              <button data-size="luas" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="spacious"></button>
                         </div>
                     </div>
+                    <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
+                        <h2 class="text-lg font-bold text-slate-300" data-translate-key="previewResolution"></h2>
+                        <div id="preview-resolution-btns" class="grid grid-cols-4 gap-2 md:gap-2 mt-2 btn-group-toggle">
+                            <button data-res="auto" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium" data-translate-key="auto"></button>
+                            <button data-res="360" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium">360p</button>
+                            <button data-res="540" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium">540p</button>
+                            <button data-res="720" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium">720p</button>
+                        </div>
+                        <p class="text-xs text-[var(--text-muted)] mt-2" data-translate-key="previewResolutionWarning"></p>
+                    </div>
+                    <div class="pt-4 border-t border-[var(--border-color)] flex items-center justify-between">
+                        <label for="debug-screen-switch" class="text-sm font-medium text-slate-300" data-translate-key="debugScreen"></label>
+                        <label class="switch">
+                            <input type="checkbox" id="debug-screen-switch">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>                                      
                     <h2 class="text-lg font-bold pt-4 border-t border-[var(--border-color)]" data-translate-key="appInfo"></h2>
                     <p class="text-sm" data-translate-key="appDescription"></p>
                     
@@ -940,7 +1158,8 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-[var(--text-muted)] mb-2" data-translate-key="fps"></label>
-                    <div id="export-fps-btns" class="grid grid-cols-3 gap-2 md:gap-2 btn-group-toggle">
+                    <div id="export-fps-btns" class="grid grid-cols-4 gap-2 md:gap-2 btn-group-toggle">
+                        <button data-fps="12" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">12</button>
                         <button data-fps="24" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">24</button>
                         <button data-fps="30" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">30</button>
                         <button data-fps="60" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">60</button>
@@ -951,8 +1170,19 @@
                     <input type="number" id="export-duration-input" value="5" min="1" max="60" class="w-full mt-1 p-2 bg-slate-700 border border-[var(--border-color-light)]">
                 </div>
                 <div>
-                    <label for="export-filename-input" class="block text-sm font-medium text-[var(--text-muted)] mt-4 mb-2" data-translate-key="fileName"></label>
-                    <input type="text" id="export-filename-input" value="animasi-sobek" class="w-full mt-1 p-2 bg-slate-700 border border-[var(--border-color-light)]">
+                    <div class="flex items-center gap-2 mt-4 mb-2">
+                        <label for="export-filename-input" class="block text-sm font-medium text-[var(--text-muted)]" data-translate-key="fileName"></label>
+                        <div class="relative info-tooltip-trigger">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle text-[var(--text-muted)] cursor-pointer" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.064.293.006.399.287.47l.45.082.082-.38-.29-.071a.499.499 0 0 1-.316-.66l.738-3.468a.499.499 0 0 1 .66-.316l.29.071zM8 4.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                            </svg>
+                            <div class="info-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-xs bg-slate-900/95 p-3 text-xs text-slate-200 border border-[var(--border-color)] shadow-lg z-10 pointer-events-none">
+                                <p data-translate-key="exportInfoTooltip"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="text" id="export-filename-input" value="papera-me" class="w-full mt-1 p-2 bg-slate-700 border border-[var(--border-color-light)]">
                 </div>
             </div>
             <div class="mt-8 flex justify-end space-x-4">
@@ -968,6 +1198,7 @@
         <div id="progress-bar-container">
             <div id="progress-bar-fill">0%</div>
         </div>
+        <button id="cancel-export-btn" class="mt-6 px-6 py-2 bg-[var(--danger-color)] text-white text-sm font-semibold hover:bg-[var(--danger-color-hover)] transition-colors cursor-pointer" data-translate-key="cancel"></button>
     </div>
 
     <!-- Confirmation popup for resetting settings -->
@@ -985,7 +1216,7 @@
             </div>
         </div>
     </div>
-
+<div id="debug-screen" class="hidden"></div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Main canvas and context
@@ -1058,12 +1289,24 @@
 
             const tempOverlayCanvas = document.createElement('canvas'); 
 
+            const debugScreenEl = document.getElementById('debug-screen'); // Simpan elemen
+            let lastDebugUpdateTime = 0; // Timer untuk membatasi update
+            let fps = 0;
+            let frameCount = 0;
+            let lastFPSTime = 0;
+            let highFpsSince = 0; // Timestamp kapan FPS tinggi mulai terdeteksi
+            let lowFpsSince = 0;  // Timestamp kapan FPS rendah mulai terdeteksi
+            const RESOLUTION_LEVELS = ['360', '540', '720'];            
+
             let animationFrameId = null;
             let needsRedraw = true; // Flag to optimize rendering
             let isExporting = false;
+            let isScrubbing = false;
+            let pauseStartTime = 0; // <-- TAMBAHKAN INI
+            let animationStartTime = 0; // <-- TAMBAHKAN INI
             // Default state for a single object
             const DEFAULT_OBJECT_STATE = {
-                image: { element: null, size: 80, offset: { x: 0, y: 0 }, file: null },
+                image: { element: null, size: 80, offset: { x: 0, y: 0 }, rotation: 0, file: null },
                 stroke: { enabled: true, width: 25, roughness: 25, detail: 0.020, seed: 0 },
                 shadow: { enabled: true, offsetX: 5, offsetY: -5, blur: 5, color: '#000000', opacity: 50 },
                 color: { enabled: false, hue: 0, saturation: 0, brightness: 0, colorize: false },
@@ -1072,8 +1315,8 @@
                     mode: 'simpel',
                     simpelSpeed: 1,
                     simpelStrength: 1,
-                    rotationSpeed: 3, 
-                    rotationStrength: 1, 
+                    rotationSpeed: 4, 
+                    rotationStrength: 0.5, 
                     positionSpeed: { x: 2, y: 4 },
                     positionStrength: { x: 1, y: 5 },
                     lastRotationUpdateTime: 0, 
@@ -1095,6 +1338,7 @@
                         open: false,
                         close: false
                     },                    
+                    isPlaying: true,
                     activeKeyframeId: null, // ID dari keyframe yang sedang dipilih
                     previewTime: null,
                     keyframes: [
@@ -1104,7 +1348,8 @@
                             time: 0,        // Waktu (dalam detik)
                             x: 0,           // Offset X (%)
                             y: 0,           // Offset Y (%)
-                            scale: 20,      // Ukuran (%) - sama dengan ukuran default gambar
+                            scale: 50,      // Ukuran (%) - sama dengan ukuran default gambar
+                            rotation: 0,
                             easing: 'linear',// Easing ke keyframe berikutnya
                             paperAnim: 'none'
                         },
@@ -1114,6 +1359,7 @@
                             x: 0,
                             y: 0,
                             scale: 80,
+                            rotation: 0,
                             easing: 'linear',
                             paperAnim: 'none'
                         }
@@ -1127,9 +1373,12 @@
                 language: 'en',
                 displayMode: 'auto', 
                 uiSize: 'normal',
+                previewResolutionMode: 'auto', // Mode pilihan pengguna: 'auto', '360', '540', '720'
+                activePreviewResolution: '540',
+                debugScreenEnabled: false,                
                 background: {
                     element: null, color: '#00ff00', file: null,
-                    transform: { enabled: true, mode: 'fill', size: 100, offset: { x: 0, y: 0 } },
+                    transform: { enabled: true, mode: 'fill', size: 100, rotation: 0, offset: { x: 0, y: 0 } },
                     effects: {
                         colorCorrection: { enabled: false, hue: 0, saturation: 0, brightness: 0, colorize: false },
                         blur: { enabled: false, intensity: 10 },
@@ -1139,7 +1388,7 @@
                 aspectRatio: '16/9',
                 canvasDisplayResolution: 720,
                 export: {
-                    duration: 5, fps: 24, filename: 'animasi-sobek'
+                    duration: 5, fps: 24, filename: 'papera-me'
                 },
                 object: JSON.parse(JSON.stringify(DEFAULT_OBJECT_STATE))
             };
@@ -1233,15 +1482,17 @@
                     instant: 'Instant',
                     easeInOut: 'Ease In Out',
                     backInOut: 'Back In Out',
-                    keyframeProperties: 'Keyframe Properties',
-                    easingToNext: 'Easing to Next Keyframe',
+                    keyframeProperties: 'Keyframe Properties', rotation: 'Rotation', easingToNext: 'Easing to Next', keyframeAnim: 'Paper Animation', animNone: 'None', animOpen: 'Open', animClose: 'Close',
                     addKeyframe: 'Add Keyframe',
                     simple: 'Simple',
                     advanced: 'Advanced',
                     openAnim: 'Opening Animation',
-                    closeAnim: 'Closing Animation',
+                    closeAnim: 'Closing Animation', timeline: 'Timeline',
                     resetPreferences: 'Reset Preferences',
                     confirmResetPrefsTitle: 'Confirm Preferences Reset',
+                    previewResolution: 'Preview Resolution', debugScreen: 'Debug Screen',
+                    previewResolutionWarning: 'Preview resolution does not affect the final export resolution.',
+                    exportInfoTooltip: 'Currently, the only available video export option is .webm to keep the app free and lightweight. <a href="https://www.webmproject.org/about/" target="_blank" rel="noopener noreferrer" class="text-[var(--accent-color)] hover:underline">Learn more</a>',
                     confirmResetPrefsMessage: 'Are you sure you want to reset language, display mode, and UI size to their defaults?'                    
                 },
                 'id': {
@@ -1300,15 +1551,17 @@
                     instant: 'Instan',
                     easeInOut: 'Ease In Out',
                     backInOut: 'Back In Out',
-                    keyframeProperties: 'Properti Keyframe',
-                    easingToNext: 'Easing ke Keyframe Berikutnya',
+                    keyframeProperties: 'Properti Keyframe', rotation: 'Rotasi', easingToNext: 'Easing Berikutnya', keyframeAnim: 'Animasi Kertas', animNone: 'Tidak Ada', animOpen: 'Buka', animClose: 'Tutup',
                     addKeyframe: 'Tambah Keyframe',       
                     simple: 'Simpel',
                     advanced: 'Lanjutan',
                     openAnim: 'Animasi Terbuka',
-                    closeAnim: 'Animasi Tertutup',
+                    closeAnim: 'Animasi Tertutup', timeline: 'Timeline',
                     resetPreferences: 'Reset Preferensi',
                     confirmResetPrefsTitle: 'Konfirmasi Reset Preferensi',
+                    previewResolution: 'Resolusi Pratinjau', debugScreen: 'Layar Debug',
+                    previewResolutionWarning: 'Resolusi pratinjau tidak memengaruhi resolusi ekspor.',
+                    exportInfoTooltip: 'Saat ini opsi file video ekspor yang tersedia adalah .webm untuk menjaga aplikasi tetap gratis dan ringan. <a href="https://www.webmproject.org/about/" target="_blank" rel="noopener noreferrer" class="text-[var(--accent-color)] hover:underline">Pelajari selengkapnya</a>',
                     confirmResetPrefsMessage: 'Apakah Anda yakin ingin mereset bahasa, mode tampilan, dan ukuran UI ke nilai default?'
                 }
             };
@@ -1348,13 +1601,17 @@
             // Fungsi ini berisi logika keyframe yang sudah ada sebelumnya
             function getAdvancedTransform(timeInSeconds, objectState) {
                 const keyframes = [...objectState.animation.keyframes].sort((a, b) => a.time - b.time);
-                let currentTransform = { x: objectState.image.offset.x, y: objectState.image.offset.y, scale: objectState.image.size };
+                // Inisialisasi dengan nilai dari object transform, bukan nilai statis
+                let currentTransform = { 
+                    x: objectState.image.offset.x, 
+                    y: objectState.image.offset.y, 
+                    scale: objectState.image.size, 
+                    rotation: objectState.image.rotation
+                };
 
-                // Deklarasikan variabel di sini agar selalu ada
                 let prevKeyframe, nextKeyframe;
 
                 if (keyframes.length > 0) {
-                    // Beri nilai awal
                     prevKeyframe = keyframes[0];
                     nextKeyframe = keyframes[keyframes.length - 1];
 
@@ -1367,12 +1624,22 @@
                             break;
                         }
                     }
-                    
+
                     if (prevKeyframe === nextKeyframe) {
-                        currentTransform = { x: prevKeyframe.x, y: prevKeyframe.y, scale: prevKeyframe.scale };
+                        currentTransform = { 
+                            x: prevKeyframe.x, 
+                            y: prevKeyframe.y, 
+                            scale: prevKeyframe.scale, 
+                            rotation: prevKeyframe.rotation 
+                        };
                     } else {
                         if (prevKeyframe.easing === 'instant') {
-                            currentTransform = { x: nextKeyframe.x, y: nextKeyframe.y, scale: nextKeyframe.scale };
+                            currentTransform = { 
+                                x: nextKeyframe.x, 
+                                y: nextKeyframe.y, 
+                                scale: nextKeyframe.scale, 
+                                rotation: nextKeyframe.rotation 
+                            };
                         } else {
                             const segmentDuration = nextKeyframe.time - prevKeyframe.time;
                             const timeIntoSegment = timeInSeconds - prevKeyframe.time;
@@ -1385,12 +1652,14 @@
                             currentTransform.x = lerp(prevKeyframe.x, nextKeyframe.x, easedProgress);
                             currentTransform.y = lerp(prevKeyframe.y, nextKeyframe.y, easedProgress);
                             currentTransform.scale = lerp(prevKeyframe.scale, nextKeyframe.scale, easedProgress);
+                            currentTransform.rotation = lerp(prevKeyframe.rotation, nextKeyframe.rotation, easedProgress);
                         }
                     }
                 }
-                // Return ini sekarang aman, bahkan jika tidak ada keyframe
+
                 return { transform: currentTransform, prevKeyframe, nextKeyframe };
             }
+
 
             // GANTI SELURUH FUNGSI INI
             function drawFinalObject(objectState, imgW, imgH, totalOffsetX, totalOffsetY, tornEdgesEnabled, layerImage = null, maskImage = null) {
@@ -1446,9 +1715,10 @@
                 }
 
                 if (layerImage) {
+                    const layerSize = Math.max(imgW, imgH);
                     contentCtx.save();
-                    contentCtx.translate(centerX, centerY); // Terapkan juga di tengah
-                    contentCtx.drawImage(layerImage, -imgW / 2, -imgH / 2, imgW, imgH);
+                    contentCtx.translate(centerX, centerY);
+                    contentCtx.drawImage(layerImage, -layerSize / 2, -layerSize / 2, layerSize, layerSize);
                     contentCtx.restore();
                 }
 
@@ -1495,24 +1765,24 @@
                 // TAHAP 3: Terapkan mask animasi
                 let finalSourceCanvas = contentCanvas;
                 if (maskImage) {
+                    const maskSize = Math.max(imgW, imgH);
+                    
                     finalObjectCtx.save();
-                    finalObjectCtx.translate(centerX, centerY); // Terapkan mask di tengah
-                    finalObjectCtx.drawImage(maskImage, -imgW / 2, -imgH / 2, imgW, imgH);
+                    finalObjectCtx.translate(centerX, centerY);
+                    finalObjectCtx.drawImage(maskImage, -maskSize / 2, -maskSize / 2, maskSize, maskSize);
                     finalObjectCtx.restore();
                     
                     finalObjectCtx.save();
                     finalObjectCtx.globalCompositeOperation = 'source-in';
                     finalObjectCtx.drawImage(contentCanvas, 0, 0);
                     finalObjectCtx.restore();
-
                     finalSourceCanvas = finalObjectCanvas;
                 }
-
                 return finalSourceCanvas; 
             }
             function requestRedraw() { needsRedraw = true; }
             
-            function draw(timestamp = performance.now()) {
+            function draw(elapsedTime = 0) {
                 ctx.save();
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -1538,6 +1808,7 @@
                     ctx.save();
                     if (state.background.transform.mode === 'fill') {
                         ctx.translate(canvas.width / 2 + bgOffsetX, canvas.height / 2 + bgOffsetY);
+                        ctx.rotate(state.background.transform.rotation * Math.PI / 180);
                         const userScale = state.background.transform.size / 100;
                         const canvasAspect = canvas.width / canvas.height;
                         const bgAspect = state.background.element.width / state.background.element.height;
@@ -1595,15 +1866,19 @@
                     const animState = objectState.animation;
                     const isSimpleMode = animState.mode === 'simple';
                     const totalDuration = state.export.duration;
-                    const currentTimeSource = isExporting ? timestamp : performance.now();
+
                     let timeInSeconds;
-                    if (animState.previewTime !== null) { timeInSeconds = animState.previewTime; } 
-                    else if (isExporting) { timeInSeconds = timestamp / 1000; } 
-                    else { timeInSeconds = (currentTimeSource / 1000) % totalDuration; }
+                    if (animState.previewTime !== null) {
+                        timeInSeconds = animState.previewTime;
+                    } else if (isExporting) {
+                        timeInSeconds = elapsedTime / 1000;
+                    } else {
+                        timeInSeconds = (elapsedTime / 1000) % totalDuration;
+                    }
 
                     let transform, isPaperAnimActive = false, paperFrameIndex = 0, currentLayer = null, currentMask = null;
                     if (isSimpleMode) {
-                        transform = { x: objectState.image.offset.x, y: objectState.image.offset.y, scale: objectState.image.size };
+                        transform = { x: objectState.image.offset.x, y: objectState.image.offset.y, scale: objectState.image.size, rotation: objectState.image.rotation };
                         // Logika animasi simpel...
                         const animDuration = 1.0, frameDuration = 0.2;
                         if (animState.simple.previewing) {
@@ -1684,8 +1959,9 @@
                     }
 
                     ctx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + (totalOffsetY * -1));
-                    if (objectState.movement.enabled) {
-                        ctx.rotate(objectState.movement.rotation * Math.PI / 180);
+                    if (objectState.movement.enabled || transform.rotation !== 0) {
+                        const totalRotation = transform.rotation + objectState.movement.rotation;
+                        ctx.rotate(totalRotation * Math.PI / 180);
                     }
 
                     ctx.drawImage(finalStampSource, -finalStampSource.width / 2, -finalStampSource.height / 2);
@@ -1693,31 +1969,80 @@
                 }
                 ctx.restore();
             }
+
+            /**
+             * Loop independen yang hanya bertugas untuk menghitung FPS
+             * dan memperbarui tampilan debug screen setiap detik.
+             */
+            function fpsLoop(timestamp) {
+                // Inisialisasi waktu jika ini adalah frame pertama
+                if (!lastFPSTime) {
+                    lastFPSTime = timestamp;
+                }
+                frameCount++;
+                const delta = timestamp - lastFPSTime;
+
+                // Jika sudah satu detik berlalu
+                if (delta >= 1000) {
+                    // Hitung FPS
+                    fps = Math.round((frameCount * 1000) / delta);
+                    // Reset counter untuk detik berikutnya
+                    frameCount = 0;
+                    lastFPSTime = timestamp;
+                    // Panggil update debug screen dari sini
+                    updateDebugScreen(); 
+                }
+
+                // Terus panggil loop ini untuk frame berikutnya
+                requestAnimationFrame(fpsLoop);
+            }
+
             /**
             * The main animation loop.
             */
             function animationLoop(timestamp = 0) {
-                updateMovement(timestamp);
-                updatePaperFoldOverlay(timestamp);
-
-                // Hentikan pratinjau animasi simpel setelah 1 detik
-                const simpleAnimState = state.object.animation.simple;
-                if (simpleAnimState.previewing && (timestamp - simpleAnimState.previewStartTime > 1000)) {
-                    simpleAnimState.previewing = null;
-                }                
-
-                // Selalu minta gambar ulang jika sedang pratinjau untuk memastikan animasi berjalan
-                if (state.object.animation.previewing) {
-                    needsRedraw = true;
+                // Pengaman: Jika tidak ada gambar objek, paksa animasi untuk berhenti.
+                if (!state.object.image.element && state.object.animation.isPlaying) {
+                    state.object.animation.isPlaying = false;
+                    updatePlayPauseButton();
                 }
                 
+                if (!animationStartTime) animationStartTime = timestamp;
+                const elapsed = timestamp - animationStartTime;
+
+                // HANYA jalankan update otomatis jika sedang "Play"
+                if (state.object.animation.isPlaying && !isScrubbing) {
+                    // updateDebugScreen(timestamp); // <-- Baris ini bisa dihapus
+                    updateMovement(timestamp);
+                    updatePaperFoldOverlay(timestamp);
+
+                    // Update UI slider hanya saat playing
+                    const timelineSlider = document.getElementById('timeline-slider');
+                    const timelineCurrentTime = document.getElementById('timeline-current-time');
+                    if (timelineSlider && timelineCurrentTime) {
+                        const totalDuration = state.export.duration;
+                        const currentTime = (elapsed / 1000) % totalDuration;
+                        timelineSlider.value = currentTime;
+                        timelineCurrentTime.textContent = `${currentTime.toFixed(2)}s`;
+                    }
+                    needsRedraw = true; // Otomatis minta redraw setiap frame saat playing
+                }
+
+                // Logika gambar ulang selalu dicek, bahkan saat pause
                 if (needsRedraw) {
-                    draw(timestamp);
-                    needsRedraw = false;
+                    // Tentukan waktu yang akan digambar: dari previewTime jika ada, jika tidak, dari waktu playback
+                    const timeToDraw = state.object.animation.previewTime !== null 
+                        ? state.object.animation.previewTime * 1000 
+                        : elapsed;
+
+                    draw(timeToDraw);
+                    needsRedraw = false; // Reset flag setelah menggambar
                 }
 
                 animationFrameId = requestAnimationFrame(animationLoop);
-            }            /**
+            }
+
+            /**
              * Updates objects' positions and rotations based on movement settings and time.
              */
             function updateMovement(timestamp) {
@@ -1813,45 +2138,109 @@
 
                 if (hasChanged) { requestRedraw(); }
             }
-
-            /**
-             * The main animation loop.
-             */
-            function animationLoop(timestamp = 0) {
-                updateMovement(timestamp);
-                updatePaperFoldOverlay(timestamp);
-                
-                if (state.object.animation.previewing || needsRedraw) {
-                    draw(timestamp); // Selalu berikan timestamp
-                    needsRedraw = false;
-                }
-
-                animationFrameId = requestAnimationFrame(animationLoop);
-            }
             
-            function updateInternalCanvasResolution() {
-                const PREVIEW_RESOLUTION_KEY = '360';
-                const aspectRatioKey = state.aspectRatio;
-                const dims = RESOLUTION_MAPS[PREVIEW_RESOLUTION_KEY]?.[aspectRatioKey];
-
-                if (!dims) {
-                    console.error("Dimensi pratinjau tidak ditemukan!");
+            /**
+             * Menyesuaikan resolusi pratinjau secara otomatis berdasarkan lebar layar.
+             */
+            function handleAutoResolutionByWidth() {
+                // Keluar jika mode bukan 'auto'
+                if (state.previewResolutionMode !== 'auto') {
                     return;
                 }
 
-                const internalCanvasWidth = dims.w;
-                const internalCanvasHeight = dims.h;
+                const screenWidth = window.innerWidth;
+                let newResolution;
+
+                if (screenWidth <= 425) {
+                    newResolution = '360';
+                } else if (screenWidth > 425 && screenWidth <= 1280) {
+                    newResolution = '540';
+                } else {
+                    newResolution = '720';
+                }
+
+                // Hanya update dan gambar ulang jika resolusi berubah
+                if (newResolution !== state.activePreviewResolution) {
+                    state.activePreviewResolution = newResolution;
+                    console.log(`Resolusi otomatis diubah ke: ${newResolution}p berdasarkan lebar layar.`);
+                    resizeAndRedrawAll();
+                    updateUIFromState();
+                }
+            }
+
+            /**
+             * Memperbarui konten pada layar debug dengan informasi yang lebih relevan.
+             */
+            function updateDebugScreen(timestamp) { // <-- Tambahkan parameter 'timestamp'
+                // Keluar jika debug dimatikan
+                if (!state.debugScreenEnabled) return;
+
+                // Batasi pembaruan hanya sekali per detik
+                if (timestamp - lastDebugUpdateTime < 1000) return;
+
+                // Gunakan elemen yang sudah disimpan, tidak perlu mencari lagi
+                if (!debugScreenEl) return; 
+
+                // Perbarui waktu terakhir
+                lastDebugUpdateTime = timestamp;
+
+                // Logika untuk mendapatkan info (tidak berubah)
+                let uiModeText;
+                const isCurrentlyDesktop = window.matchMedia('(min-width: 769px)').matches;
+                if (state.displayMode === 'auto') {
+                    uiModeText = isCurrentlyDesktop ? 'auto (desktop)' : 'auto (mobile)';
+                } else {
+                    uiModeText = state.displayMode;
+                }
+
+                let resPreviewText;
+                if (state.previewResolutionMode === 'auto') {
+                    resPreviewText = `auto (${state.activePreviewResolution}p)`;
+                } else {
+                    resPreviewText = `${state.activePreviewResolution}p`;
+                }
+
+                const bgFileName = state.background.file ? truncateFilename(state.background.file.name, 20) : 'null';
+                const objFileName = state.object.image.file ? truncateFilename(state.object.image.file.name, 20) : 'null';
+
+                const debugInfo = `
+FPS          : ${fps}
+UI Mode      : ${uiModeText}
+Res Preview  : ${resPreviewText} ${canvas.width}x${canvas.height}
+Background   : ${bgFileName}
+Object       : ${objFileName}
+                `.trim();
+
+                debugScreenEl.textContent = debugInfo;
+            }
+            
+            function updateInternalCanvasResolution() {
+                // Gunakan resolusi aktif dari state, bukan nilai statis
+                const PREVIEW_RESOLUTION_KEY = state.activePreviewResolution;
+                const aspectRatioKey = state.aspectRatio;
+                
+                // Temukan dimensi yang sesuai dari map resolusi
+                const dims = RESOLUTION_MAPS[PREVIEW_RESOLUTION_KEY]?.[aspectRatioKey];
+
+                if (!dims) {
+                    console.error(`Dimensi pratinjau tidak ditemukan untuk ${PREVIEW_RESOLUTION_KEY}! Kembali ke 540p.`);
+                    const fallbackDims = RESOLUTION_MAPS['540']?.[aspectRatioKey];
+                    canvas.width = fallbackDims ? fallbackDims.w : 960;
+                    canvas.height = fallbackDims ? fallbackDims.h : 540;
+                } else {
+                    canvas.width = dims.w;
+                    canvas.height = dims.h;
+                }
 
                 const imageSizeSlider = document.getElementById('image-size');
                 const maxScalePercent = imageSizeSlider ? parseFloat(imageSizeSlider.max) : 200;
-                const offscreenMultiplier = (maxScalePercent / 100.0) + 0.1; // Tambahan 0.2 untuk buffer efek sobekan
+                // Buffer ekstra untuk efek seperti stroke dan shadow agar tidak terpotong
+                const offscreenMultiplier = (maxScalePercent / 100.0) + 0.1; 
 
-                const offscreenCanvasWidth = Math.round(internalCanvasWidth * offscreenMultiplier);
-                const offscreenCanvasHeight = Math.round(internalCanvasHeight * offscreenMultiplier);               
+                const offscreenCanvasWidth = Math.round(canvas.width * offscreenMultiplier);
+                const offscreenCanvasHeight = Math.round(canvas.height * offscreenMultiplier);          
 
-                canvas.width = internalCanvasWidth;
-                canvas.height = internalCanvasHeight;
-
+                // Atur resolusi semua kanvas offscreen
                 objectCanvas.width = contentCanvas.width = finalObjectCanvas.width = offscreenCanvasWidth;
                 objectCanvas.height = contentCanvas.height = finalObjectCanvas.height = offscreenCanvasHeight;
                 
@@ -1864,7 +2253,7 @@
                 const paddingY = parseFloat(containerStyle.paddingTop) + parseFloat(containerStyle.paddingBottom);
                 let availableWidth = canvasContainer.offsetWidth - paddingX;
                 let availableHeight = canvasContainer.offsetHeight - paddingY;
-                
+
                 availableWidth = Math.max(10, availableWidth);
                 availableHeight = Math.max(10, availableHeight);
 
@@ -1876,14 +2265,197 @@
                     displayH = availableHeight;
                     displayW = displayH * canvasRatio;
                 }
-                canvas.style.width = `${Math.round(displayW)}px`;
-                canvas.style.height = `${Math.round(displayH)}px`;
+
+                // JavaScript sekarang mengatur ukuran #canvas-wrapper
+                const wrapper = document.getElementById('canvas-wrapper');
+                if (wrapper) {
+                    wrapper.style.width = `${Math.round(displayW)}px`;
+                    wrapper.style.height = `${Math.round(displayH)}px`;
+                }
             }
 
             function resizeAndRedrawAll() {
                 updateInternalCanvasResolution();
                 updateCanvasDisplaySize();
             }
+
+            /**
+             * FINAL: Membuat dan menampilkan titik penanda keyframe yang posisinya
+             * disesuaikan agar pas dengan PUSAT thumb slider.
+             */
+            function renderKeyframeMarkers() {
+                const markersContainer = document.getElementById('keyframe-markers-container');
+                if (!markersContainer) return;
+
+                markersContainer.innerHTML = '';
+
+                if (state.object.animation.mode !== 'advanced') {
+                    return;
+                }
+
+                const totalDuration = state.export.duration;
+                if (totalDuration <= 0) return;
+
+                const keyframes = state.object.animation.keyframes;
+
+                keyframes.forEach(kf => {
+                    const marker = document.createElement('div');
+                    marker.className = 'keyframe-marker';
+                    
+                    // Berikan posisi keyframe (0.0 - 1.0) sebagai CSS Custom Property
+                    const keyframePosition = kf.time / totalDuration;
+                    if (keyframePosition >= 0 && keyframePosition <= 1) {
+                        marker.style.setProperty('--kf-pos', keyframePosition);
+                        markersContainer.appendChild(marker);
+                    }
+                });
+            }
+
+            function getIconForKeyframe(currentKeyframe, currentIndex, sortedKeyframes) {
+                const iconStyle = 'stroke="white" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round"';
+                const openIcon = `<svg viewBox="0 0 24 24" ${iconStyle}><path d="M5 15l7-7 7 7z"/></svg>`;
+                const closeIcon = `<svg viewBox="0 0 24 24" ${iconStyle}><path d="M5 9l7 7 7-7z"/></svg>`;
+                const squareIcon = `<svg viewBox="0 0 24 24" ${iconStyle}><rect x="6" y="6" width="12" height="12"/></svg>`;
+                const lineIcon = `<svg viewBox="0 0 24 24" ${iconStyle}><path d="M12 5v14"/></svg>`;
+
+                if (currentKeyframe.paperAnim === 'open') return openIcon;
+                if (currentKeyframe.paperAnim === 'close') return closeIcon;
+
+                if (currentKeyframe.paperAnim === 'none') {
+                    for (let i = currentIndex - 1; i >= 0; i--) {
+                        const prevAnim = sortedKeyframes[i].paperAnim;
+                        if (prevAnim === 'open') return squareIcon;
+                        if (prevAnim === 'close') return lineIcon;
+                    }
+                    return squareIcon;
+                }
+
+                return squareIcon;
+            }
+
+            /**
+             * FINAL: Menggambar bar durasi dengan panjang dan posisi yang akurat.
+             */
+            function renderSimpleAnimationMarkers() {
+                const container = document.getElementById('keyframe-markers-container');
+                if (!container) return;
+
+                const trackWidth = container.offsetWidth;
+                container.querySelectorAll('.simple-anim-marker').forEach(m => m.remove());
+
+                if (state.object.animation.mode !== 'simple') return;
+
+                const totalDuration = state.export.duration;
+                if (totalDuration <= 0 || trackWidth <= 0) return;
+
+                const animDuration = 1.0;
+                const thumbWidth = 20;
+                const borderWidth = 3; // Total lebar border (1.5px * 2)
+
+                // Lebar 1 detik dalam piksel
+                const oneSecondInPixels = (animDuration / totalDuration) * trackWidth;
+                
+                // Lebar total marker = (lebar 1 detik + lebar 1 thumb) - lebar border
+                const markerWidthInPixels = oneSecondInPixels + thumbWidth - borderWidth;
+
+                // Jika animasi "open" aktif
+                if (state.object.animation.simple.open) {
+                    const openMarker = document.createElement('div');
+                    openMarker.className = 'simple-anim-marker';
+                    openMarker.style.left = '0px';
+                    openMarker.style.width = `${markerWidthInPixels}px`;
+                    container.appendChild(openMarker);
+                }
+
+                // Jika animasi "close" aktif
+                if (state.object.animation.simple.close) {
+                    const closeMarker = document.createElement('div');
+                    closeMarker.className = 'simple-anim-marker';
+
+                    // Hitung posisi akhir, lalu kurangi dengan lebar marker untuk mendapatkan posisi awal
+                    const endPosition = trackWidth;
+                    const startPosition = endPosition - markerWidthInPixels;
+                    
+                    closeMarker.style.left = `${startPosition}px`;
+                    closeMarker.style.width = `${markerWidthInPixels}px`;
+                    container.appendChild(closeMarker);
+                }
+            }
+
+            /**
+			 * FINAL: Menginisialisasi slider rotasi dengan thumb yang "wrapping" dan rentang tetap.
+			 */
+			function initContinuousSlider(sliderEl, inputEl, labelEl, getValue, stateUpdater) {
+				if (!sliderEl || !inputEl || !labelEl) return;
+
+				// Pastikan rentang slider SELALU TETAP -180 hingga 180
+				sliderEl.min = -180;
+				sliderEl.max = 180;
+
+				let isDragging = false;
+				let startX = 0;
+				let startValue = 0;
+				const sensitivity = 2.0;
+
+				const syncUI = (newValue) => {
+					const value = Math.round(newValue);
+					stateUpdater(value);
+					inputEl.value = value;
+					sliderEl.value = (value % 360 + 540) % 360 - 180;
+					const loop = Math.floor((value + 180) / 360);
+					const baseText = translations[state.language]?.rotation || 'Rotation';
+					labelEl.textContent = loop === 0 ? baseText : `${baseText} (${loop > 0 ? '+' : ''}${loop})`;
+					requestRedraw();
+				};
+
+				const handleDragStart = (clientX) => {
+					isDragging = true;
+					startX = clientX;
+					startValue = getValue();
+					document.body.style.cursor = 'ew-resize';
+					sliderEl.classList.add('grabbing');
+					document.addEventListener('mousemove', handleMouseMove);
+					document.addEventListener('mouseup', handleDragEnd);
+					document.addEventListener('touchmove', handleTouchMove, { passive: false });
+					document.addEventListener('touchend', handleDragEnd);
+				};
+
+				const handleDragMove = (clientX) => {
+					if (!isDragging) return;
+					const deltaX = clientX - startX;
+					const newValue = startValue + (deltaX / sensitivity);
+					syncUI(newValue);
+				};
+
+				const handleDragEnd = () => {
+					isDragging = false;
+					document.body.style.cursor = 'default';
+					sliderEl.classList.remove('grabbing');
+					document.removeEventListener('mousemove', handleMouseMove);
+					document.removeEventListener('mouseup', handleDragEnd);
+					document.removeEventListener('touchmove', handleTouchMove);
+					document.removeEventListener('touchend', handleDragEnd);
+				};
+
+				const handleMouseDown = (e) => handleDragStart(e.clientX);
+				const handleMouseMove = (e) => handleDragMove(e.clientX);
+				const handleTouchStart = (e) => { e.preventDefault(); handleDragStart(e.touches[0].clientX); };
+				const handleTouchMove = (e) => { e.preventDefault(); handleDragMove(e.touches[0].clientX); };
+
+				const updateFromInput = () => syncUI(parseFloat(inputEl.value) || 0);
+
+				sliderEl.addEventListener('mousedown', handleMouseDown);
+				sliderEl.addEventListener('touchstart', handleTouchStart, { passive: false });
+				inputEl.addEventListener('change', updateFromInput);
+				inputEl.addEventListener('wheel', (e) => {
+					e.preventDefault();
+					const step = e.deltaY < 0 ? 1 : -1;
+					const currentValue = parseFloat(inputEl.value) || 0;
+					syncUI(currentValue + step);
+				});
+
+				syncUI(getValue());
+			}
 
             function syncSliderAndInput(sliderId, inputId, stateUpdater) {
                 const slider = document.getElementById(sliderId);
@@ -1966,6 +2538,10 @@
                                 // 5. Simpan gambar yang SUDAH memiliki padding ini ke dalam state
                                 state.object.image.element = paddedImg;
                                 state.object.image.file = file; // Tetap simpan file asli untuk info
+                                state.object.animation.isPlaying = true;
+                                animationStartTime = performance.now();
+                                pauseStartTime = 0;
+                                updatePlayPauseButton(); // Perbarui ikon tombol                               
                                 updateUIFromState();
                                 requestRedraw();
                             };
@@ -1993,7 +2569,7 @@
                 document.querySelectorAll('[data-translate-key]').forEach(el => {
                     const key = el.dataset.translateKey;
                     if (translationMap[key]) {
-                        if (key === 'dropImagePrompt' || key === 'creatorInfo2') {
+                        if (key === 'dropImagePrompt' || key === 'creatorInfo2' || key === 'exportInfoTooltip') {
                            el.innerHTML = translationMap[key];
                         } else {
                            el.textContent = translationMap[key];
@@ -2048,16 +2624,18 @@
             let activeKeyframeUI = null; // Variabel global untuk melacak UI keyframe yang aktif
 
             /**
-             * Membuat dan merender seluruh daftar keyframe berdasarkan state.
+             * Membuat dan merender seluruh daftar keyframe berdasarkan state, sekarang dengan ikon.
              */
             function renderKeyframeList() {
                 const keyframeListContainer = document.getElementById('keyframe-list');
-                const keyframes = state.object.animation.keyframes.sort((a, b) => a.time - b.time); // Selalu urutkan berdasarkan waktu
-                keyframeListContainer.innerHTML = ''; // Kosongkan daftar
+                const keyframes = state.object.animation.keyframes;
+                const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
 
-                keyframes.forEach((kf, index) => {
+                keyframeListContainer.innerHTML = '';
+
+                sortedKeyframes.forEach((kf, index) => {
                     const item = document.createElement('div');
-                    item.className = 'keyframe-item flex items-center gap-3 p-2 border border-slate-700 bg-slate-800 cursor-pointer transition-colors hover:bg-slate-700/50';
+                    item.className = 'keyframe-item flex items-center gap-2 p-2 border border-slate-700 bg-slate-800 cursor-pointer transition-colors hover:bg-slate-700/50';
                     item.dataset.keyframeId = kf.id;
 
                     if (kf.id === state.object.animation.activeKeyframeId) {
@@ -2065,17 +2643,24 @@
                         item.style.borderColor = 'var(--accent-color)';
                     }
 
+                    const iconSVG = getIconForKeyframe(kf, index, sortedKeyframes);
+
                     item.innerHTML = `
+                        <div class="w-6 h-6 flex-shrink-0 text-white flex items-center justify-center">${iconSVG}</div>
                         <span class="font-semibold text-slate-300 flex-shrink-0">Keyframe ${index + 1}</span>
-                        <input type="number" min="0" step="0.1" value="${kf.time}" class="keyframe-time-input number-input-uniform bg-slate-900 border border-[var(--border-color-light)] py-1 px-2 text-sm focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)]">
-                        <span class="text-sm text-[var(--text-muted)]">s</span>
-                        <button class="delete-keyframe-btn ml-auto p-1.5 text-red-400 hover:text-white hover:bg-red-500/80 transition-all">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                        </button>
+                        <div class="flex items-center gap-2 ml-auto">
+                            <input type="number" min="0" step="0.1" value="${kf.time.toFixed(2)}" class="keyframe-time-input number-input-uniform bg-slate-900 border border-[var(--border-color-light)] py-1 px-2 text-sm focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)]">
+                            <span class="text-sm text-[var(--text-muted)]">s</span>
+                            <button class="delete-keyframe-btn p-1.5 text-red-400 hover:text-white hover:bg-red-500/80 transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            </button>
+                        </div>
                     `;
                     keyframeListContainer.appendChild(item);
                 });
-                renderKeyframeProperties(); // Update panel properti setelah daftar di-render
+
+                renderKeyframeProperties();
+                renderKeyframeMarkers();
             }
 
             /**
@@ -2086,97 +2671,103 @@
                 const activeKeyframeId = state.object.animation.activeKeyframeId;
                 const keyframes = state.object.animation.keyframes;
                 const keyframe = keyframes.find(kf => kf.id === activeKeyframeId);
-
                 if (!keyframe) {
                     panel.innerHTML = '';
                     panel.classList.add('hidden');
                     return;
                 }
-                // 1. Dapatkan index dan state sebelum keyframe ini
                 const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
                 const currentIndex = sortedKeyframes.findIndex(kf => kf.id === activeKeyframeId);
-                const timeBefore = (currentIndex > 0) ? sortedKeyframes[currentIndex - 1].time : -1;
                 const stateBefore = getVisualStateAtTime(keyframe.time, keyframes);
-
-                // 2. Tentukan apakah tombol harus dinonaktifkan
                 const isOpenDisabled = !(stateBefore === 'closed' || currentIndex === 0);
                 const isCloseDisabled = !(stateBefore === 'open');
-                
                 panel.classList.remove('hidden');
                 panel.innerHTML = `
                     <div class="accordion-section border border-[var(--border-color)] accordion-open">
                         <div class="accordion-header w-full flex items-center justify-between p-4 bg-slate-700/30">
-                            <h2 class="text-base font-semibold text-slate-300" data-translate-key="keyframeProperties">Properti Keyframe</h2>
+                            <h2 class="text-base font-semibold text-slate-300" data-translate-key="keyframeProperties"></h2>
                         </div>
                         <div class="accordion-body space-y-4 p-4 border-t border-[var(--border-color)]">
                             <div>
-                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="imageSize">Ukuran (%)</label>
+                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="imageSize"></label>
                                 <div class="flex items-center gap-3">
                                     <input type="range" id="kf-scale" min="10" max="200" value="${keyframe.scale}" class="w-full slider">
                                     <input type="number" id="kf-scale-input" min="10" max="200" value="${keyframe.scale}" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
                                 </div>
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="offsetX">Offset X (%)</label>
+                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="offsetX"></label>
                                 <div class="flex items-center gap-3">
                                     <input type="range" id="kf-offset-x" min="-150" max="150" value="${keyframe.x}" class="w-full slider">
                                     <input type="number" id="kf-offset-x-input" min="-150" max="150" value="${keyframe.x}" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
                                 </div>
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="offsetY">Offset Y (%)</label>
+                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="offsetY"></label>
                                 <div class="flex items-center gap-3">
                                     <input type="range" id="kf-offset-y" min="-150" max="150" value="${keyframe.y}" class="w-full slider">
                                     <input type="number" id="kf-offset-y-input" min="-150" max="150" value="${keyframe.y}" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
                                 </div>
                             </div>
-                            <div class="pt-4 border-t border-slate-700">
-                            <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="easingToNext">Easing ke Keyframe Berikutnya</label>
-                            <div id="kf-easing-btns" class="space-y-2">
-                                <div class="grid grid-cols-4 gap-2 btn-group-toggle">
-                                    <button data-easing="linear" title="Linear" class="${keyframe.easing === 'linear' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">Linear</button>
-                                    <button data-easing="easeIn" title="Ease In" class="${keyframe.easing === 'easeIn' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">In</button>
-                                    <button data-easing="easeOut" title="Ease Out" class="${keyframe.easing === 'easeOut' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">Out</button>
-                                    <button data-easing="easeInOut" title="Ease In Out" class="${keyframe.easing === 'easeInOut' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">In-Out</button>
-                                </div>
-                                <div class="grid grid-cols-4 gap-2 btn-group-toggle">
-                                    <button data-easing="instant" title="Instant" class="${keyframe.easing === 'instant' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">Instan</button>
-                                    <button data-easing="backIn" title="Back In" class="${keyframe.easing === 'backIn' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">Back In</button>
-                                    <button data-easing="backOut" title="Back Out" class="${keyframe.easing === 'backOut' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">Back Out</button>
-                                    <button data-easing="backInOut" title="Back In Out" class="${keyframe.easing === 'backInOut' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">Back In-Out</button>
+                            <div>
+                                <label id="kf-rotation-label" class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="rotation"></label>
+                                <div class="flex items-center gap-3">
+                                    <input type="range" id="kf-rotation" min="-180" max="180" value="${(keyframe.rotation % 360 + 540) % 360 - 180}" class="w-full slider">
+                                    <input type="number" id="kf-rotation-input" value="${keyframe.rotation}" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
                                 </div>
                             </div>
                             <div class="pt-4 border-t border-slate-700">
-                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block">Animasi Kertas</label>
+                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="easingToNext"></label>
+                                <div id="kf-easing-btns" class="space-y-2">
+                                    <div class="grid grid-cols-4 gap-2 btn-group-toggle">
+                                        <button data-easing="linear" class="${keyframe.easing === 'linear' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="linear"></button>
+                                        <button data-easing="easeIn" class="${keyframe.easing === 'easeIn' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="easeIn"></button>
+                                        <button data-easing="easeOut" class="${keyframe.easing === 'easeOut' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="easeOut"></button>
+                                        <button data-easing="easeInOut" class="${keyframe.easing === 'easeInOut' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="easeInOut"></button>
+                                    </div>
+                                    <div class="grid grid-cols-4 gap-2 btn-group-toggle">
+                                        <button data-easing="instant" class="${keyframe.easing === 'instant' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="instant"></button>
+                                        <button data-easing="backIn" class="${keyframe.easing === 'backIn' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="backIn"></button>
+                                        <button data-easing="backOut" class="${keyframe.easing === 'backOut' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="backOut"></button>
+                                        <button data-easing="backInOut" class="${keyframe.easing === 'backInOut' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="backInOut"></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pt-4 border-t border-slate-700">
+                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="keyframeAnim"></label>
                                 <div id="kf-paper-anim-btns" class="grid grid-cols-3 gap-2 btn-group-toggle">
-                                    <button data-anim="none" class="${keyframe.paperAnim === 'none' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm">Tidak Ada</button>
-                                    <button data-anim="open" class="${keyframe.paperAnim === 'open' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" ${isOpenDisabled ? 'disabled' : ''}>Buka</button>
-                                    <button data-anim="close" class="${keyframe.paperAnim === 'close' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" ${isCloseDisabled ? 'disabled' : ''}>Tutup</button>
+                                    <button data-anim="none" class="${keyframe.paperAnim === 'none' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="animNone"></button>
+                                    <button data-anim="open" class="${keyframe.paperAnim === 'open' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" ${isOpenDisabled ? 'disabled' : ''} data-translate-key="animOpen"></button>
+                                    <button data-anim="close" class="${keyframe.paperAnim === 'close' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" ${isCloseDisabled ? 'disabled' : ''} data-translate-key="animClose"></button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
-
-                // Hubungkan slider dan input dengan state
+                updateUIText(state.language);
                 syncSliderAndInput('kf-scale', 'kf-scale-input', val => keyframe.scale = val);
                 syncSliderAndInput('kf-offset-x', 'kf-offset-x-input', val => keyframe.x = val);
                 syncSliderAndInput('kf-offset-y', 'kf-offset-y-input', val => keyframe.y = val);
-                
-                // Event listener untuk tombol easing
+                initContinuousSlider(
+                    document.getElementById('kf-rotation'),
+                    document.getElementById('kf-rotation-input'),
+                    document.getElementById('kf-rotation-label'),
+                    () => keyframe.rotation,
+                    val => { keyframe.rotation = val; }
+                );
                 document.getElementById('kf-easing-btns').addEventListener('click', e => {
                     const btn = e.target.closest('button');
                     if (btn) {
                         keyframe.easing = btn.dataset.easing;
-                        renderKeyframeProperties(); // Render ulang untuk menunjukkan tombol aktif
+                        renderKeyframeProperties();
                         requestRedraw();
                     }
                 });
                 document.getElementById('kf-paper-anim-btns').addEventListener('click', e => {
                     const btn = e.target.closest('button');
-                    if (btn && !btn.disabled) { // Tambahkan pengecekan !btn.disabled
+                    if (btn && !btn.disabled) {
                         keyframe.paperAnim = btn.dataset.anim;
-                        renderKeyframeProperties(); 
+                        renderKeyframeProperties();
                         requestRedraw();
                     }
                 });
@@ -2318,7 +2909,7 @@
                     { id: 'overlay-speed-input', value: activeObjectState.paperFoldOverlay.speed },
 
                     { id: 'export-duration-input', value: state.export.duration },
-                    { id: 'export-filename-input', value: state.export.filename },
+                    { id: 'export-filename-input', value: state.export.filename + '.webm'},
                 ];
                  inputsToUpdate.forEach(item => {
                     const el = document.getElementById(item.id);
@@ -2388,7 +2979,12 @@
                     if (body) {
                         body.classList.toggle('hidden', !isOpen);
                     }
-                });                
+                });
+                document.querySelectorAll('#preview-resolution-btns button').forEach(button => {
+                    button.classList.toggle('active', button.dataset.res === state.previewResolutionMode);
+                });  
+                document.getElementById('debug-screen-switch').checked = state.debugScreenEnabled;
+                document.getElementById('debug-screen').classList.toggle('hidden', !state.debugScreenEnabled);                              
                 showTab(state.activeTab);
                 requestRedraw();
                 renderKeyframeList();
@@ -2589,51 +3185,45 @@
             /**
              * Starts the video export process using CCapture.js.
              */
+            // GANTI SELURUH FUNGSI LAMA DENGAN INI
             async function startExport() {
                 isExporting = true;
                 const hasAnyImage = state.object.image.element || state.background.element;
                 if (!hasAnyImage) {
                     showTopNotification("notificationWarnUpload");
-                    isExporting = false; // Pastikan untuk mereset flag
+                    isExporting = false;
                     return;
                 }
+
                 const exportSettingsPopup = document.getElementById('export-settings-popup');
                 const exportProgressPopup = document.getElementById('export-progress-popup');
                 const progressBarFill = document.getElementById('progress-bar-fill');
-                
-                if (exportSettingsPopup) exportSettingsPopup.classList.add('hidden');
-                if (exportProgressPopup) {
-                    exportProgressPopup.classList.remove('hidden');
-                    exportProgressPopup.classList.add('flex');
-                }
+                const cancelExportBtn = document.getElementById('cancel-export-btn');
+
+                exportSettingsPopup.classList.add('hidden');
+                exportProgressPopup.classList.remove('hidden');
+                exportProgressPopup.classList.add('flex');
+
                 cancelAnimationFrame(animationFrameId);
 
-                // Simpan resolusi pratinjau saat ini untuk pemulihan
                 const originalCanvasWidth = canvas.width;
                 const originalCanvasHeight = canvas.height;
-                
                 const finalExportDims = RESOLUTION_MAPS[state.canvasDisplayResolution.toString()]?.[state.aspectRatio];
 
                 if (!finalExportDims) {
                     console.error("Invalid export resolution.");
-                    if (exportProgressPopup) {
-                        exportProgressPopup.classList.add('hidden');
-                        exportProgressPopup.classList.remove('flex');
-                    }
                     isExporting = false;
+                    // Kembalikan UI ke keadaan normal
+                    exportProgressPopup.classList.add('hidden');
+                    exportProgressPopup.classList.remove('flex');
                     animationLoop();
                     return;
                 }
 
-                // === PERBAIKAN UTAMA DI SINI ===
-                // Set SEMUA kanvas ke resolusi ekspor final
-                const exportW = finalExportDims.w;
-                const exportH = finalExportDims.h;
-                canvas.width = objectCanvas.width = finalObjectCanvas.width = contentCanvas.width = exportW;
-                canvas.height = objectCanvas.height = finalObjectCanvas.height = contentCanvas.height = exportH;
-                // === AKHIR DARI PERBAIKAN ===
+                canvas.width = objectCanvas.width = finalObjectCanvas.width = contentCanvas.width = finalExportDims.w;
+                canvas.height = objectCanvas.height = finalObjectCanvas.height = contentCanvas.height = finalExportDims.h;
 
-                // Reset state animasi objek untuk memulai dari awal
+                // Reset state animasi
                 const obj = state.object;
                 obj.movement.lastRotationUpdateTime = 0;
                 obj.movement.lastPositionUpdateTime = { x: 0, y: 0 };
@@ -2641,58 +3231,79 @@
                 obj.movement.positionOffset = { x: 0, y: 0 };
                 obj.paperFoldOverlay.lastImageSwitchTime = 0;
                 obj.paperFoldOverlay.currentImageIndex = 0;
-                obj.animation.simple.previewing = null;
 
                 const DURATION_S = state.export.duration;
                 const FRAME_RATE = state.export.fps;
-                const FILENAME = state.export.filename || 'animasi-sobek';
+                const FILENAME = state.export.filename || 'papera-me';
                 const TOTAL_FRAMES = DURATION_S * FRAME_RATE;
                 const capturer = new CCapture({ format: 'webm', framerate: FRAME_RATE, quality: 95, name: FILENAME });
-                
+
+                let isExportCancelled = false;
+                const handleCancel = () => {
+                    isExportCancelled = true;
+                };
+                cancelExportBtn.addEventListener('click', handleCancel, { once: true });
+
                 capturer.start();
 
-                // Loop perekaman frame
-                for (let i = 0; i <= TOTAL_FRAMES; i++) {
-                    const timestamp = (i / FRAME_RATE) * 1000;
+                // Loop Asinkron untuk Perekaman Frame
+                function processFrame(frame) {
+                    // Cek jika dibatalkan
+                    if (isExportCancelled) {
+                        console.log("Export cancelled by user.");
+                        // Hentikan perekaman tanpa menyimpan
+                        capturer.stop();
+                        // Bersihkan dan kembalikan UI
+                        exportProgressPopup.classList.add('hidden');
+                        exportProgressPopup.classList.remove('flex');
+                        cancelExportBtn.removeEventListener('click', handleCancel);
+                        resizeAndRedrawAll(); // Kembalikan resolusi kanvas
+                        isExporting = false;
+                        animationFrameId = requestAnimationFrame(animationLoop);
+                        return;
+                    }
+
+                    // Cek jika sudah selesai
+                    if (frame > TOTAL_FRAMES) {
+                        progressBarFill.textContent = `${translations[state.language].completing}...`;
+                        capturer.stop();
+                        capturer.save(blob => {
+                            exportProgressPopup.classList.add('hidden');
+                            exportProgressPopup.classList.remove('flex');
+                            cancelExportBtn.removeEventListener('click', handleCancel);
+                            resizeAndRedrawAll();
+                            isExporting = false;
+                            animationFrameId = requestAnimationFrame(animationLoop);
+
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `${FILENAME}.webm`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            window.URL.revokeObjectURL(url);
+                        });
+                        return;
+                    }
+
+                    // Proses frame saat ini
+                    const timestamp = (frame / FRAME_RATE) * 1000;
                     updateMovement(timestamp);
                     updatePaperFoldOverlay(timestamp);
                     draw(timestamp);
                     capturer.capture(canvas);
-                    const percentage = Math.round((i / TOTAL_FRAMES) * 100);
-                    if (progressBarFill) {
-                        progressBarFill.style.width = `${percentage}%`;
-                        progressBarFill.textContent = `${percentage}%`;
-                    }
-                    await new Promise(resolve => setTimeout(resolve, 1));
+
+                    const percentage = Math.round((frame / TOTAL_FRAMES) * 100);
+                    progressBarFill.style.width = `${percentage}%`;
+                    progressBarFill.textContent = `${percentage}%`;
+
+                    // Panggil frame berikutnya
+                    requestAnimationFrame(() => processFrame(frame + 1));
                 }
 
-                if (progressBarFill) progressBarFill.textContent = `${translations[state.language].completing}...`;
-                
-                capturer.stop();
-
-                // Simpan video hasil rekaman
-                capturer.save(blob => {
-                    if (exportProgressPopup) {
-                        exportProgressPopup.classList.add('hidden');
-                        exportProgressPopup.classList.remove('flex');
-                    }
-
-                    // Kembalikan ukuran kanvas ke resolusi pratinjau
-                    // Fungsi resizeAndRedrawAll() akan menangani semua kanvas
-                    resizeAndRedrawAll();
-                    
-                    isExporting = false;
-                    animationFrameId = requestAnimationFrame(animationLoop);
-                    
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `${FILENAME}.webm`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                });
+                // Mulai dari frame 0
+                processFrame(0);
             }
             /**
              * Shows the content for a specific tab and updates the active state of tab buttons.
@@ -2751,7 +3362,33 @@
                 if (controlsPanel) {
                     controlsPanel.scrollTop = tabScrollPositions[tabName] || 0;
                 }
-            }            
+            }
+
+            let smoothResizeRafId = null; // Untuk memegang ID dari requestAnimationFrame
+            function animateCanvasResize(duration = 310) { // Beri sedikit waktu ekstra
+                if (smoothResizeRafId) {
+                    cancelAnimationFrame(smoothResizeRafId);
+                }
+
+                const startTime = performance.now();
+
+                function loop(currentTime) {
+                    const elapsedTime = currentTime - startTime;
+
+                    if (elapsedTime < duration) {
+                        updateCanvasDisplaySize();
+                        smoothResizeRafId = requestAnimationFrame(loop);
+                    } else {
+                        updateCanvasDisplaySize(); // Pembaruan terakhir untuk memastikan ukuran pas
+                        cancelAnimationFrame(smoothResizeRafId);
+                        smoothResizeRafId = null;
+                    }
+                }
+
+                smoothResizeRafId = requestAnimationFrame(loop);
+            }
+
+
             /**
              * Toggles the settings panel open or closed, managing browser history for back button support.
              */
@@ -2759,15 +3396,113 @@
                 const isOpen = panelWrapper.classList.contains('panel-open');
                 if (isOpen) {
                     if (history.state && history.state.panel === 'open') {
-                        history.back(); // Use history to close if opened via history
+                        history.back(); // This triggers the popstate listener which will remove the body class
                     } else {
                         panelWrapper.classList.remove('panel-open');
+                        body.classList.remove('desktop-panel-open'); // Also remove body class here
                     }
                 } else {
                     history.pushState({ panel: 'open' }, 'Panel Open');
                     panelWrapper.classList.add('panel-open');
+                    body.classList.add('desktop-panel-open'); // Add body class here
                 }
-            }          
+                animateCanvasResize();
+            }
+
+            function syncDurationInputs(newValue) {
+                const newDuration = Math.max(1, parseFloat(newValue) || 1);
+                state.export.duration = newDuration;
+
+                // Update kedua input
+                const exportInput = document.getElementById('export-duration-input');
+                const timelineInput = document.getElementById('timeline-duration-input');
+                if (exportInput) exportInput.value = newDuration.toFixed(1);
+                if (timelineInput) timelineInput.value = newDuration.toFixed(1);
+
+                // Update slider max value
+                const timelineSlider = document.getElementById('timeline-slider');
+                if (timelineSlider) {
+                    timelineSlider.max = newDuration;
+                    // Pastikan value tidak melebihi max baru
+                    if (parseFloat(timelineSlider.value) > newDuration) {
+                        timelineSlider.value = newDuration;
+                    }
+                }
+                requestRedraw();
+                renderKeyframeMarkers();
+                renderSimpleAnimationMarkers();
+            }
+
+            function updatePlayPauseButton() {
+                const isPlaying = state.object.animation.isPlaying;
+                document.getElementById('play-icon').classList.toggle('hidden', isPlaying);
+                document.getElementById('pause-icon').classList.toggle('hidden', !isPlaying);
+            }
+
+            /**
+             * Checks if a keyframe's time exceeds the total duration and extends it if necessary.
+             */
+            function checkAndExtendDuration(keyframeTime) {
+                if (keyframeTime > state.export.duration) {
+                    // Bulatkan ke atas ke 0.5 detik terdekat untuk kerapian
+                    const newDuration = Math.ceil(keyframeTime * 2) / 2;
+                    syncDurationInputs(newDuration);
+                }
+            }           
+
+            /**
+             * Menyesuaikan pembagian tinggi kanvas dan panel kontrol secara otomatis
+             * pada tampilan mobile, HANYA JIKA kanvas membutuhkan <= 50% ruang.
+             */
+            function autoAdjustMobileLayout() {
+                const isMobile = body.classList.contains('force-mobile') || (!body.classList.contains('force-desktop') && window.matchMedia('(max-width: 768px)').matches);
+                if (!isMobile) {
+                    return;
+                }
+
+                const canvasContainer = document.getElementById('canvas-container');
+                const panelWrapper = document.getElementById('settings-panel-wrapper');
+                const mobileFooter = document.getElementById('mobile-footer');
+
+                if (!canvasContainer || !panelWrapper || !mobileFooter) return;
+
+                // Perhitungan dimensi
+                const containerWidth = canvasContainer.offsetWidth;
+                const containerStyle = window.getComputedStyle(canvasContainer);
+                const paddingX = parseFloat(containerStyle.paddingLeft) + parseFloat(containerStyle.paddingRight);
+                const paddingY = parseFloat(containerStyle.paddingTop) + parseFloat(containerStyle.paddingBottom);
+                const canvasContentWidth = containerWidth - paddingX;
+                const [aspectW, aspectH] = state.aspectRatio.split('/').map(Number);
+                const requiredCanvasContentHeight = canvasContentWidth / (aspectW / aspectH);
+                const requiredContainerHeight = requiredCanvasContentHeight + paddingY;
+                const totalLayoutHeight = window.innerHeight - mobileFooter.offsetHeight;
+                
+                const canvasHeightPercentage = (requiredContainerHeight / totalLayoutHeight) * 100;
+
+                // BARU: Cek apakah hasil perhitungan melebihi 50%
+                if (canvasHeightPercentage > 50) {
+                    // Jika ya, hentikan fungsi dan biarkan layout default 50/50.
+                    return; 
+                }
+
+                // Kode di bawah ini hanya akan berjalan jika persentase kanvas <= 50%
+
+                // Logika Animasi
+                const transitionStyle = 'flex-basis 0.5s ease-in-out';
+                canvasContainer.style.transition = transitionStyle;
+                panelWrapper.style.transition = transitionStyle;
+
+                // Terapkan persentase baru
+                canvasContainer.style.flexBasis = `${canvasHeightPercentage}%`;
+                panelWrapper.style.flexBasis = `${100 - canvasHeightPercentage}%`;
+
+                // Hapus style transisi setelah animasi selesai
+                setTimeout(() => {
+                    canvasContainer.style.transition = '';
+                    panelWrapper.style.transition = '';
+                    resizeAndRedrawAll();
+                }, 500);
+            }       
             /**
              * Initializes the application, sets up event listeners, and starts the animation loop.
              */
@@ -2775,6 +3510,8 @@
                 // Open panel by default on desktop
                 if (!window.matchMedia('(max-width: 768px)').matches) {
                    panelWrapper.classList.add('panel-open');
+                   body.classList.add('desktop-panel-open');
+                   animateCanvasResize();
                 }
 
                 // Set initial language based on browser setting
@@ -2786,9 +3523,12 @@
                 const isCurrentlyMobile = !window.matchMedia('(min-width: 769px)').matches;
                 state.displayMode = 'auto'; 
                 state.uiSize = isCurrentlyMobile ? 'compact' : 'normal';
+                handleAutoResolutionByWidth();
 
                 resizeAndRedrawAll();
                 animationFrameId = requestAnimationFrame(animationLoop);
+                requestAnimationFrame(fpsLoop);
+
                 const bgTransformAccordion = document.getElementById('background-transform-accordion');
                 bgTransformAccordion.classList.add('accordion-open');
                 bgTransformAccordion.querySelector('.accordion-body').classList.remove('hidden');
@@ -2829,7 +3569,35 @@
                          const isMobile = !window.matchMedia('(min-width: 769px)').matches;
                          applyUISize(isMobile ? 'compact' : 'normal');
                     }
+                    handleAutoResolutionByWidth();
                     resizeAndRedrawAll();
+                });
+
+                document.getElementById('preview-resolution-btns').addEventListener('click', (e) => {
+                    const button = e.target.closest('button');
+                    if (button && button.dataset.res) {
+                        const newResMode = button.dataset.res;
+                        state.previewResolutionMode = newResMode;
+
+                        if (newResMode !== 'auto') {
+                            // Jika pengguna memilih resolusi manual, langsung set resolusi aktif
+                            state.activePreviewResolution = newResMode;
+                        } else {
+                            // Jika kembali ke 'auto', mulai lagi dari 540p
+                            state.activePreviewResolution = '540';
+                        }
+
+                        // Reset timer auto-resolution setiap kali ada interaksi manual
+                        highFpsSince = 0;
+                        lowFpsSince = 0;
+
+                        updateUIFromState(); // Perbarui UI tombol
+                        resizeAndRedrawAll(); // Terapkan resolusi baru
+                    }
+                });
+                document.getElementById('debug-screen-switch').addEventListener('change', (e) => {
+                    state.debugScreenEnabled = e.target.checked;
+                    updateUIFromState(); // Update UI untuk menampilkan/menyembunyikan layar
                 });
                 panelHandle.addEventListener('click', togglePanel);
                 document.getElementById('mobile-export-btn').addEventListener('click', () => {
@@ -2839,6 +3607,8 @@
                 window.addEventListener('popstate', (event) => {
                     if (!event.state || event.state.panel !== 'open') {
                         panelWrapper.classList.remove('panel-open');
+                        body.classList.remove('desktop-panel-open');
+                        animateCanvasResize();
                     }
                 });
                 ['handle-background', 'handle-object', 'handle-animasi', 'handle-info'].forEach(id => {
@@ -2895,8 +3665,14 @@
                     state.export.duration = Math.max(min, Math.min(max, val || 1));
                     e.target.value = state.export.duration;
                 });
-                 document.getElementById('export-filename-input').addEventListener('input', (e) => {
-                    state.export.filename = e.target.value.trim();
+                document.getElementById('export-filename-input').addEventListener('input', (e) => {
+                    let currentVal = e.target.value;
+                    
+                    let baseName = currentVal.endsWith('.webm')
+                        ? currentVal.slice(0, -5)
+                        : currentVal;
+                    
+                    state.export.filename = baseName.trim();
                 });
 
                 // Setup drag and drop zones
@@ -3015,6 +3791,14 @@
                 syncSliderAndInput('image-size', 'image-size-input', (val) => getActiveObject().image.size = val);
                 syncSliderAndInput('image-offset-x', 'image-offset-x-input', (val) => getActiveObject().image.offset.x = val);
                 syncSliderAndInput('image-offset-y', 'image-offset-y-input', (val) => getActiveObject().image.offset.y = val);
+                initContinuousSlider(
+                    document.getElementById('image-rotation'),
+                    document.getElementById('image-rotation-input'),
+                    document.getElementById('image-rotation-label'),
+                    () => getActiveObject().image.rotation,
+                    (val) => { getActiveObject().image.rotation = val; }
+                );
+
                 syncSliderAndInput('stroke-width', 'stroke-width-input', (val) => getActiveObject().stroke.width = val);
                 syncSliderAndInput('stroke-roughness', 'stroke-roughness-input', (val) => getActiveObject().stroke.roughness = val);
                 syncSliderAndInput('stroke-detail', 'stroke-detail-input', (val) => getActiveObject().stroke.detail = val / 1000);
@@ -3064,6 +3848,14 @@
                 syncSliderAndInput('background-size', 'background-size-input', (val) => state.background.transform.size = val);
                 syncSliderAndInput('background-offset-x', 'background-offset-x-input', (val) => state.background.transform.offset.x = val);
                 syncSliderAndInput('background-offset-y', 'background-offset-y-input', (val) => state.background.transform.offset.y = val);
+                initContinuousSlider(
+                    document.getElementById('background-rotation'),
+                    document.getElementById('background-rotation-input'),
+                    document.getElementById('background-rotation-label'),
+                    () => state.background.transform.rotation,
+                    (val) => { state.background.transform.rotation = val; }
+                );
+
                 syncSliderAndInput('background-color-hue', 'background-color-hue-input', (val) => state.background.effects.colorCorrection.hue = val);
                 syncSliderAndInput('background-color-saturation', 'background-color-saturation-input', (val) => state.background.effects.colorCorrection.saturation = val);
                 syncSliderAndInput('background-color-brightness', 'background-color-brightness-input', (val) => state.background.effects.colorCorrection.brightness = val);
@@ -3105,48 +3897,54 @@
                 
 
                 // Mobile panel resizer logic
-                const resizerMove = (e) => {
-                    e.preventDefault();
-                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                    const totalHeight = window.innerHeight;
-                    const footerHeight = document.getElementById('mobile-footer').offsetHeight;
+				let dragOffset = 0; // Untuk menyimpan jarak klik dari tepi atas header
 
-                    let canvasHeight = clientY;
-                    let panelHeight = totalHeight - clientY;
+				const resizerMove = (e) => {
+					e.preventDefault();
+					const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+					const totalHeight = window.innerHeight;
+					const footerHeight = document.getElementById('mobile-footer').offsetHeight;
+					const minHeight = totalHeight * 0.20;
 
-                    const minHeight = totalHeight * 0.20;
+					// Hitung tinggi kanvas dengan mengurangi offset awal
+					let canvasHeight = clientY - dragOffset;
 
-                    canvasHeight = Math.max(minHeight, canvasHeight);
-                    canvasHeight = Math.min(totalHeight - minHeight - footerHeight, canvasHeight);
-                    panelHeight = totalHeight - canvasHeight;
+					// Batasi ukuran minimum dan maksimum
+					canvasHeight = Math.max(minHeight, canvasHeight);
+					canvasHeight = Math.min(totalHeight - minHeight - footerHeight, canvasHeight);
 
-                    canvasContainer.style.flexBasis = `${canvasHeight}px`;
-                    panelWrapper.style.flexBasis = `${panelHeight}px`;
-                    
-                    requestAnimationFrame(updateCanvasDisplaySize);
-                };
+					const panelHeight = totalHeight - canvasHeight;
 
-                const resizerStop = () => {
-                    document.removeEventListener('mousemove', resizerMove);
-                    document.removeEventListener('touchmove', resizerMove);
-                    document.removeEventListener('mouseup', resizerStop);
-                    document.removeEventListener('touchend', resizerStop);
-                    body.style.userSelect = '';
-                    resizeAndRedrawAll();
-                };
-                
-                mobilePanelHeader.addEventListener('mousedown', (e) => {
-                    e.preventDefault();
-                    body.style.userSelect = 'none';
-                    document.addEventListener('mousemove', resizerMove);
-                    document.addEventListener('mouseup', resizerStop);
-                });
-                mobilePanelHeader.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    body.style.userSelect = 'none';
-                    document.addEventListener('touchmove', resizerMove, { passive: false });
-                    document.addEventListener('touchend', resizerStop);
-                });
+					canvasContainer.style.flexBasis = `${canvasHeight}px`;
+					panelWrapper.style.flexBasis = `${panelHeight}px`;
+
+					requestAnimationFrame(updateCanvasDisplaySize);
+				};
+
+				const resizerStop = () => {
+					document.removeEventListener('mousemove', resizerMove);
+					document.removeEventListener('touchmove', resizerMove);
+					document.removeEventListener('mouseup', resizerStop);
+					document.removeEventListener('touchend', resizerStop);
+					body.style.userSelect = '';
+					resizeAndRedrawAll();
+				};
+
+				const resizerStart = (e) => {
+					const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+					// Hitung dan simpan jarak antara jari/mouse dengan tepi atas header
+					dragOffset = clientY - mobilePanelHeader.getBoundingClientRect().top;
+
+					body.style.userSelect = 'none';
+					document.addEventListener('mousemove', resizerMove);
+					document.addEventListener('mouseup', resizerStop);
+					document.addEventListener('touchmove', resizerMove, { passive: false });
+					document.addEventListener('touchend', resizerStop);
+				};
+
+				mobilePanelHeader.addEventListener('mousedown', resizerStart);
+				mobilePanelHeader.addEventListener('touchstart', resizerStart, { passive: false });
 
                 document.getElementById('animation-mode-btns').addEventListener('click', (e) => {
                     const button = e.target.closest('button');
@@ -3155,66 +3953,90 @@
                         // Reset pratinjau saat berganti mode
                         state.object.animation.previewTime = null;
                         updateUIFromState(); // Panggil ini untuk update seluruh UI
+                        renderKeyframeMarkers();
+                        renderSimpleAnimationMarkers();
                     }
                 });
 
                 // Event listener untuk switch di mode simpel
                 document.getElementById('simple-anim-open-switch').addEventListener('change', (e) => {
                     state.object.animation.simple.open = e.target.checked;
+                    renderSimpleAnimationMarkers();
                     // Di masa depan, logika animasi simpel akan dipanggil di sini
                 });
 
                 document.getElementById('simple-anim-close-switch').addEventListener('change', (e) => {
                     state.object.animation.simple.close = e.target.checked;
+                    renderSimpleAnimationMarkers();
                     // Di masa depan, logika animasi simpel akan dipanggil di sini
                 });
                              
                 document.getElementById('add-keyframe-btn').addEventListener('click', () => {
                     const keyframes = state.object.animation.keyframes;
-                    // Tentukan waktu default untuk keyframe baru, sedikit setelah keyframe terakhir
                     const lastTime = keyframes.length > 0 ? keyframes.sort((a, b) => a.time - b.time)[keyframes.length - 1].time : 0;
                     const lastProps = keyframes.length > 0 ? keyframes[keyframes.length - 1] : DEFAULT_OBJECT_STATE.animation.keyframes[0];
 
                     const newKeyframe = {
                         id: Date.now(),
-                        time: Math.round((lastTime + 1) * 10) / 10, // Menambah 1 detik dari keyframe terakhir
-                        x: lastProps.x,
-                        y: lastProps.y,
-                        scale: lastProps.scale,
-                        easing: 'linear',
-                        paperAnim: 'none'
+                        time: Math.round((lastTime + 1) * 10) / 10,
+                        x: lastProps.x, y: lastProps.y, scale: lastProps.scale,
+                        easing: 'linear', paperAnim: 'none'
                     };
                     keyframes.push(newKeyframe);
-                    state.object.animation.activeKeyframeId = newKeyframe.id; // Langsung aktifkan keyframe baru
+                    state.object.animation.activeKeyframeId = newKeyframe.id;
+                    
+                    // Panggil fungsi untuk memperpanjang durasi
+                    checkAndExtendDuration(newKeyframe.time);
+                    
                     renderKeyframeList();
                     requestRedraw();
                 });
 
                 document.getElementById('keyframe-list').addEventListener('click', (e) => {
-                    const item = e.target.closest('.keyframe-item');
-                    if (!item) return;
+					if (e.target.classList.contains('keyframe-time-input')) return;
+
+					const item = e.target.closest('.keyframe-item');
+					if (!item) return;
 
                     const id = Number(item.dataset.keyframeId);
-                    const kf = state.object.animation.keyframes.find(k => k.id === id); // +++ Tambah ini                    // Cek apakah tombol hapus yang diklik
 
+                    // Logika untuk tombol hapus
                     if (e.target.closest('.delete-keyframe-btn')) {
                         state.object.animation.keyframes = state.object.animation.keyframes.filter(kf => kf.id !== id);
-                        // Jika keyframe yang dihapus adalah yang aktif, nonaktifkan
                         if (state.object.animation.activeKeyframeId === id) {
                             state.object.animation.activeKeyframeId = null;
                         }
+                        // Setelah menghapus, perbarui daftar dan kanvas
                         renderKeyframeList();
                         requestRedraw();
                         return;
                     }
 
-                    // Jika item biasa yang diklik, set sebagai aktif
+                    // Logika untuk memilih sebuah keyframe
                     state.object.animation.activeKeyframeId = id;
+                    const kf = state.object.animation.keyframes.find(k => k.id === id);
+
                     if (kf) {
+                        // 1. Atur status animasi ke mode pratinjau/jeda
+                        state.object.animation.isPlaying = false;
                         state.object.animation.previewTime = kf.time;
-                        needsRedraw = true; // Paksa gambar ulang untuk menampilkan pratinjau
-                    }                    
-                    renderKeyframeList(); // Render ulang untuk update highlight dan panel properti
+                        pauseStartTime = kf.time * 1000;
+
+                        // 2. Perbarui UI timeline (slider dan teks waktu) secara manual
+                        const timelineSlider = document.getElementById('timeline-slider');
+                        const timelineCurrentTime = document.getElementById('timeline-current-time');
+                        if (timelineSlider) timelineSlider.value = kf.time;
+                        if (timelineCurrentTime) timelineCurrentTime.textContent = `${kf.time.toFixed(2)}s`;
+
+                        // 3. Perbarui UI tombol play/pause
+                        updatePlayPauseButton();
+
+                        // 4. Minta kanvas untuk menggambar ulang pratinjau
+                        needsRedraw = true;
+                    }
+
+                    // 5. Selalu perbarui daftar keyframe dan panel propertinya
+                    renderKeyframeList();
                 });
 
                 // Event listener untuk input waktu
@@ -3224,26 +4046,114 @@
                         const id = Number(item.dataset.keyframeId);
                         const kf = state.object.animation.keyframes.find(k => k.id === id);
                         if (kf) {
-                            kf.time = Math.max(0, parseFloat(e.target.value) || 0);
-                            renderKeyframeList(); // Urutkan ulang dan render kembali
+                            const newTime = Math.max(0, parseFloat(e.target.value) || 0);
+                            kf.time = newTime;
+                            
+                            // Panggil fungsi untuk memperpanjang durasi
+                            checkAndExtendDuration(newTime);
+
+                            renderKeyframeList();
                             requestRedraw();
                         }
                     }
                 });
+   
+                document.getElementById('play-pause-btn').addEventListener('click', () => {
+                    const animState = state.object.animation;
+                    if (!state.object.image.element && !animState.isPlaying) {
+                        showTopNotification("notificationWarnObject"); // Tampilkan notifikasi
+                        return; // Hentikan fungsi
+                    }                    
+                    animState.isPlaying = !animState.isPlaying;
 
-                document.getElementById('preview-simple-open').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    state.object.animation.simple.previewing = 'open';
-                    state.object.animation.simple.previewStartTime = performance.now();
-                    requestRedraw();
+                    if (animState.isPlaying) {
+                        // Jika melanjutkan, hitung ulang waktu mulai animasi
+                        // untuk menghindari lompatan waktu.
+                        animState.previewTime = null;
+                        animationStartTime = performance.now() - pauseStartTime;
+                    } else {
+                        // Jika pause, simpan waktu saat ini
+                        pauseStartTime = performance.now() - animationStartTime;
+                        animState.previewTime = (pauseStartTime / 1000) % state.export.duration;
+                        needsRedraw = true; // gambar frame terakhir saat pause
+                    }
+                    
+                    updatePlayPauseButton();
                 });
 
-                document.getElementById('preview-simple-close').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    state.object.animation.simple.previewing = 'close';
-                    state.object.animation.simple.previewStartTime = performance.now();
-                    requestRedraw();
-                });                
+                // --- Timeline/Playhead Scrubbing Logic (Standard Drag) ---
+                const timelineSlider = document.getElementById('timeline-slider');
+                if (timelineSlider) {
+                    const timelineCurrentTime = document.getElementById('timeline-current-time');
+
+                    const startScrub = () => {
+                        isScrubbing = true;
+                        state.object.animation.isPlaying = false;
+                        updatePlayPauseButton();
+                    };
+
+                    const stopScrub = () => {
+                        if (isScrubbing) {
+                            isScrubbing = false;
+                            const lastScrubTime = state.object.animation.previewTime;
+                            if (lastScrubTime !== null) {
+                                animationStartTime = performance.now() - (lastScrubTime * 1000);
+                                pauseStartTime = lastScrubTime * 1000;
+                            }
+                        }
+                    };
+
+                    const doScrub = (e) => {
+                        if (!isScrubbing) return;
+                        const newTime = parseFloat(e.target.value);
+                        state.object.animation.previewTime = newTime;
+                        if (timelineCurrentTime) {
+                            timelineCurrentTime.textContent = `${newTime.toFixed(2)}s`;
+                        }
+                        requestRedraw();
+                    };
+
+                    timelineSlider.addEventListener('mousedown', startScrub);
+                    timelineSlider.addEventListener('touchstart', startScrub, { passive: true });
+                    timelineSlider.addEventListener('input', doScrub);
+                    document.addEventListener('mouseup', stopScrub);
+                    document.addEventListener('touchend', stopScrub);
+                }
+
+                let hideTooltipTimeout; // Variabel untuk menampung timer
+
+                document.querySelectorAll('.info-tooltip-trigger').forEach(trigger => {
+                    const tooltip = trigger.querySelector('.info-tooltip');
+                    if (!tooltip) return;
+
+                    const showTooltip = () => {
+                        clearTimeout(hideTooltipTimeout); // Batalkan timer untuk menyembunyikan
+                        tooltip.classList.add('tooltip-visible'); // Tampilkan tooltip
+                    };
+
+                    const startHideTimer = () => {
+                        hideTooltipTimeout = setTimeout(() => {
+                            tooltip.classList.remove('tooltip-visible');
+                        }, 500); // Sembunyikan setelah 500ms
+                    };
+
+                    trigger.addEventListener('mouseenter', showTooltip);
+                    trigger.addEventListener('mouseleave', startHideTimer);
+                    tooltip.addEventListener('mouseenter', showTooltip); // Jaga agar tetap tampil saat kursor di atas tooltip
+                    tooltip.addEventListener('mouseleave', startHideTimer);
+                });
+                
+                // MODIFIKASI & TAMBAHKAN Listener untuk sinkronisasi durasi
+                const exportDurationInput = document.getElementById('export-duration-input');
+                const timelineDurationInput = document.getElementById('timeline-duration-input');
+                
+                if (exportDurationInput) {
+                    exportDurationInput.addEventListener('change', (e) => syncDurationInputs(e.target.value));
+                }
+                if (timelineDurationInput) {
+                    timelineDurationInput.addEventListener('change', (e) => syncDurationInputs(e.target.value));
+                }     
+                setTimeout(autoAdjustMobileLayout, 500);                  
                 updateUIFromState();
             }
             init(); 
