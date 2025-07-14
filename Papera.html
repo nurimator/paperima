@@ -1304,7 +1304,6 @@
 
             let maskImages = [];
             let layerImages = [];
-            
             let originalOverlayImages = []; 
             
             // Offscreen canvases for processing
@@ -1325,7 +1324,6 @@
             let isCacheGenerationNeeded = true; // Flag untuk memicu pembuatan ulang cache
             let isLiveTornEdgePreview = false;
             let originalOverlaySpeed = 0;
-            let generationController = { timeoutId: null };
             let isAdjustingTornEdge = false;
             let isGeneratingCache = false;
 
@@ -1333,10 +1331,7 @@
             let lastDebugUpdateTime = 0; // Timer untuk membatasi update
             let fps = 0;
             let frameCount = 0;
-            let lastFPSTime = 0;
-            let highFpsSince = 0; // Timestamp kapan FPS tinggi mulai terdeteksi
-            let lowFpsSince = 0;  // Timestamp kapan FPS rendah mulai terdeteksi
-            const RESOLUTION_LEVELS = ['360', '540', '720'];            
+            let lastFPSTime = 0;           
 
             let animationFrameId = null;
             let needsRedraw = true; // Flag to optimize rendering
@@ -1503,24 +1498,13 @@
                     tabTitleBackground: 'Background Settings', tabTitleObject: 'Object Settings', tabTitleAnimasi: 'Animation Settings', tabTitleInfo: 'Preferences',
                     activeObject: 'Active Object',
                     animationObject: 'Object Animation',
-                    animIn: 'In Animation',
-                    animOut: 'Out Animation',
-                    preview: 'Preview',
-                    type: 'Type', 
                     dropShadowTooltip: 'We recommend turning off drop shadow when exporting for a greenscreen. <a href="#" target="_blank" class="text-blue-400 hover:underline">Learn more</a>',
-                    move: 'Move',
-                    zoom: 'Zoom',
-                    direction: 'Direction',
-                    distance: 'Distance (%)',
-                    initialScale: 'Initial Scale (%)',
-                    finalScale: 'Final Scale (%)',
                     easing: 'Easing',
                     linear: 'Linear',
                     easeIn: 'Ease In',
                     easeOut: 'Ease Out',
                     backIn: 'Back In',
                     backOut: 'Back Out',
-                    startAt: 'Start At (sec)',
                     instant: 'Instant',
                     easeInOut: 'Ease In Out',
                     backInOut: 'Back In Out',
@@ -1573,24 +1557,13 @@
                     tabTitleBackground: 'Pengaturan Latar', tabTitleObject: 'Pengaturan Objek', tabTitleAnimasi: 'Pengaturan Animasi', tabTitleInfo: 'Preferensi',
                     activeObject: 'Objek Aktif',
                     animationObject: 'Animasi Objek',
-                    animIn: 'Animasi In',
-                    animOut: 'Animasi Out',
-                    preview: 'Pratinjau',
-                    type: 'Tipe',
                     dropShadowTooltip: 'Kami menyarankan dropshadow dimatikan jika ekspor sebagai greenscreen. <a href="#" target="_blank" class="text-blue-400 hover:underline">Pelajari selengkapnya</a>',
-                    move: 'Geser',
-                    zoom: 'Zoom',
-                    direction: 'Arah',
-                    distance: 'Jarak (%)',
-                    initialScale: 'Skala Awal (%)',
-                    finalScale: 'Skala Akhir (%)',
                     easing: 'Easing',
                     linear: 'Linear',
                     easeIn: 'Ease In',
                     easeOut: 'Ease Out',
                     backIn: 'Back In',
                     backOut: 'Back Out',
-                    startAt: 'Mulai (detik ke-)',
                     instant: 'Instan',
                     easeInOut: 'Ease In Out',
                     backInOut: 'Back In Out',
@@ -2271,24 +2244,6 @@
 					requestRedraw();
 				}
 			}
-
-			function updateTornEdgeAnimation(timestamp) {
-				const objectState = state.object;
-				if (!objectState.stroke.enabled || !objectState.image.element || objectState.stroke.width <= 0) return;
-
-				const speed = objectState.paperFoldOverlay.speed;
-				if (speed <= 0) return;
-
-				const timeSinceLastSwitch = timestamp - objectState.stroke.lastTornEdgeSwitchTime;
-				const interval = 1000 / speed;
-
-				if (timeSinceLastSwitch >= interval) {
-					objectState.stroke.currentVariationIndex = (objectState.stroke.currentVariationIndex + 1) % 4;
-					objectState.stroke.lastTornEdgeSwitchTime = timestamp;
-					requestRedraw();
-				}
-			}
-            
             
             /**
              * Menyesuaikan resolusi pratinjau secara otomatis berdasarkan lebar layar.
@@ -2763,25 +2718,6 @@ Object       : ${objFileName}
                     return name.substring(0, maxLength) + '...' + ext;
                 }
                 return filename;
-            }
-
-            // Tambahkan fungsi pembantu ini di mana saja (misal, di atas `updateUIFromState`)
-            function updateAnimationPanels(type) {
-                const animState = state.object.animation[type];
-                const isMove = animState.type === 'move';
-                document.getElementById(`anim-${type}-move-controls`).classList.toggle('hidden', !isMove);
-                document.getElementById(`anim-${type}-zoom-controls`).classList.toggle('hidden', isMove);
-
-                // Update tombol aktif
-                document.querySelectorAll(`#anim-${type}-type-btns button`).forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.type === animState.type);
-                });
-                document.querySelectorAll(`#anim-${type}-move-direction-btns button`).forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.direction === animState.move.direction);
-                });
-                document.querySelectorAll(`#anim-${type}-easing-btns button`).forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.easing === animState.easing);
-                });
             }
 
             let activeKeyframeUI = null; // Variabel global untuk melacak UI keyframe yang aktif
@@ -3807,10 +3743,6 @@ Object       : ${objFileName}
                             state.activePreviewResolution = '540';
                         }
 
-                        // Reset timer auto-resolution setiap kali ada interaksi manual
-                        highFpsSince = 0;
-                        lowFpsSince = 0;
-
                         updateUIFromState(); // Perbarui UI tombol
                         resizeAndRedrawAll(); // Terapkan resolusi baru
                     }
@@ -4388,7 +4320,7 @@ Object       : ${objFileName}
 
                     timelineSlider.addEventListener('mousedown', startScrub);
                     timelineSlider.addEventListener('touchstart', startScrub, { passive: true });
-                    timelineSlider.addEventListener('input', throttle(doScrub, 40));
+                    timelineSlider.addEventListener('input', throttle(doScrub, 20));
                     document.addEventListener('mouseup', stopScrub);
                     document.addEventListener('touchend', stopScrub);
                 }
