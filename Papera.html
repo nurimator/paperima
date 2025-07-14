@@ -476,14 +476,14 @@
         }
         #debug-screen {
             position: fixed;
-            top: 1rem;
-            left: 1rem;
+            top: 0.5rem;
+            left: 0.5rem;
             background-color: rgba(15, 23, 42, 0.85); /* --bg-dark dengan transparansi */
             color: var(--text-primary);
-            padding: 0.75rem 1rem;
+            padding: 0.25rem 0.5rem;
             font-family: monospace;
-            font-size: 13px;
-            line-height: 1.6;
+            font-size: 8px;
+            line-height: 1.2;
             z-index: 9999;
             pointer-events: none; /* Penting agar bisa klik menembus elemen ini */
             white-space: pre;     /* Agar format teks dengan newline terjaga */
@@ -856,6 +856,15 @@
                                 <div class="flex items-center gap-3 md:gap-3">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="accordion-chevron transition-transform duration-300 text-[var(--text-muted)]"><path d="m6 9 6 6 6-6"/></svg>
                                     <h2 class="text-base font-semibold text-slate-300" data-translate-key="dropShadow"></h2>
+                                    <div class="relative info-tooltip-trigger">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle text-[var(--text-muted)] cursor-pointer" viewBox="0 0 16 16">
+                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.064.293.006.399.287.47l.45.082.082-.38-.29-.071a.499.499 0 0 1-.316-.66l.738-3.468a.499.499 0 0 1 .66-.316l.29.071zM8 4.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                                        </svg>
+                                        <div class="info-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-xs bg-slate-900/95 p-3 text-xs text-slate-200 border border-[var(--border-color)] shadow-lg z-10 pointer-events-none">
+                                            <p data-translate-key="dropShadowTooltip"></p>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="flex items-center">
                                     <button class="reset-section-btn" data-section-key="shadow" data-translate-key-title="resetDropShadowTitle">
@@ -1052,64 +1061,85 @@
 
                 <!-- Info/Settings Tab Content -->
                 <div id="info-tab-content" class="tab-content hidden space-y-4 md:space-y-4 text-slate-300">
-                     <div class="space-y-2 md:space-y-2">
-                         <h2 class="text-lg font-bold text-slate-300" data-translate-key="language"></h2>
-                         <div id="language-btns" class="grid grid-cols-2 gap-2 md:gap-2 mt-2 btn-group-toggle">
-                             <button data-lang="en" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150">English</button>
-                             <button data-lang="id" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150">Indonesia</button>
-                         </div>
-                    </div>
-                    <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
-                        <h2 class="text-lg font-bold text-slate-300" data-translate-key="displayMode"></h2>
-                        <div id="display-mode-btns" class="flex flex-col gap-2 mt-2 btn-group-toggle">
-                             <button data-mode="auto" class="w-full p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="auto"></button>
-                             <button data-mode="mobile" class="w-full p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="mobile"></button>
-                             <button data-mode="desktop" class="w-full p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="desktop"></button>
+                    <div class="space-y-4">
+                        <div class="space-y-2 md:space-y-2">
+                            <h2 class="text-lg font-bold text-slate-300" data-translate-key="language"></h2>
+                            <div id="language-btns" class="grid grid-cols-2 gap-2 md:gap-2 mt-2 btn-group-toggle">
+                                <button data-lang="en" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150">English</button>
+                                <button data-lang="id" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150">Indonesia</button>
+                            </div>
                         </div>
-                        <p id="display-mode-warning" class="text-sm text-red-400 mt-2 hidden" data-translate-key="displayModeWarning"></p>
-                    </div>
-                    <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
-                        <h2 class="text-lg font-bold text-slate-300" data-translate-key="uiSize"></h2>
-                        <div id="ui-size-btns" class="grid grid-cols-3 gap-2 md:gap-2 mt-2 btn-group-toggle">
-                             <button data-size="compact" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="compact"></button>
-                             <button data-size="normal" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="normal"></button>
-                             <button data-size="luas" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="spacious"></button>
+                        <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
+                            <h2 class="text-lg font-bold text-slate-300" data-translate-key="displayMode"></h2>
+                            <div id="display-mode-btns" class="flex flex-col gap-2 mt-2 btn-group-toggle">
+                                <button data-mode="auto" class="w-full p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="auto"></button>
+                                <button data-mode="mobile" class="w-full p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="mobile"></button>
+                                <button data-mode="desktop" class="w-full p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="desktop"></button>
+                            </div>
+                            <p id="display-mode-warning" class="text-sm text-red-400 mt-2 hidden" data-translate-key="displayModeWarning"></p>
                         </div>
-                    </div>
-                    <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
-                        <h2 class="text-lg font-bold text-slate-300" data-translate-key="previewResolution"></h2>
-                        <div id="preview-resolution-btns" class="grid grid-cols-4 gap-2 md:gap-2 mt-2 btn-group-toggle">
-                            <button data-res="auto" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium" data-translate-key="auto"></button>
-                            <button data-res="360" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium">360p</button>
-                            <button data-res="540" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium">540p</button>
-                            <button data-res="720" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium">720p</button>
+                        <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
+                            <h2 class="text-lg font-bold text-slate-300" data-translate-key="uiSize"></h2>
+                            <div id="ui-size-btns" class="grid grid-cols-3 gap-2 md:gap-2 mt-2 btn-group-toggle">
+                                <button data-size="compact" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="compact"></button>
+                                <button data-size="normal" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="normal"></button>
+                                <button data-size="luas" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="spacious"></button>
+                            </div>
                         </div>
-                        <p class="text-xs text-[var(--text-muted)] mt-2" data-translate-key="previewResolutionWarning"></p>
-                    </div>
-                    <div class="pt-4 border-t border-[var(--border-color)] flex items-center justify-between">
-                        <label for="debug-screen-switch" class="text-sm font-medium text-slate-300" data-translate-key="debugScreen"></label>
-                        <label class="switch">
-                            <input type="checkbox" id="debug-screen-switch">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>                                      
-                    <h2 class="text-lg font-bold pt-4 border-t border-[var(--border-color)]" data-translate-key="appInfo"></h2>
-                    <p class="text-sm" data-translate-key="appDescription"></p>
-                    
-                    <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
-                        <h3 class="text-md font-semibold" data-translate-key="creatorInfo"></h3>
-                        <p class="text-sm" data-translate-key="creatorInfo2"></p>
-                        <div class="flex flex-col space-y-2 md:space-y-2 mt-4">
-                            <a href="https://lynk.id/nurimator" target="_blank" class="w-full px-4 py-2 bg-[var(--accent-color)] text-white text-sm font-semibold text-center hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="donateLocal">
-                            </a>
-                            <a href="https://lynk.id/nurimator" target="_blank" class="w-full px-4 py-2 bg-[var(--accent-color)] text-white text-sm font-semibold text-center hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="donateLocal">
-                            </a>
-                            <a href="https://ko-fi.com/nurimator" target="_blank" class="w-full px-4 py-2 bg-[var(--accent-color)] text-white text-sm font-semibold text-center hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="donateGlobal">
-                            </a>
+                        <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-lg font-bold text-slate-300" data-translate-key="previewResolution"></h2>
+                                <div class="relative info-tooltip-trigger">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle text-[var(--text-muted)] cursor-pointer" viewBox="0 0 16 16">
+                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.064.293.006.399.287.47l.45.082.082-.38-.29-.071a.499.499 0 0 1-.316-.66l.738-3.468a.499.499 0 0 1 .66-.316l.29.071zM8 4.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                                    </svg>
+                                    <div class="info-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-xs bg-slate-900/95 p-3 text-xs text-slate-200 border border-[var(--border-color)] shadow-lg z-10 pointer-events-none">
+                                        <p data-translate-key="previewResolutionWarning"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="preview-resolution-btns" class="grid grid-cols-4 gap-2 md:gap-2 mt-2 btn-group-toggle">
+                                <button data-res="auto" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium" data-translate-key="auto"></button>
+                                <button data-res="360" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium">360p</button>
+                                <button data-res="540" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium">540p</button>
+                                <button data-res="720" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium">720p</button>
+                            </div>
+                            </div>
+                        <div class="pt-4 border-t border-[var(--border-color)] flex items-center justify-between">
+                            <label for="debug-screen-switch" class="text-sm font-medium text-slate-300" data-translate-key="debugScreen"></label>
+                            <label class="switch">
+                                <input type="checkbox" id="debug-screen-switch">
+                                <span class="toggle-slider"></span>
+                            </label>
                         </div>
                     </div>
-                </div>
-                <!-- Reset All Settings Button -->
+
+                    <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
+                        <h2 class="text-lg font-bold text-slate-300" data-translate-key="appInfo"></h2>
+                        <p class="text-sm" data-translate-key="appDescription"></p>
+                        <p class="text-sm pt-2" data-translate-key="creatorInfo2"></p>
+                    </div>
+
+                    <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
+                        <a href="https://www.youtube.com/@nurimator/shorts" target="_blank" class="flex items-center justify-center gap-2 w-full px-4 py-2 bg-slate-600/50 text-white text-sm font-semibold text-center hover:bg-slate-500/50 transition-all duration-150 cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-youtube" viewBox="0 0 16 16"><path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.188-.01.957-.074 1.957l-.008.104-.022.26-.01.104c-.048.519-.119 1.023-.22 1.402a2.01 2.01 0 0 1-1.415 1.42c-1.16.308-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.01 2.01 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31.4 31.4 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.908l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.01 2.01 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.004.171-.007A99.788 99.788 0 0 1 7.858 2h.193zM6.4 5.209v4.818l4.157-2.408L6.4 5.209z"/></svg>
+                            Tutorial
+                        </a>
+                        <a href="https://github.com/your-repo/papera-me" target="_blank" class="flex items-center justify-center gap-2 w-full px-4 py-2 bg-slate-600/50 text-white text-sm font-semibold text-center hover:bg-slate-500/50 transition-all duration-150 cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+                            Source Code
+                        </a>
+                        <a href="https://github.com/your-repo/papera-me/blob/main/LICENSE" target="_blank" class="flex items-center justify-center gap-2 w-full px-4 py-2 bg-slate-600/50 text-white text-sm font-semibold text-center hover:bg-slate-500/50 transition-all duration-150 cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-text" viewBox="0 0 16 16"><path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"/><path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5L9.5 0zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/></svg>
+                            Lisensi
+                        </a>
+                        <a href="https://lynk.id/nurimator" target="_blank" class="flex items-center justify-center gap-2 w-full px-4 py-2 bg-[var(--accent-color)] text-white text-sm font-semibold text-center hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/></svg>
+                            Dukung Kreator
+                        </a>
+                    </div>
+                </div>                <!-- Reset All Settings Button -->
                 <div class="space-y-4 md:space-y-4 pt-4 border-t border-[var(--border-color)] mt-4">
                     <button id="reset-settings-btn" class="flex items-center justify-center gap-2 md:gap-2 w-full px-5 py-3 bg-[var(--danger-color)] text-white text-sm font-semibold hover:bg-[var(--danger-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="resetAll"></button>
 
@@ -1289,6 +1319,16 @@
 
             const tempOverlayCanvas = document.createElement('canvas'); 
 
+            let originalDebugContent = null;
+
+            let tornEdgeCache = []; // Array untuk menyimpan hasil render sobekan
+            let isCacheGenerationNeeded = true; // Flag untuk memicu pembuatan ulang cache
+            let isLiveTornEdgePreview = false;
+            let originalOverlaySpeed = 0;
+            let generationController = { timeoutId: null };
+            let isAdjustingTornEdge = false;
+            let isGeneratingCache = false;
+
             const debugScreenEl = document.getElementById('debug-screen'); // Simpan elemen
             let lastDebugUpdateTime = 0; // Timer untuk membatasi update
             let fps = 0;
@@ -1306,7 +1346,7 @@
             let animationStartTime = 0; // <-- TAMBAHKAN INI
             // Default state for a single object
             const DEFAULT_OBJECT_STATE = {
-                image: { element: null, size: 80, offset: { x: 0, y: 0 }, rotation: 0, file: null },
+                image: { element: null, originalElement: null, size: 80, offset: { x: 0, y: 0 }, rotation: 0, file: null },
                 stroke: { enabled: true, width: 25, roughness: 25, detail: 0.020, seed: 0 },
                 shadow: { enabled: true, offsetX: 5, offsetY: -5, blur: 5, color: '#000000', opacity: 50 },
                 color: { enabled: false, hue: 0, saturation: 0, brightness: 0, colorize: false },
@@ -1394,6 +1434,7 @@
             };
 
             let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+            let keyframeClipboard = null;
             
             const RESOLUTION_MAPS = {
                 '360': { '16/9': { w: 640, h: 360 }, '9/16': { w: 360, h: 640 }, '4/3': { w: 480, h: 360 }, '3/4': { w: 360, h: 480 }, '1/1': { w: 360, h: 360 } },
@@ -1465,7 +1506,8 @@
                     animIn: 'In Animation',
                     animOut: 'Out Animation',
                     preview: 'Preview',
-                    type: 'Type',
+                    type: 'Type', 
+                    dropShadowTooltip: 'We recommend turning off drop shadow when exporting for a greenscreen. <a href="#" target="_blank" class="text-blue-400 hover:underline">Learn more</a>',
                     move: 'Move',
                     zoom: 'Zoom',
                     direction: 'Direction',
@@ -1487,9 +1529,9 @@
                     simple: 'Simple',
                     advanced: 'Advanced',
                     openAnim: 'Opening Animation',
-                    closeAnim: 'Closing Animation', timeline: 'Timeline',
-                    resetPreferences: 'Reset Preferences',
-                    confirmResetPrefsTitle: 'Confirm Preferences Reset',
+                    closeAnim: 'Closing Animation', timeline: 'Timeline', processingImageEffect: 'Processing image effect...',
+                    resetPreferences: 'Reset Preferences', preparingExportCanvas: 'Preparing export canvas...',
+                    confirmResetPrefsTitle: 'Confirm Preferences Reset', completing: 'Completing',
                     previewResolution: 'Preview Resolution', debugScreen: 'Debug Screen',
                     previewResolutionWarning: 'Preview resolution does not affect the final export resolution.',
                     exportInfoTooltip: 'Currently, the only available video export option is .webm to keep the app free and lightweight. <a href="https://www.webmproject.org/about/" target="_blank" rel="noopener noreferrer" class="text-[var(--accent-color)] hover:underline">Learn more</a>',
@@ -1535,6 +1577,7 @@
                     animOut: 'Animasi Out',
                     preview: 'Pratinjau',
                     type: 'Tipe',
+                    dropShadowTooltip: 'Kami menyarankan dropshadow dimatikan jika ekspor sebagai greenscreen. <a href="#" target="_blank" class="text-blue-400 hover:underline">Pelajari selengkapnya</a>',
                     move: 'Geser',
                     zoom: 'Zoom',
                     direction: 'Arah',
@@ -1556,9 +1599,9 @@
                     simple: 'Simpel',
                     advanced: 'Lanjutan',
                     openAnim: 'Animasi Terbuka',
-                    closeAnim: 'Animasi Tertutup', timeline: 'Timeline',
-                    resetPreferences: 'Reset Preferensi',
-                    confirmResetPrefsTitle: 'Konfirmasi Reset Preferensi',
+                    closeAnim: 'Animasi Tertutup', timeline: 'Timeline', processingImageEffect: 'Memproses efek gambar...',
+                    resetPreferences: 'Reset Preferensi', preparingExportCanvas: 'Menyiapkan kanvas ekspor...',
+                    confirmResetPrefsTitle: 'Konfirmasi Reset Preferensi', completing: 'Menyelesaikan',
                     previewResolution: 'Resolusi Pratinjau', debugScreen: 'Layar Debug',
                     previewResolutionWarning: 'Resolusi pratinjau tidak memengaruhi resolusi ekspor.',
                     exportInfoTooltip: 'Saat ini opsi file video ekspor yang tersedia adalah .webm untuk menjaga aplikasi tetap gratis dan ringan. <a href="https://www.webmproject.org/about/" target="_blank" rel="noopener noreferrer" class="text-[var(--accent-color)] hover:underline">Pelajari selengkapnya</a>',
@@ -1566,9 +1609,6 @@
                 }
             };
             
-            /**
-             * Converts a HEX color to an RGBA string.
-             */
             function hexToRgba(hex, opacity) {
                 let r = 0, g = 0, b = 0;
                 if (hex.length === 7) { 
@@ -1579,9 +1619,64 @@
                 return `rgba(${r},${g},${b},${opacity})`;
             }
 
+            function throttle(func, delay) {
+                let inProgress = false;
+                return (...args) => {
+                    if (inProgress) {
+                        return;
+                    }
+                    inProgress = true;
+                    setTimeout(() => {
+                        func(...args);
+                        inProgress = false;
+                    }, delay);
+                };
+            }   
+            
+            // Elemen untuk notifikasi pemrosesan
+            const processingNotificationEl = document.getElementById('processing-notification');            
+            function showProcessingMessage(messageKey) {
+                if (processingNotificationEl) {
+                    const message = translations[state.language][messageKey] || messageKey;
+                    processingNotificationEl.textContent = message;
+                    processingNotificationEl.classList.remove('hidden');
+                }
+            }
+
+            /**
+             * Menyembunyikan pesan pemrosesan.
+             */
+            function hideProcessingMessage() {
+                if (processingNotificationEl) {
+                    processingNotificationEl.classList.add('hidden');
+                }
+            }
+
+            function toggleProcessingMessage(show, messageKey) {
+                const debugScreenEl = document.getElementById('debug-screen');
+                if (!debugScreenEl) return;
+
+                if (show) {
+                    if (state.debugScreenEnabled) {
+                        originalDebugContent = debugScreenEl.textContent;
+                    }
+                    const message = translations[state.language][messageKey] || messageKey;
+                    debugScreenEl.textContent = message;
+                    debugScreenEl.classList.remove('hidden');
+
+                } else {
+                    if (state.debugScreenEnabled && originalDebugContent) {
+                        debugScreenEl.textContent = originalDebugContent;
+                        originalDebugContent = null;
+                    } else {
+                        debugScreenEl.classList.add('hidden');
+                    }
+                }
+            }            
+
             function getVisualStateAtTime(timeInSeconds, keyframes) {
                 const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
-                let currentState = 'open'; // Asumsi awal, objek selalu terbuka
+                let currentState = 'open';
 
                 for (const kf of sortedKeyframes) {
                     if (kf.time < timeInSeconds) {
@@ -1590,7 +1685,6 @@
                         } else if (kf.paperAnim === 'close') {
                             currentState = 'closed';
                         }
-                        // Jika 'none', state tidak berubah dari sebelumnya.
                     } else {
                         break;
                     }
@@ -1601,7 +1695,6 @@
             // Fungsi ini berisi logika keyframe yang sudah ada sebelumnya
             function getAdvancedTransform(timeInSeconds, objectState) {
                 const keyframes = [...objectState.animation.keyframes].sort((a, b) => a.time - b.time);
-                // Inisialisasi dengan nilai dari object transform, bukan nilai statis
                 let currentTransform = { 
                     x: objectState.image.offset.x, 
                     y: objectState.image.offset.y, 
@@ -1660,18 +1753,73 @@
                 return { transform: currentTransform, prevKeyframe, nextKeyframe };
             }
 
+            async function generateTornEdgeCache() {
+                if (isGeneratingCache || !state.object.image.element || !state.object.stroke.enabled) {
+                    return
+                }
 
-            // GANTI SELURUH FUNGSI INI
+                toggleProcessingMessage(true, 'processingImageEffect');
+                isGeneratingCache = true
+                isCacheGenerationNeeded = false
+                console.log("Memulai pembuatan cache progresif...")
+
+                                
+                tornEdgeCache = [];
+                console.log("Cache lama dikosongkan, memulai pembuatan cache baru...");
+
+                const objectState = state.object
+                const seeds = [20, 30, 40, 10]
+                const sourceImg = objectState.image.element
+                const newCache = []
+
+                const BASE_RENDER_WIDTH = 1080.0
+                const renderScaleFactor = sourceImg.width / BASE_RENDER_WIDTH
+
+                for (let i = 0; i < seeds.length; i++) {
+                    const seed = seeds[i]
+                    const cacheCanvas = document.createElement('canvas')
+                    const cacheCtx = cacheCanvas.getContext('2d')
+                    cacheCanvas.width = sourceImg.width
+                    cacheCanvas.height = sourceImg.height
+
+                    const adjustedStrokeWidth = objectState.stroke.width * renderScaleFactor
+                    const adjustedRoughness = objectState.stroke.roughness * renderScaleFactor
+                    const adjustedDetail = objectState.stroke.detail / renderScaleFactor
+
+                    tornDilate.setAttribute('radius', adjustedStrokeWidth)
+                    tornDisplacement.setAttribute('scale', adjustedRoughness)
+                    tornTurbulence.setAttribute('baseFrequency', adjustedDetail)
+                    tornTurbulence.setAttribute('seed', seed)
+                    tornFlood.setAttribute('flood-color', '#FFFFFF')
+
+                    cacheCtx.filter = 'url(#combined-filter)'
+                    cacheCtx.drawImage(sourceImg, 0, 0)
+
+                    const img = new Image()
+                    img.src = cacheCanvas.toDataURL()
+                    await img.decode()
+
+                    newCache[i] = img
+                    tornEdgeCache = [...newCache]
+                    requestRedraw()
+
+                    await new Promise(resolve => setTimeout(resolve, 16))
+                }
+
+                isGeneratingCache = false
+                toggleProcessingMessage(false);
+                console.log("Pembuatan cache progresif selesai.")
+            }
+
+
             function drawFinalObject(objectState, imgW, imgH, totalOffsetX, totalOffsetY, tornEdgesEnabled, layerImage = null, maskImage = null) {
-                // Pastikan semua kanvas sementara bersih sebelum digunakan
+                const centerX = contentCanvas.width / 2;
+                const centerY = contentCanvas.height / 2;
+
                 objectCtx.clearRect(0, 0, objectCanvas.width, objectCanvas.height);
                 contentCtx.clearRect(0, 0, contentCanvas.width, contentCanvas.height);
                 finalObjectCtx.clearRect(0, 0, finalObjectCanvas.width, finalObjectCanvas.height);
 
-                const centerX = objectCanvas.width / 2;
-                const centerY = objectCanvas.height / 2;
-
-                // TAHAP 1: Siapkan konten visual gabungan (objek + warna + tekstur)
                 let fgColorFilterString = '';
                 if (objectState.color.enabled) {
                     let filterParts = [];
@@ -1681,9 +1829,10 @@
                     filterParts.push(`brightness(${100 + objectState.color.brightness}%)`);
                     fgColorFilterString = filterParts.join(' ');
                 }
+
                 contentCtx.save();
                 contentCtx.filter = fgColorFilterString;
-                contentCtx.translate(centerX, centerY); // Gambar di tengah
+                contentCtx.translate(centerX, centerY);
                 contentCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
                 contentCtx.restore();
 
@@ -1695,18 +1844,14 @@
                     tempCtx.drawImage(overlayImage, 0, 0);
                     const imageData = tempCtx.getImageData(0, 0, tempOverlayCanvas.width, tempOverlayCanvas.height);
                     const data = imageData.data;
-                    
-                    // Jika toggle 'enabled' aktif, gunakan opacity dari slider. Jika tidak, paksa opacity jadi 0.
                     const effectStrength = objectState.paperFoldOverlay.enabled ? objectState.paperFoldOverlay.opacity : 0;
                     const strength = (100 - effectStrength) / 100;
-
                     for (let i = 0; i < data.length; i += 4) {
                         data[i] += (255 - data[i]) * strength;
                         data[i + 1] += (255 - data[i + 1]) * strength;
                         data[i + 2] += (255 - data[i + 2]) * strength;
                     }
                     tempCtx.putImageData(imageData, 0, 0);
-
                     contentCtx.save();
                     contentCtx.translate(centerX, centerY);
                     contentCtx.globalCompositeOperation = objectState.paperFoldOverlay.blendMode;
@@ -1722,67 +1867,95 @@
                     contentCtx.restore();
                 }
 
-                // TAHAP 2: Buat bentuk sobekan dan potong konten
                 if (tornEdgesEnabled && objectState.stroke.width > 0) {
-                    // JIKA TORN EDGES AKTIF: Lakukan logika sobekan yang sudah ada.
-                    const BASE_RENDER_WIDTH = 1080.0;
-                    const renderScaleFactor = imgW / BASE_RENDER_WIDTH;
-                    const adjustedStrokeWidth = objectState.stroke.width * renderScaleFactor;
-                    const adjustedRoughness = objectState.stroke.roughness * renderScaleFactor;
-                    const canvasResolutionScale = canvas.height / 720.0;
-                    const adjustedDetail = objectState.stroke.detail / canvasResolutionScale;
-                    
-                    tornDilate.setAttribute('radius', adjustedStrokeWidth);
-                    tornDisplacement.setAttribute('scale', adjustedRoughness);
-                    tornTurbulence.setAttribute('baseFrequency', adjustedDetail);
-                    tornTurbulence.setAttribute('seed', objectState.stroke.seed);
-                    tornFlood.setAttribute('flood-color', '#FFFFFF');
-
+                    objectCtx.clearRect(0, 0, objectCanvas.width, objectCanvas.height);
                     objectCtx.save();
-                    objectCtx.filter = 'url(#combined-filter)';
-                    objectCtx.translate(centerX, centerY);
-                    objectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
-                    objectCtx.restore();
 
+                    if (isLiveTornEdgePreview) {
+
+                        const previewCanvas = tempOverlayCanvas; 
+                        const previewCtx = previewCanvas.getContext('2d');
+                        
+                        const sourceImg = objectState.image.element;
+                        previewCanvas.width = sourceImg.width;
+                        previewCanvas.height = sourceImg.height; 
+
+                        const BASE_RENDER_WIDTH = 1080.0;
+                        const renderScaleFactor = sourceImg.width / BASE_RENDER_WIDTH; 
+                        const adjustedStrokeWidth = objectState.stroke.width * renderScaleFactor;
+                        const adjustedRoughness = objectState.stroke.roughness * renderScaleFactor;
+                        const adjustedDetail = objectState.stroke.detail / renderScaleFactor;
+
+                        tornDilate.setAttribute('radius', adjustedStrokeWidth);
+                        tornDisplacement.setAttribute('scale', adjustedRoughness);
+                        tornTurbulence.setAttribute('baseFrequency', adjustedDetail);
+                        tornTurbulence.setAttribute('seed', 10);
+                        tornFlood.setAttribute('flood-color', '#FFFFFF');
+
+                        previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+                        previewCtx.filter = 'url(#combined-filter)';
+                        previewCtx.drawImage(sourceImg, 0, 0);
+
+                        objectCtx.filter = 'none'; 
+                        objectCtx.translate(centerX, centerY);
+                        objectCtx.drawImage(previewCanvas, -imgW / 2, -imgH / 2, imgW, imgH); 
+                    } else {
+                        let cachedImage = tornEdgeCache[objectState.paperFoldOverlay.currentImageIndex];
+
+                        if (!cachedImage && tornEdgeCache.length > 0) {
+                            cachedImage = tornEdgeCache[0];
+                        }
+                        
+                        if (cachedImage && cachedImage.complete) {
+                            objectCtx.translate(centerX, centerY);
+                            objectCtx.drawImage(cachedImage, -imgW / 2, -imgH / 2, imgW, imgH);
+                        } else {
+                            objectCtx.translate(centerX, centerY);
+                            objectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
+                        }
+                    }
+
+                    objectCtx.restore();
                     contentCtx.save();
                     contentCtx.globalCompositeOperation = 'destination-in';
                     contentCtx.drawImage(objectCanvas, 0, 0);
                     contentCtx.restore();
                 } else {
-                    // JIKA TORN EDGES MATI: Lakukan pemotongan sesuai bentuk gambar asli.
-                    // 1. Gambar bentuk asli objek ke kanvas sementara (objectCtx) untuk membuat mask.
                     objectCtx.save();
                     objectCtx.translate(centerX, centerY);
                     objectCtx.drawImage(objectState.image.element, -imgW / 2, -imgH / 2, imgW, imgH);
                     objectCtx.restore();
 
-                    // 2. Gunakan mask tersebut untuk memotong contentCtx.
                     contentCtx.save();
                     contentCtx.globalCompositeOperation = 'destination-in';
                     contentCtx.drawImage(objectCanvas, 0, 0);
                     contentCtx.restore();
                 }
-                // TAHAP 3: Terapkan mask animasi
+
                 let finalSourceCanvas = contentCanvas;
                 if (maskImage) {
                     const maskSize = Math.max(imgW, imgH);
-                    
                     finalObjectCtx.save();
                     finalObjectCtx.translate(centerX, centerY);
                     finalObjectCtx.drawImage(maskImage, -maskSize / 2, -maskSize / 2, maskSize, maskSize);
                     finalObjectCtx.restore();
-                    
                     finalObjectCtx.save();
                     finalObjectCtx.globalCompositeOperation = 'source-in';
                     finalObjectCtx.drawImage(contentCanvas, 0, 0);
                     finalObjectCtx.restore();
                     finalSourceCanvas = finalObjectCanvas;
                 }
-                return finalSourceCanvas; 
+
+                return finalSourceCanvas;
             }
+            
             function requestRedraw() { needsRedraw = true; }
             
-            function draw(elapsedTime = 0) {
+            async function draw(elapsedTime = 0) { // <-- JADIKAN ASYNC
+                if (isCacheGenerationNeeded && !isGeneratingCache && !isLiveTornEdgePreview) {
+                    generateTornEdgeCache()
+                }
+
                 ctx.save();
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -1801,7 +1974,6 @@
                     bgFilterString += ` blur(${state.background.effects.blur.intensity}px)`;
                 }
                 ctx.filter = bgFilterString.trim();
-                // PERUBAHAN 1: Balik arah Y untuk offset latar belakang
                 const bgOffsetX = (canvas.width * state.background.transform.offset.x) / 100;
                 const bgOffsetY = (canvas.height * (state.background.transform.offset.y * -1)) / 100;
                 if (state.background.element) {
@@ -1826,47 +1998,28 @@
                 ctx.filter = 'none';
                 if (state.background.effects.vignette.enabled) {
                     ctx.save();
-
                     const centerX = canvas.width / 2;
                     const centerY = canvas.height / 2;
-
-                    // Peningkatan 1: Menangani canvas non-persegi dengan benar.
-                    // Radius luar dihitung ke sudut kanvas untuk memastikan cakupan penuh.
                     const outerRadius = 1.5 * Math.sqrt(centerX * centerX + centerY * centerY);
-
-                    const gradient = ctx.createRadialGradient(
-                        centerX, centerY, 0,
-                        centerX, centerY, outerRadius
-                    );
-
+                    const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, outerRadius);
                     const vignetteColor = hexToRgba(state.background.effects.vignette.color, state.background.effects.vignette.opacity / 100);
-
-                    // Peningkatan 1: Logika baru untuk radius dan feather.
                     const midPoint = state.background.effects.vignette.radius / 100;
                     const halfFeather = (state.background.effects.vignette.feather / 100) / 2;
-
-                    // Hitung posisi stop dengan clamping (Math.max/min) untuk keamanan.
                     const stop1 = Math.max(0, midPoint - halfFeather);
                     const stop2 = Math.min(1, midPoint + halfFeather);
-
-                    gradient.addColorStop(stop1, 'rgba(0,0,0,0)'); // Area transparan
-                    gradient.addColorStop(stop2, vignetteColor);    // Akhir dari transisi feather
-                    gradient.addColorStop(1, vignetteColor);         // Memastikan tepi luar selalu solid
-
+                    gradient.addColorStop(stop1, 'rgba(0,0,0,0)');
+                    gradient.addColorStop(stop2, vignetteColor);
+                    gradient.addColorStop(1, vignetteColor);
                     ctx.fillStyle = gradient;
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    
                     ctx.restore();
                 }
-
                 // --- 2. GAMBAR OBJEK ---
                 const objectState = state.object;
                 if (objectState.image.element) {
-                    // Kalkulasi animasi dan transformasi (Logika ini tetap sama)
                     const animState = objectState.animation;
                     const isSimpleMode = animState.mode === 'simple';
                     const totalDuration = state.export.duration;
-
                     let timeInSeconds;
                     if (animState.previewTime !== null) {
                         timeInSeconds = animState.previewTime;
@@ -1875,14 +2028,12 @@
                     } else {
                         timeInSeconds = (elapsedTime / 1000) % totalDuration;
                     }
-
                     let transform, isPaperAnimActive = false, paperFrameIndex = 0, currentLayer = null, currentMask = null;
                     if (isSimpleMode) {
                         transform = { x: objectState.image.offset.x, y: objectState.image.offset.y, scale: objectState.image.size, rotation: objectState.image.rotation };
-                        // Logika animasi simpel...
                         const animDuration = 1.0, frameDuration = 0.2;
                         if (animState.simple.previewing) {
-                            const timeSincePreviewStart = (currentTimeSource - animState.simple.previewStartTime) / 1000;
+                            const timeSincePreviewStart = (performance.now() - animState.simple.previewStartTime) / 1000;
                             if (timeSincePreviewStart < animDuration) {
                                 isPaperAnimActive = true;
                                 let frameIndex = Math.min(4, Math.floor(timeSincePreviewStart / frameDuration));
@@ -1901,7 +2052,7 @@
                                 paperFrameIndex = 4 - frameIndex;
                             }
                         }
-                    } else { // Mode Advanced
+                    } else {
                         const { transform: advTransform, prevKeyframe, nextKeyframe } = getAdvancedTransform(timeInSeconds, objectState);
                         transform = advTransform;
                         if (prevKeyframe && nextKeyframe) {
@@ -1923,7 +2074,6 @@
                         currentMask = maskImages[paperFrameIndex];
                     }
                     if (!transform) { console.error("Gagal menentukan transformasi objek."); ctx.restore(); return; }
-
                     const canvasAspect = canvas.width / canvas.height;
                     const imageAspect = objectState.image.element.width / objectState.image.element.height;
                     const baseScale = (canvasAspect > imageAspect) ? canvas.height / objectState.image.element.height : canvas.width / objectState.image.element.width;
@@ -1934,19 +2084,14 @@
                     const imgBaseOffsetY = (canvas.height * transform.y) / 100;
                     const totalOffsetX = imgBaseOffsetX + objectState.movement.positionOffset.x;
                     const totalOffsetY = imgBaseOffsetY + objectState.movement.positionOffset.y;
-                    
                     const isTornEdgesEnabled = objectState.stroke.enabled;
                     const stateBefore = getVisualStateAtTime(timeInSeconds, animState.keyframes);
-
-                    // Panggil drawFinalObject dan TANGKAP HASILNYA di variabel finalStampSource.
                     let finalStampSource;
                     if (!isSimpleMode && !isPaperAnimActive && stateBefore === 'closed') {
                         finalStampSource = drawFinalObject(objectState, finalW, finalH, totalOffsetX, totalOffsetY, isTornEdgesEnabled, layerImages[0], maskImages[0]);
                     } else {
                         finalStampSource = drawFinalObject(objectState, finalW, finalH, totalOffsetX, totalOffsetY, isTornEdgesEnabled, currentLayer, currentMask);
                     }
-
-                    // Ambil "stempel" yang sudah jadi dan gambar ke kanvas utama dengan transformasi
                     ctx.save();
                     if (objectState.shadow.enabled) {
                         const baseResolution = 720;
@@ -1957,95 +2102,81 @@
                         ctx.shadowOffsetX = objectState.shadow.offsetX * resolutionScaleFactor;
                         ctx.shadowOffsetY = (objectState.shadow.offsetY * -1) * resolutionScaleFactor;
                     }
-
                     ctx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + (totalOffsetY * -1));
                     if (objectState.movement.enabled || transform.rotation !== 0) {
                         const totalRotation = transform.rotation + objectState.movement.rotation;
                         ctx.rotate(totalRotation * Math.PI / 180);
                     }
-
                     ctx.drawImage(finalStampSource, -finalStampSource.width / 2, -finalStampSource.height / 2);
                     ctx.restore();
                 }
                 ctx.restore();
             }
 
-            /**
-             * Loop independen yang hanya bertugas untuk menghitung FPS
-             * dan memperbarui tampilan debug screen setiap detik.
-             */
             function fpsLoop(timestamp) {
-                // Inisialisasi waktu jika ini adalah frame pertama
                 if (!lastFPSTime) {
                     lastFPSTime = timestamp;
                 }
                 frameCount++;
                 const delta = timestamp - lastFPSTime;
 
-                // Jika sudah satu detik berlalu
                 if (delta >= 1000) {
-                    // Hitung FPS
                     fps = Math.round((frameCount * 1000) / delta);
-                    // Reset counter untuk detik berikutnya
                     frameCount = 0;
                     lastFPSTime = timestamp;
-                    // Panggil update debug screen dari sini
                     updateDebugScreen(); 
                 }
 
-                // Terus panggil loop ini untuk frame berikutnya
                 requestAnimationFrame(fpsLoop);
             }
 
-            /**
-            * The main animation loop.
-            */
-            function animationLoop(timestamp = 0) {
-                // Pengaman: Jika tidak ada gambar objek, paksa animasi untuk berhenti.
-                if (!state.object.image.element && state.object.animation.isPlaying) {
-                    state.object.animation.isPlaying = false;
-                    updatePlayPauseButton();
-                }
-                
-                if (!animationStartTime) animationStartTime = timestamp;
-                const elapsed = timestamp - animationStartTime;
+            function updateTimelineUI() {
+                if (isScrubbing) return
 
-                // HANYA jalankan update otomatis jika sedang "Play"
+                const elapsed = performance.now() - animationStartTime
+                const totalDuration = state.export.duration
+                const currentTime = (elapsed / 1000) % totalDuration
+
+                const timelineSlider = document.getElementById('timeline-slider')
+                const timelineCurrentTime = document.getElementById('timeline-current-time')
+
+                if (timelineSlider) timelineSlider.value = currentTime
+                if (timelineCurrentTime) timelineCurrentTime.textContent = `${currentTime.toFixed(2)}s`
+            }
+
+            function animationLoop() {
+                const timestamp = performance.now()
+
                 if (state.object.animation.isPlaying && !isScrubbing) {
-                    // updateDebugScreen(timestamp); // <-- Baris ini bisa dihapus
-                    updateMovement(timestamp);
-                    updatePaperFoldOverlay(timestamp);
-
-                    // Update UI slider hanya saat playing
-                    const timelineSlider = document.getElementById('timeline-slider');
-                    const timelineCurrentTime = document.getElementById('timeline-current-time');
-                    if (timelineSlider && timelineCurrentTime) {
-                        const totalDuration = state.export.duration;
-                        const currentTime = (elapsed / 1000) % totalDuration;
-                        timelineSlider.value = currentTime;
-                        timelineCurrentTime.textContent = `${currentTime.toFixed(2)}s`;
-                    }
-                    needsRedraw = true; // Otomatis minta redraw setiap frame saat playing
+                    updateMovement(timestamp)
+                    updatePaperFoldOverlay(timestamp)
+                    updateTimelineUI()
                 }
 
-                // Logika gambar ulang selalu dicek, bahkan saat pause
                 if (needsRedraw) {
-                    // Tentukan waktu yang akan digambar: dari previewTime jika ada, jika tidak, dari waktu playback
-                    const timeToDraw = state.object.animation.previewTime !== null 
-                        ? state.object.animation.previewTime * 1000 
-                        : elapsed;
+                    const animState = state.object.animation
+                    let timeToDraw
 
-                    draw(timeToDraw);
-                    needsRedraw = false; // Reset flag setelah menggambar
+                    if (animState.previewTime !== null) {
+                        timeToDraw = animState.previewTime * 1000
+                    } else {
+                        const elapsed = timestamp - animationStartTime
+                        timeToDraw = elapsed
+                    }
+
+                    draw(timeToDraw).then(() => {
+                        needsRedraw = false
+                    })
                 }
 
-                animationFrameId = requestAnimationFrame(animationLoop);
+                animationFrameId = requestAnimationFrame(animationLoop)
             }
 
             /**
              * Updates objects' positions and rotations based on movement settings and time.
              */
             function updateMovement(timestamp) {
+                if (isLiveTornEdgePreview) return;
                 let hasChanged = false;
                 const objectState = state.object; // Ganti dari forEach ke referensi langsung
 
@@ -2115,35 +2246,54 @@
             /**
              * Cycles through the paper texture overlay images for each object.
              */
-            function updatePaperFoldOverlay(timestamp) {
-                const loadedImages = originalOverlayImages.filter(img => img !== null);
-                if (loadedImages.length === 0) return;
+			function updatePaperFoldOverlay(timestamp) {
+				const objectState = state.object;
+				const hasOverlayImages = originalOverlayImages.filter(img => img && img.complete).length > 0;
 
-                let hasChanged = false;
-                const objectState = state.object;
+				if ((!objectState.paperFoldOverlay.enabled || !hasOverlayImages) && !objectState.stroke.enabled) {
+					return;
+				}
 
-                if (objectState.paperFoldOverlay.enabled && objectState.paperFoldOverlay.speed > 0) {
-                    const timeSinceLastSwitch = timestamp - objectState.paperFoldOverlay.lastImageSwitchTime;
-                    const interval = 1000 / objectState.paperFoldOverlay.speed;
-                    if (timeSinceLastSwitch >= interval) {
-                        objectState.paperFoldOverlay.currentImageIndex = (objectState.paperFoldOverlay.currentImageIndex + 1) % loadedImages.length;
-                        
-                        // Ganti nilai seed agar tekstur sobekan juga berubah. Kita putar dari 0-99.
-                        objectState.stroke.seed = (objectState.stroke.seed + 1) % 100;
-                        
-                        objectState.paperFoldOverlay.lastImageSwitchTime = timestamp;
-                        hasChanged = true;
-                    }
-                }
+				const speed = objectState.paperFoldOverlay.speed;
+				if (speed <= 0) return;
 
-                if (hasChanged) { requestRedraw(); }
-            }
+				const timeSinceLastSwitch = timestamp - objectState.paperFoldOverlay.lastImageSwitchTime;
+				const interval = 1000 / speed;
+				let hasChanged = false;
+
+				if (timeSinceLastSwitch >= interval) {
+					objectState.paperFoldOverlay.currentImageIndex = (objectState.paperFoldOverlay.currentImageIndex + 1) % 4;
+					objectState.paperFoldOverlay.lastImageSwitchTime = timestamp;
+					hasChanged = true;
+				}
+
+				if (hasChanged) {
+					requestRedraw();
+				}
+			}
+
+			function updateTornEdgeAnimation(timestamp) {
+				const objectState = state.object;
+				if (!objectState.stroke.enabled || !objectState.image.element || objectState.stroke.width <= 0) return;
+
+				const speed = objectState.paperFoldOverlay.speed;
+				if (speed <= 0) return;
+
+				const timeSinceLastSwitch = timestamp - objectState.stroke.lastTornEdgeSwitchTime;
+				const interval = 1000 / speed;
+
+				if (timeSinceLastSwitch >= interval) {
+					objectState.stroke.currentVariationIndex = (objectState.stroke.currentVariationIndex + 1) % 4;
+					objectState.stroke.lastTornEdgeSwitchTime = timestamp;
+					requestRedraw();
+				}
+			}
+            
             
             /**
              * Menyesuaikan resolusi pratinjau secara otomatis berdasarkan lebar layar.
              */
             function handleAutoResolutionByWidth() {
-                // Keluar jika mode bukan 'auto'
                 if (state.previewResolutionMode !== 'auto') {
                     return;
                 }
@@ -2151,15 +2301,14 @@
                 const screenWidth = window.innerWidth;
                 let newResolution;
 
-                if (screenWidth <= 425) {
+                if (screenWidth <= 480) {
                     newResolution = '360';
-                } else if (screenWidth > 425 && screenWidth <= 1280) {
+                } else if (screenWidth > 480 && screenWidth < 1440) {
                     newResolution = '540';
                 } else {
                     newResolution = '720';
                 }
 
-                // Hanya update dan gambar ulang jika resolusi berubah
                 if (newResolution !== state.activePreviewResolution) {
                     state.activePreviewResolution = newResolution;
                     console.log(`Resolusi otomatis diubah ke: ${newResolution}p berdasarkan lebar layar.`);
@@ -2171,20 +2320,12 @@
             /**
              * Memperbarui konten pada layar debug dengan informasi yang lebih relevan.
              */
-            function updateDebugScreen(timestamp) { // <-- Tambahkan parameter 'timestamp'
-                // Keluar jika debug dimatikan
+            function updateDebugScreen(timestamp) {
                 if (!state.debugScreenEnabled) return;
-
-                // Batasi pembaruan hanya sekali per detik
                 if (timestamp - lastDebugUpdateTime < 1000) return;
-
-                // Gunakan elemen yang sudah disimpan, tidak perlu mencari lagi
                 if (!debugScreenEl) return; 
-
-                // Perbarui waktu terakhir
                 lastDebugUpdateTime = timestamp;
 
-                // Logika untuk mendapatkan info (tidak berubah)
                 let uiModeText;
                 const isCurrentlyDesktop = window.matchMedia('(min-width: 769px)').matches;
                 if (state.displayMode === 'auto') {
@@ -2234,7 +2375,6 @@ Object       : ${objFileName}
 
                 const imageSizeSlider = document.getElementById('image-size');
                 const maxScalePercent = imageSizeSlider ? parseFloat(imageSizeSlider.max) : 200;
-                // Buffer ekstra untuk efek seperti stroke dan shadow agar tidak terpotong
                 const offscreenMultiplier = (maxScalePercent / 100.0) + 0.1; 
 
                 const offscreenCanvasWidth = Math.round(canvas.width * offscreenMultiplier);
@@ -2512,53 +2652,76 @@ Object       : ${objFileName}
             }
             
             function handleImageFile(file, target) {
-                if (!file || !file.type.startsWith('image/')) return;
+                if (!file || !file.type.startsWith('image/')) return
 
-                const reader = new FileReader();
+                const reader = new FileReader()
                 reader.onload = (event) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        if (target === 'foreground') {
-                            // 1. Tentukan ukuran padding (misalnya 25% dari dimensi asli)
-                            const paddingX = img.width * 0.25;
-                            const paddingY = img.height * 0.25;
-                            
-                            // 2. Buat kanvas baru yang ukurannya lebih besar
-                            const paddedCanvas = document.createElement('canvas');
-                            const paddedCtx = paddedCanvas.getContext('2d');
-                            paddedCanvas.width = img.width + paddingX * 2;
-                            paddedCanvas.height = img.height + paddingY * 2;
-                            
-                            // 3. Gambar gambar asli di tengah kanvas baru, sehingga tercipta padding
-                            paddedCtx.drawImage(img, paddingX, paddingY);
-                            
-                            // 4. Buat elemen Image baru dari kanvas yang sudah dipadding
-                            const paddedImg = new Image();
-                            paddedImg.onload = () => {
-                                // 5. Simpan gambar yang SUDAH memiliki padding ini ke dalam state
-                                state.object.image.element = paddedImg;
-                                state.object.image.file = file; // Tetap simpan file asli untuk info
-                                state.object.animation.isPlaying = true;
-                                animationStartTime = performance.now();
-                                pauseStartTime = 0;
-                                updatePlayPauseButton(); // Perbarui ikon tombol                               
-                                updateUIFromState();
-                                requestRedraw();
-                            };
-                            paddedImg.src = paddedCanvas.toDataURL();
-
-                        } else if (target === 'background') {
-                            // Untuk background, kita tidak perlu padding
-                            state.background.element = img;
-                            state.background.file = file;
-                            updateUIFromState();
-                            requestRedraw();
+                    const highResImg = new Image()
+                    highResImg.onload = () => {
+                        if (target === 'background') {
+                            state.background.element = highResImg
+                            state.background.file = file
+                            updateUIFromState()
+                            requestRedraw()
+                            return
                         }
-                    };
-                    img.onerror = () => { console.error(`Failed to load ${target} image file.`); };
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
+
+                        state.object.image.originalElement = highResImg
+                        state.object.image.file = file
+
+                        const MAX_PREVIEW_SIZE = 800
+                        let previewWidth = highResImg.width
+                        let previewHeight = highResImg.height
+
+                        if (previewWidth > MAX_PREVIEW_SIZE || previewHeight > MAX_PREVIEW_SIZE) {
+                            const ratio = previewWidth / previewHeight
+                            if (ratio > 1) {
+                                previewWidth = MAX_PREVIEW_SIZE
+                                previewHeight = MAX_PREVIEW_SIZE / ratio
+                            } else {
+                                previewHeight = MAX_PREVIEW_SIZE
+                                previewWidth = MAX_PREVIEW_SIZE * ratio
+                            }
+                        }
+
+                        const resampleCanvas = document.createElement('canvas')
+                        const resampleCtx = resampleCanvas.getContext('2d')
+                        resampleCanvas.width = previewWidth
+                        resampleCanvas.height = previewHeight
+                        resampleCtx.drawImage(highResImg, 0, 0, previewWidth, previewHeight)
+
+                        const previewImg = new Image()
+                        previewImg.onload = () => {
+                            const paddedCanvas = document.createElement('canvas')
+                            const paddedCtx = paddedCanvas.getContext('2d')
+                            const paddingX = previewImg.width * 0.25
+                            const paddingY = previewImg.height * 0.25
+                            paddedCanvas.width = previewImg.width + paddingX * 2
+                            paddedCanvas.height = previewImg.height + paddingY * 2
+                            paddedCtx.drawImage(previewImg, paddingX, paddingY)
+
+                            const finalPaddedImg = new Image()
+                            finalPaddedImg.onload = () => {
+                                state.object.image.element = finalPaddedImg
+                                isCacheGenerationNeeded = true
+                                state.object.animation.isPlaying = true
+                                animationStartTime = performance.now()
+                                pauseStartTime = 0
+                                state.object.paperFoldOverlay.lastImageSwitchTime = animationStartTime
+                                updatePlayPauseButton()
+                                updateUIFromState()
+                                requestRedraw()
+                            }
+                            finalPaddedImg.src = paddedCanvas.toDataURL()
+                        }
+                        previewImg.src = resampleCanvas.toDataURL()
+                    }
+                    highResImg.onerror = () => {
+                        console.error(`Gagal memuat gambar ${target}`)
+                    }
+                    highResImg.src = event.target.result
+                }
+                reader.readAsDataURL(file)
             }
 
             /**
@@ -2569,7 +2732,7 @@ Object       : ${objFileName}
                 document.querySelectorAll('[data-translate-key]').forEach(el => {
                     const key = el.dataset.translateKey;
                     if (translationMap[key]) {
-                        if (key === 'dropImagePrompt' || key === 'creatorInfo2' || key === 'exportInfoTooltip') {
+                        if (key === 'dropImagePrompt' || key === 'creatorInfo2' || key === 'exportInfoTooltip' || key === 'dropShadowTooltip') {
                            el.innerHTML = translationMap[key];
                         } else {
                            el.textContent = translationMap[key];
@@ -2671,80 +2834,131 @@ Object       : ${objFileName}
                 const activeKeyframeId = state.object.animation.activeKeyframeId;
                 const keyframes = state.object.animation.keyframes;
                 const keyframe = keyframes.find(kf => kf.id === activeKeyframeId);
+
                 if (!keyframe) {
                     panel.innerHTML = '';
                     panel.classList.add('hidden');
                     return;
                 }
+
                 const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
                 const currentIndex = sortedKeyframes.findIndex(kf => kf.id === activeKeyframeId);
                 const stateBefore = getVisualStateAtTime(keyframe.time, keyframes);
                 const isOpenDisabled = !(stateBefore === 'closed' || currentIndex === 0);
                 const isCloseDisabled = !(stateBefore === 'open');
+
                 panel.classList.remove('hidden');
                 panel.innerHTML = `
-                    <div class="accordion-section border border-[var(--border-color)] accordion-open">
-                        <div class="accordion-header w-full flex items-center justify-between p-4 bg-slate-700/30">
-                            <h2 class="text-base font-semibold text-slate-300" data-translate-key="keyframeProperties"></h2>
+                <div class="accordion-section border border-[var(--border-color)] accordion-open">
+                    <div class="accordion-header w-full flex items-center justify-between p-4 bg-slate-700/30">
+                        <h2 class="text-base font-semibold text-slate-300" data-translate-key="keyframeProperties"></h2>
+                        <div class="flex items-center gap-2">
+                            <button id="kf-reset-btn" title="Reset Properti Keyframe" class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-600 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                            </button>
+                            <button id="kf-copy-btn" title="Salin Properti" class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-600 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM9 1.5H7v1h2v-1z"/></svg>
+                            </button>
+                            <button id="kf-paste-btn" title="Tempel Properti" class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-600 transition-colors ${keyframeClipboard === null ? 'is-disabled' : ''}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 1.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-1Zm-5 0A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5v1A1.5 1.5 0 0 1 9.5 4h-3A1.5 1.5 0 0 1 5 2.5v-1Zm.5 4a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3Z"/><path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2Zm13 2v5H1V4a1 1 0 0 1 1-1h12ZM1 10.5v1.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V10.5H1Z"/></svg>
+                            </button>
                         </div>
-                        <div class="accordion-body space-y-4 p-4 border-t border-[var(--border-color)]">
-                            <div>
-                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="imageSize"></label>
-                                <div class="flex items-center gap-3">
-                                    <input type="range" id="kf-scale" min="10" max="200" value="${keyframe.scale}" class="w-full slider">
-                                    <input type="number" id="kf-scale-input" min="10" max="200" value="${keyframe.scale}" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
+                    </div>
+                    <div class="accordion-body space-y-4 p-4 border-t border-[var(--border-color)]">
+                        <!-- Scale -->
+                        <div>
+                            <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="imageSize"></label>
+                            <div class="flex items-center gap-3">
+                                <input type="range" id="kf-scale" min="10" max="200" value="${keyframe.scale}" class="w-full slider">
+                                <input type="number" id="kf-scale-input" min="10" max="200" value="${keyframe.scale}" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
+                            </div>
+                        </div>
+                        <!-- Offset X -->
+                        <div>
+                            <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="offsetX"></label>
+                            <div class="flex items-center gap-3">
+                                <input type="range" id="kf-offset-x" min="-150" max="150" value="${keyframe.x}" class="w-full slider">
+                                <input type="number" id="kf-offset-x-input" min="-150" max="150" value="${keyframe.x}" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
+                            </div>
+                        </div>
+                        <!-- Offset Y -->
+                        <div>
+                            <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="offsetY"></label>
+                            <div class="flex items-center gap-3">
+                                <input type="range" id="kf-offset-y" min="-150" max="150" value="${keyframe.y}" class="w-full slider">
+                                <input type="number" id="kf-offset-y-input" min="-150" max="150" value="${keyframe.y}" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
+                            </div>
+                        </div>
+                        <!-- Rotation -->
+                        <div>
+                            <label id="kf-rotation-label" class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="rotation"></label>
+                            <div class="flex items-center gap-3">
+                                <input type="range" id="kf-rotation" min="-180" max="180" value="${(keyframe.rotation % 360 + 540) % 360 - 180}" class="w-full slider">
+                                <input type="number" id="kf-rotation-input" value="${keyframe.rotation}" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
+                            </div>
+                        </div>
+                        <!-- Easing -->
+                        <div class="pt-4 border-t border-slate-700">
+                            <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="easingToNext"></label>
+                            <div id="kf-easing-btns" class="space-y-2">
+                                <div class="grid grid-cols-4 gap-2 btn-group-toggle">
+                                    ${['linear', 'easeIn', 'easeOut', 'easeInOut'].map(type => `
+                                        <button data-easing="${type}" class="${keyframe.easing === type ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="${type}"></button>
+                                    `).join('')}
+                                </div>
+                                <div class="grid grid-cols-4 gap-2 btn-group-toggle">
+                                    ${['instant', 'backIn', 'backOut', 'backInOut'].map(type => `
+                                        <button data-easing="${type}" class="${keyframe.easing === type ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="${type}"></button>
+                                    `).join('')}
                                 </div>
                             </div>
-                            <div>
-                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="offsetX"></label>
-                                <div class="flex items-center gap-3">
-                                    <input type="range" id="kf-offset-x" min="-150" max="150" value="${keyframe.x}" class="w-full slider">
-                                    <input type="number" id="kf-offset-x-input" min="-150" max="150" value="${keyframe.x}" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="offsetY"></label>
-                                <div class="flex items-center gap-3">
-                                    <input type="range" id="kf-offset-y" min="-150" max="150" value="${keyframe.y}" class="w-full slider">
-                                    <input type="number" id="kf-offset-y-input" min="-150" max="150" value="${keyframe.y}" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
-                                </div>
-                            </div>
-                            <div>
-                                <label id="kf-rotation-label" class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="rotation"></label>
-                                <div class="flex items-center gap-3">
-                                    <input type="range" id="kf-rotation" min="-180" max="180" value="${(keyframe.rotation % 360 + 540) % 360 - 180}" class="w-full slider">
-                                    <input type="number" id="kf-rotation-input" value="${keyframe.rotation}" class="number-input-uniform bg-slate-900 border border-[var(--border-color)] py-1 px-2 text-sm">
-                                </div>
-                            </div>
-                            <div class="pt-4 border-t border-slate-700">
-                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="easingToNext"></label>
-                                <div id="kf-easing-btns" class="space-y-2">
-                                    <div class="grid grid-cols-4 gap-2 btn-group-toggle">
-                                        <button data-easing="linear" class="${keyframe.easing === 'linear' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="linear"></button>
-                                        <button data-easing="easeIn" class="${keyframe.easing === 'easeIn' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="easeIn"></button>
-                                        <button data-easing="easeOut" class="${keyframe.easing === 'easeOut' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="easeOut"></button>
-                                        <button data-easing="easeInOut" class="${keyframe.easing === 'easeInOut' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="easeInOut"></button>
-                                    </div>
-                                    <div class="grid grid-cols-4 gap-2 btn-group-toggle">
-                                        <button data-easing="instant" class="${keyframe.easing === 'instant' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="instant"></button>
-                                        <button data-easing="backIn" class="${keyframe.easing === 'backIn' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="backIn"></button>
-                                        <button data-easing="backOut" class="${keyframe.easing === 'backOut' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="backOut"></button>
-                                        <button data-easing="backInOut" class="${keyframe.easing === 'backInOut' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="backInOut"></button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="pt-4 border-t border-slate-700">
-                                <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="keyframeAnim"></label>
-                                <div id="kf-paper-anim-btns" class="grid grid-cols-3 gap-2 btn-group-toggle">
-                                    <button data-anim="none" class="${keyframe.paperAnim === 'none' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="animNone"></button>
-                                    <button data-anim="open" class="${keyframe.paperAnim === 'open' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" ${isOpenDisabled ? 'disabled' : ''} data-translate-key="animOpen"></button>
-                                    <button data-anim="close" class="${keyframe.paperAnim === 'close' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" ${isCloseDisabled ? 'disabled' : ''} data-translate-key="animClose"></button>
-                                </div>
+                        </div>
+                        <!-- Paper Animation -->
+                        <div class="pt-4 border-t border-slate-700">
+                            <label class="text-sm font-medium text-[var(--text-muted)] mb-2 block" data-translate-key="keyframeAnim"></label>
+                            <div id="kf-paper-anim-btns" class="grid grid-cols-3 gap-2 btn-group-toggle">
+                                <button data-anim="none" class="${keyframe.paperAnim === 'none' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" data-translate-key="animNone"></button>
+                                <button data-anim="open" class="${keyframe.paperAnim === 'open' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" ${isOpenDisabled ? 'disabled' : ''} data-translate-key="animOpen"></button>
+                                <button data-anim="close" class="${keyframe.paperAnim === 'close' ? 'active' : ''} p-2.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm" ${isCloseDisabled ? 'disabled' : ''} data-translate-key="animClose"></button>
                             </div>
                         </div>
                     </div>
-                `;
+                </div>`;
+
                 updateUIText(state.language);
+
+                document.getElementById('kf-reset-btn').addEventListener('click', () => {
+                    const defaultProps = DEFAULT_OBJECT_STATE.animation.keyframes[0];
+                    keyframe.x = defaultProps.x;
+                    keyframe.y = defaultProps.y;
+                    keyframe.scale = defaultProps.scale;
+                    keyframe.rotation = defaultProps.rotation;
+                    renderKeyframeProperties();
+                    requestRedraw();
+                });
+
+                document.getElementById('kf-copy-btn').addEventListener('click', () => {
+                    keyframeClipboard = {
+                        x: keyframe.x,
+                        y: keyframe.y,
+                        scale: keyframe.scale,
+                        rotation: keyframe.rotation,
+                    };
+                    renderKeyframeProperties();
+                });
+
+                document.getElementById('kf-paste-btn').addEventListener('click', (e) => {
+                    if (e.currentTarget.classList.contains('is-disabled')) return;
+                    if (keyframeClipboard) {
+                        keyframe.x = keyframeClipboard.x;
+                        keyframe.y = keyframeClipboard.y;
+                        keyframe.scale = keyframeClipboard.scale;
+                        keyframe.rotation = keyframeClipboard.rotation;
+                        renderKeyframeProperties();
+                        requestRedraw();
+                    }
+                });
+
                 syncSliderAndInput('kf-scale', 'kf-scale-input', val => keyframe.scale = val);
                 syncSliderAndInput('kf-offset-x', 'kf-offset-x-input', val => keyframe.x = val);
                 syncSliderAndInput('kf-offset-y', 'kf-offset-y-input', val => keyframe.y = val);
@@ -2768,227 +2982,215 @@ Object       : ${objFileName}
                     if (btn && !btn.disabled) {
                         keyframe.paperAnim = btn.dataset.anim;
                         renderKeyframeProperties();
+                        renderKeyframeList();
                         requestRedraw();
                     }
                 });
             }
 
-            function updateUIFromState() {
-                updateUIText(state.language);
 
-                // Get the currently active object's state
-                const activeObjectState = state.object;                
-                // Kelola visibilitas panel Simple vs Advanced
-                const animMode = activeObjectState.animation.mode;
-                document.getElementById('animation-simple-controls').classList.toggle('hidden', animMode !== 'simple');
-                document.getElementById('animation-advanced-controls').classList.toggle('hidden', animMode !== 'advanced');
+			function updateUIFromState() {
+				updateUIText(state.language);
 
-                // Update tombol mode yang aktif
-                document.querySelectorAll('#animation-mode-btns button').forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.mode === animMode);
-                });
+				const activeObjectState = state.object;
+				const animMode = activeObjectState.animation.mode;
+				document.getElementById('animation-simple-controls').classList.toggle('hidden', animMode !== 'simple');
+				document.getElementById('animation-advanced-controls').classList.toggle('hidden', animMode !== 'advanced');
 
-                // Update switch di mode simple
-                document.getElementById('simple-anim-open-switch').checked = activeObjectState.animation.simple.open;
-                document.getElementById('simple-anim-close-switch').checked = activeObjectState.animation.simple.close;
+				document.querySelectorAll('#animation-mode-btns button').forEach(btn => {
+					btn.classList.toggle('active', btn.dataset.mode === animMode);
+				});
 
-                // Nonaktifkan panel Transform di tab Objek jika mode animasi adalah Advanced
-                const transformAccordion = document.getElementById('foreground-transform-accordion');
-                if (transformAccordion) {
-                    if (animMode === 'advanced') {
-                        transformAccordion.classList.add('is-disabled');
-                        // Jika sedang terbuka, tutup paksa
-                        if (transformAccordion.classList.contains('accordion-open')) {
-                            transformAccordion.classList.remove('accordion-open');
-                            transformAccordion.querySelector('.accordion-body').classList.add('hidden');
-                        }
-                    } else {
-                        transformAccordion.classList.remove('is-disabled');
-                    }
-                }
-                // Update object image controls based on the active object
-                const imageSpecificControls = document.getElementById('image-specific-controls');
-                const dropZonePrompt = document.getElementById('drop-zone-prompt');
-                const dropZoneFilenameContainer = document.getElementById('drop-zone-filename');
-                const deleteImageBtn = document.getElementById('delete-image-btn');
-                
-                if (activeObjectState.image.element) {
-                    imageSpecificControls.classList.remove('is-disabled');
-                    dropZonePrompt.classList.add('hidden');
-                    dropZoneFilenameContainer.classList.remove('hidden');
-                    if (dropZoneFilenameContainer.querySelector('p') && activeObjectState.image.file) {
-                        dropZoneFilenameContainer.querySelector('p').textContent = truncateFilename(activeObjectState.image.file.name);
-                    }
-                    deleteImageBtn.classList.remove('hidden');
-                } else {
-                    imageSpecificControls.classList.add('is-disabled');
-                    dropZonePrompt.classList.remove('hidden');
-                    dropZoneFilenameContainer.classList.add('hidden');
-                    deleteImageBtn.classList.add('hidden');
-                }             
+				document.getElementById('simple-anim-open-switch').checked = activeObjectState.animation.simple.open;
+				document.getElementById('simple-anim-close-switch').checked = activeObjectState.animation.simple.close;
 
-                // Update background image controls
-                const backgroundColorControl = document.getElementById('background-color-control');
-                const backgroundDropZonePrompt = document.getElementById('background-drop-zone-prompt');
-                const backgroundDropZoneFilename = document.getElementById('background-drop-zone-filename');
-                const removeBackgroundImageBtn = document.getElementById('remove-background-image');
-                const bgDependentAccordions = ['background-transform-accordion', 'background-blur-accordion'];
-                
-                const hasBgImage = !!state.background.element;
-                bgDependentAccordions.forEach(id => {
-                    document.getElementById(id).classList.toggle('controls-disabled-for-bg', !hasBgImage);
-                });
-                
-                if (hasBgImage) {
-                    backgroundColorControl.classList.add('is-disabled');
-                    backgroundDropZonePrompt.classList.add('hidden');
-                    backgroundDropZoneFilename.classList.remove('hidden');
-                    if (backgroundDropZoneFilename.querySelector('p') && state.background.file) {
-                         backgroundDropZoneFilename.querySelector('p').textContent = truncateFilename(state.background.file.name);
-                    }
-                    removeBackgroundImageBtn.classList.remove('hidden');
-                } else {
-                    backgroundColorControl.classList.remove('is-disabled');
-                    backgroundDropZonePrompt.classList.remove('hidden');
-                    backgroundDropZoneFilename.classList.add('hidden');
-                    removeBackgroundImageBtn.classList.add('hidden');
-                }
+				const transformAccordion = document.getElementById('foreground-transform-accordion');
+				if (transformAccordion) {
+					if (animMode === 'advanced') {
+						transformAccordion.classList.add('is-disabled');
+						if (transformAccordion.classList.contains('accordion-open')) {
+							transformAccordion.classList.remove('accordion-open');
+							transformAccordion.querySelector('.accordion-body').classList.add('hidden');
+						}
+					} else {
+						transformAccordion.classList.remove('is-disabled');
+					}
+				}
 
-                // Update paper fold overlay controls
-                const paperFoldOverlayControls = document.getElementById('overlay-controls');
-                const anyOverlayImageLoaded = originalOverlayImages.length > 0 && originalOverlayImages.some(img => img !== null);
-                if (activeObjectState.paperFoldOverlay.enabled && anyOverlayImageLoaded) {
-                    paperFoldOverlayControls.classList.remove('controls-disabled-for-overlay');
-                } else {
-                    paperFoldOverlayControls.classList.add('controls-disabled-for-overlay');
-                }
+				const imageSpecificControls = document.getElementById('image-specific-controls');
+				const dropZonePrompt = document.getElementById('drop-zone-prompt');
+				const dropZoneFilenameContainer = document.getElementById('drop-zone-filename');
+				const deleteImageBtn = document.getElementById('delete-image-btn');
 
-                // Sync all input values from state
-                document.getElementById('background-color').value = state.background.color;
-                document.querySelectorAll('#aspect-ratio-btns button').forEach(btn => btn.classList.toggle('active', btn.dataset.ratio === state.aspectRatio));
-                document.querySelectorAll('#canvas-resolution-btns button').forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.res) === state.canvasDisplayResolution));
-                
-                // This list now updates based on the ACTIVE OBJECT's state
-                const inputsToUpdate = [
-                    { id: 'background-size-input', value: state.background.transform.size },
-                    { id: 'background-offset-x-input', value: state.background.transform.offset.x },
-                    { id: 'background-offset-y-input', value: state.background.transform.offset.y },
-                    { id: 'background-color-hue-input', value: state.background.effects.colorCorrection.hue },
-                    { id: 'background-color-saturation-input', value: state.background.effects.colorCorrection.saturation },
-                    { id: 'background-color-brightness-input', value: state.background.effects.colorCorrection.brightness },
-                    { id: 'background-colorize-switch', checked: state.background.effects.colorCorrection.colorize },
-                    { id: 'background-blur-intensity-input', value: state.background.effects.blur.intensity },
-                    { id: 'background-vignette-opacity-input', value: state.background.effects.vignette.opacity },
-                    { id: 'background-vignette-radius-input', value: state.background.effects.vignette.radius },
-                    { id: 'background-vignette-feather-input', value: state.background.effects.vignette.feather },
-                    { id: 'background-vignette-color', value: state.background.effects.vignette.color },
+				if (activeObjectState.image.element) {
+					imageSpecificControls.classList.remove('is-disabled');
+					dropZonePrompt.classList.add('hidden');
+					dropZoneFilenameContainer.classList.remove('hidden');
+					if (dropZoneFilenameContainer.querySelector('p') && activeObjectState.image.file) {
+						dropZoneFilenameContainer.querySelector('p').textContent = truncateFilename(activeObjectState.image.file.name);
+					}
+					deleteImageBtn.classList.remove('hidden');
+				} else {
+					imageSpecificControls.classList.add('is-disabled');
+					dropZonePrompt.classList.remove('hidden');
+					dropZoneFilenameContainer.classList.add('hidden');
+					deleteImageBtn.classList.add('hidden');
+				}
 
-                    { id: 'image-size-input', value: activeObjectState.image.size },
-                    { id: 'image-offset-x-input', value: activeObjectState.image.offset.x },
-                    { id: 'image-offset-y-input', value: activeObjectState.image.offset.y },
-                    { id: 'stroke-width-input', value: activeObjectState.stroke.width },
-                    { id: 'stroke-roughness-input', value: activeObjectState.stroke.roughness },
-                    { id: 'stroke-detail-input', value: activeObjectState.stroke.detail * 1000 },
-                    { id: 'shadow-offset-x-input', value: activeObjectState.shadow.offsetX }, { id: 'shadow-offset-y-input', value: activeObjectState.shadow.offsetY },
-                    { id: 'shadow-blur-input', value: activeObjectState.shadow.blur },
-                    { id: 'shadow-opacity-input', value: activeObjectState.shadow.opacity },
-                    { id: 'shadow-color', value: activeObjectState.shadow.color },
-                    { id: 'color-hue-input', value: activeObjectState.color.hue },
-                    { id: 'color-saturation-input', value: activeObjectState.color.saturation },
-                    { id: 'color-brightness-input', value: activeObjectState.color.brightness },
-                    { id: 'colorize-switch', checked: activeObjectState.color.colorize },
-                    { id: 'movement-simpel-speed-input', value: activeObjectState.movement.simpelSpeed },
-                    { id: 'movement-simpel-strength-input', value: activeObjectState.movement.simpelStrength },
-                    { id: 'movement-rotation-speed-input', value: activeObjectState.movement.rotationSpeed },
-                    { id: 'movement-rotation-strength-input', value: activeObjectState.movement.rotationStrength },
-                    { id: 'movement-position-speed-x-input', value: activeObjectState.movement.positionSpeed.x },
-                    { id: 'movement-position-speed-y-input', value: activeObjectState.movement.positionSpeed.y },
-                    { id: 'movement-position-strength-x-input', value: activeObjectState.movement.positionStrength.x },
-                    { id: 'movement-position-strength-y-input', value: activeObjectState.movement.positionStrength.y },
-                    { id: 'overlay-opacity-input', value: activeObjectState.paperFoldOverlay.opacity },
-                    { id: 'overlay-speed-input', value: activeObjectState.paperFoldOverlay.speed },
+				const backgroundColorControl = document.getElementById('background-color-control');
+				const backgroundDropZonePrompt = document.getElementById('background-drop-zone-prompt');
+				const backgroundDropZoneFilename = document.getElementById('background-drop-zone-filename');
+				const removeBackgroundImageBtn = document.getElementById('remove-background-image');
+				const bgDependentAccordions = ['background-transform-accordion', 'background-blur-accordion'];
 
-                    { id: 'export-duration-input', value: state.export.duration },
-                    { id: 'export-filename-input', value: state.export.filename + '.webm'},
-                ];
-                 inputsToUpdate.forEach(item => {
-                    const el = document.getElementById(item.id);
-                    const sliderEl = document.getElementById(item.id.replace('-input', ''));
-                    if (el) {
-                        if (el.type === 'checkbox') {
-                            el.checked = item.checked;
-                        } else if (item.value !== undefined) {
-                            el.value = item.value;
-                        }
-                    }
-                    if(sliderEl && sliderEl.type === 'range' && item.value !== undefined) sliderEl.value = item.value;
-                });
-                
-                document.querySelectorAll('#export-fps-btns button').forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.fps) === state.export.fps));
+				const hasBgImage = !!state.background.element;
+				bgDependentAccordions.forEach(id => {
+					document.getElementById(id).classList.toggle('controls-disabled-for-bg', !hasBgImage);
+				});
 
-                document.querySelectorAll('.accordion-section').forEach(section => {
-                    const switchInput = section.querySelector('.accordion-header .switch input');
-                    if (!switchInput) return;
+				if (hasBgImage) {
+					backgroundColorControl.classList.add('is-disabled');
+					backgroundDropZonePrompt.classList.add('hidden');
+					backgroundDropZoneFilename.classList.remove('hidden');
+					if (backgroundDropZoneFilename.querySelector('p') && state.background.file) {
+						backgroundDropZoneFilename.querySelector('p').textContent = truncateFilename(state.background.file.name);
+					}
+					removeBackgroundImageBtn.classList.remove('hidden');
+				} else {
+					backgroundColorControl.classList.remove('is-disabled');
+					backgroundDropZonePrompt.classList.remove('hidden');
+					backgroundDropZoneFilename.classList.add('hidden');
+					removeBackgroundImageBtn.classList.add('hidden');
+				}
 
-                    let isEnabled;
-                    const sectionId = section.id;
-                    if (sectionId.includes('foreground-stroke')) isEnabled = activeObjectState.stroke.enabled;
-                    else if(sectionId.includes('foreground-shadow')) isEnabled = activeObjectState.shadow.enabled;
-                    else if(sectionId.includes('foreground-color')) isEnabled = activeObjectState.color.enabled;
-                    else if(sectionId.includes('movement')) isEnabled = activeObjectState.movement.enabled;
-                    else if(sectionId.includes('background-color-correction')) isEnabled = state.background.effects.colorCorrection.enabled;
-                    else if(sectionId.includes('background-blur')) isEnabled = state.background.effects.blur.enabled;
-                    else if(sectionId.includes('background-vignette')) isEnabled = state.background.effects.vignette.enabled;
-                    else if(sectionId.includes('paper-fold-overlay')) isEnabled = activeObjectState.paperFoldOverlay.enabled;
-                    
-                    if(typeof isEnabled !== 'undefined') switchInput.checked = isEnabled;
-                });
-                
-                const isSimpelMode = activeObjectState.movement.mode === 'simpel';
-                document.getElementById('movement-controls-simpel').classList.toggle('hidden', !isSimpelMode);
-                document.getElementById('movement-controls-lengkap').classList.toggle('hidden', isSimpelMode);
-                document.querySelectorAll('#movement-mode-btns button').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === activeObjectState.movement.mode));
+				const paperFoldOverlayControls = document.getElementById('overlay-controls');
+				const anyOverlayImageLoaded = originalOverlayImages.length > 0 && originalOverlayImages.some(img => img !== null);
+				if (activeObjectState.paperFoldOverlay.enabled && anyOverlayImageLoaded) {
+					paperFoldOverlayControls.classList.remove('controls-disabled-for-overlay');
+				} else {
+					paperFoldOverlayControls.classList.add('controls-disabled-for-overlay');
+				}
 
-                document.getElementById('color-correction-standard-controls').classList.remove('hidden');
-                document.getElementById('background-color-correction-standard-controls').classList.remove('hidden');
+				document.getElementById('background-color').value = state.background.color;
+				document.querySelectorAll('#aspect-ratio-btns button').forEach(btn => btn.classList.toggle('active', btn.dataset.ratio === state.aspectRatio));
+				document.querySelectorAll('#canvas-resolution-btns button').forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.res) === state.canvasDisplayResolution));
 
-                syncBackgroundTransformModeUI();
-                syncDisplayModeUI();
-                syncUISizeUI();
-                document.querySelectorAll('#language-btns button').forEach(button => {
-                    button.classList.toggle('active', button.dataset.lang === state.language);
-                });
-                document.querySelectorAll('.accordion-section').forEach(section => {
-                    const body = section.querySelector('.accordion-body');
-                    const isEnabledBySwitch = section.querySelector('.switch input')?.checked ?? true;
+				const inputsToUpdate = [
+					{ id: 'background-size-input', value: state.background.transform.size },
+					{ id: 'background-offset-x-input', value: state.background.transform.offset.x },
+					{ id: 'background-offset-y-input', value: state.background.transform.offset.y },
+					{ id: 'background-color-hue-input', value: state.background.effects.colorCorrection.hue },
+					{ id: 'background-color-saturation-input', value: state.background.effects.colorCorrection.saturation },
+					{ id: 'background-color-brightness-input', value: state.background.effects.colorCorrection.brightness },
+					{ id: 'background-colorize-switch', checked: state.background.effects.colorCorrection.colorize },
+					{ id: 'background-blur-intensity-input', value: state.background.effects.blur.intensity },
+					{ id: 'background-vignette-opacity-input', value: state.background.effects.vignette.opacity },
+					{ id: 'background-vignette-radius-input', value: state.background.effects.vignette.radius },
+					{ id: 'background-vignette-feather-input', value: state.background.effects.vignette.feather },
+					{ id: 'background-vignette-color', value: state.background.effects.vignette.color },
+					{ id: 'image-size-input', value: activeObjectState.image.size },
+					{ id: 'image-offset-x-input', value: activeObjectState.image.offset.x },
+					{ id: 'image-offset-y-input', value: activeObjectState.image.offset.y },
+					{ id: 'stroke-width-input', value: activeObjectState.stroke.width },
+					{ id: 'stroke-roughness-input', value: activeObjectState.stroke.roughness },
+					{ id: 'stroke-detail-input', value: activeObjectState.stroke.detail * 1000 },
+					{ id: 'shadow-offset-x-input', value: activeObjectState.shadow.offsetX },
+					{ id: 'shadow-offset-y-input', value: activeObjectState.shadow.offsetY },
+					{ id: 'shadow-blur-input', value: activeObjectState.shadow.blur },
+					{ id: 'shadow-opacity-input', value: activeObjectState.shadow.opacity },
+					{ id: 'shadow-color', value: activeObjectState.shadow.color },
+					{ id: 'color-hue-input', value: activeObjectState.color.hue },
+					{ id: 'color-saturation-input', value: activeObjectState.color.saturation },
+					{ id: 'color-brightness-input', value: activeObjectState.color.brightness },
+					{ id: 'colorize-switch', checked: activeObjectState.color.colorize },
+					{ id: 'movement-simpel-speed-input', value: activeObjectState.movement.simpelSpeed },
+					{ id: 'movement-simpel-strength-input', value: activeObjectState.movement.simpelStrength },
+					{ id: 'movement-rotation-speed-input', value: activeObjectState.movement.rotationSpeed },
+					{ id: 'movement-rotation-strength-input', value: activeObjectState.movement.rotationStrength },
+					{ id: 'movement-position-speed-x-input', value: activeObjectState.movement.positionSpeed.x },
+					{ id: 'movement-position-speed-y-input', value: activeObjectState.movement.positionSpeed.y },
+					{ id: 'movement-position-strength-x-input', value: activeObjectState.movement.positionStrength.x },
+					{ id: 'movement-position-strength-y-input', value: activeObjectState.movement.positionStrength.y },
+					{ id: 'overlay-opacity-input', value: activeObjectState.paperFoldOverlay.opacity },
+					{ id: 'overlay-speed-input', value: activeObjectState.paperFoldOverlay.speed },
+					{ id: 'export-duration-input', value: state.export.duration },
+					{ id: 'export-filename-input', value: state.export.filename + '.webm' }
+				];
 
-                    // Logika khusus untuk membuka akordeon Transform saat reset
-                    let shouldBeOpenByDefault = false;
-                    if (section.id === 'background-transform-accordion' && !state.background.element) {
-                        // Jangan buka jika tidak ada gambar latar
-                    } else if (section.id === 'background-transform-accordion' || (section.id === 'foreground-transform-accordion' && activeObjectState.image.element)) {
-                        // Buka akordeon transform latar, atau transform objek jika ada gambar
-                        shouldBeOpenByDefault = true;
-                    }
-                    
-                    // Tentukan apakah akordeon harus terbuka
-                    const isOpen = isEnabledBySwitch || section.classList.contains('accordion-open');
-                    
-                    // Terapkan kelas untuk visual (ikon chevron, dll.)
-                    section.classList.toggle('accordion-open', isOpen);
-                    if (body) {
-                        body.classList.toggle('hidden', !isOpen);
-                    }
-                });
-                document.querySelectorAll('#preview-resolution-btns button').forEach(button => {
-                    button.classList.toggle('active', button.dataset.res === state.previewResolutionMode);
-                });  
-                document.getElementById('debug-screen-switch').checked = state.debugScreenEnabled;
-                document.getElementById('debug-screen').classList.toggle('hidden', !state.debugScreenEnabled);                              
-                showTab(state.activeTab);
-                requestRedraw();
-                renderKeyframeList();
-            }
+				inputsToUpdate.forEach(item => {
+					const el = document.getElementById(item.id);
+					const sliderEl = document.getElementById(item.id.replace('-input', ''));
+					if (el) {
+						if (el.type === 'checkbox') {
+							el.checked = item.checked;
+						} else if (item.value !== undefined) {
+							el.value = item.value;
+						}
+					}
+					if (sliderEl && sliderEl.type === 'range' && item.value !== undefined) {
+						sliderEl.value = item.value;
+					}
+				});
+
+				document.querySelectorAll('#export-fps-btns button').forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.fps) === state.export.fps));
+
+				document.querySelectorAll('.accordion-section').forEach(section => {
+					const switchInput = section.querySelector('.accordion-header .switch input');
+					if (!switchInput) return;
+					let isEnabled;
+					const sectionId = section.id;
+					if (sectionId.includes('foreground-stroke')) isEnabled = activeObjectState.stroke.enabled;
+					else if (sectionId.includes('foreground-shadow')) isEnabled = activeObjectState.shadow.enabled;
+					else if (sectionId.includes('foreground-color')) isEnabled = activeObjectState.color.enabled;
+					else if (sectionId.includes('movement')) isEnabled = activeObjectState.movement.enabled;
+					else if (sectionId.includes('background-color-correction')) isEnabled = state.background.effects.colorCorrection.enabled;
+					else if (sectionId.includes('background-blur')) isEnabled = state.background.effects.blur.enabled;
+					else if (sectionId.includes('background-vignette')) isEnabled = state.background.effects.vignette.enabled;
+					else if (sectionId.includes('paper-fold-overlay')) isEnabled = activeObjectState.paperFoldOverlay.enabled;
+					if (typeof isEnabled !== 'undefined') switchInput.checked = isEnabled;
+				});
+
+				const isSimpelMode = activeObjectState.movement.mode === 'simpel';
+				document.getElementById('movement-controls-simpel').classList.toggle('hidden', !isSimpelMode);
+				document.getElementById('movement-controls-lengkap').classList.toggle('hidden', isSimpelMode);
+				document.querySelectorAll('#movement-mode-btns button').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === activeObjectState.movement.mode));
+
+				document.getElementById('color-correction-standard-controls').classList.remove('hidden');
+				document.getElementById('background-color-correction-standard-controls').classList.remove('hidden');
+
+				syncBackgroundTransformModeUI();
+				syncDisplayModeUI();
+				syncUISizeUI();
+
+				document.querySelectorAll('#language-btns button').forEach(button => {
+					button.classList.toggle('active', button.dataset.lang === state.language);
+				});
+
+				document.querySelectorAll('.accordion-section').forEach(section => {
+					const body = section.querySelector('.accordion-body');
+					const isEnabledBySwitch = section.querySelector('.switch input')?.checked ?? true;
+					let shouldBeOpenByDefault = false;
+					if (section.id === 'background-transform-accordion' && !state.background.element) {
+					} else if (section.id === 'background-transform-accordion' || (section.id === 'foreground-transform-accordion' && activeObjectState.image.element)) {
+						shouldBeOpenByDefault = true;
+					}
+					const isOpen = isEnabledBySwitch || section.classList.contains('accordion-open');
+					section.classList.toggle('accordion-open', isOpen);
+					if (body) {
+						body.classList.toggle('hidden', !isOpen);
+					}
+				});
+
+				document.querySelectorAll('#preview-resolution-btns button').forEach(button => {
+					button.classList.toggle('active', button.dataset.res === state.previewResolutionMode);
+				});
+
+				document.getElementById('debug-screen-switch').checked = state.debugScreenEnabled;
+				document.getElementById('debug-screen').classList.toggle('hidden', !state.debugScreenEnabled);
+				showTab(state.activeTab);
+				requestRedraw();
+				renderKeyframeList();
+			}
 
             /**
              * Updates the UI for the background transform controls based on the selected mode ('fill' or 'stretch').
@@ -3092,31 +3294,33 @@ Object       : ${objFileName}
                     state.object.image.element = currentObjectImg;
                     state.object.image.file = currentObjectFile;
                 }
-                // Jika deleteImages true, state gambar akan tetap null dari DEFAULT_STATE.
-                
-                // Perbarui seluruh UI berdasarkan state yang baru.
-                // Panggilan ini akan membersihkan tampilan drop-zone.
                 updateUIFromState();
                 resizeAndRedrawAll();
             }
             
-            /**
-             * Resets a specific section of the settings to its default value for the active object.
-             */
             function resetSectionSettings(sectionKey) {
                 const defaultObjectState = DEFAULT_OBJECT_STATE;
 
-                // Cek sederhana: Apakah ini pengaturan milik objek?
                 if (sectionKey === 'image' || ['stroke', 'shadow', 'color', 'movement', 'paperFoldOverlay'].includes(sectionKey)) {
-                    // Langsung targetkan 'state.object', tidak perlu tahu indeks
                     if (sectionKey === 'image') {
                         state.object.image.size = defaultObjectState.image.size;
                         state.object.image.offset = JSON.parse(JSON.stringify(defaultObjectState.image.offset));
+                        state.object.image.rotation = defaultObjectState.image.rotation;
+
+                        const rotSlider = document.getElementById('image-rotation');
+                        const rotInput = document.getElementById('image-rotation-input');
+                        const rotLabel = document.getElementById('image-rotation-label');
+                        
+                        if (rotSlider) rotSlider.value = 0;
+                        if (rotInput) rotInput.value = 0;
+                        if (rotLabel) rotLabel.textContent = translations[state.language]?.rotation || 'Rotation';                        
                     } else {
                         state.object[sectionKey] = JSON.parse(JSON.stringify(defaultObjectState[sectionKey]));
+                            if (sectionKey === 'stroke') {
+                                isCacheGenerationNeeded = true; // Paksa regenerasi cache efek sobekan
+                            }
                     }
                 } else {
-                    // Logika untuk pengaturan global/latar belakang (tidak berubah)
                     const keys = sectionKey.split('.');
                     let defaultSection = DEFAULT_STATE;
                     let currentSection = state;
@@ -3132,9 +3336,6 @@ Object       : ${objFileName}
                 requestRedraw();
             }
 
-            /**
-             * Shows a notification message at the top of the screen.
-             */
             function showTopNotification(messageKey, duration = 3000) {
                 clearTimeout(notificationTimeout);
                 topNotificationMessage.textContent = translations[state.language][messageKey] || messageKey;
@@ -3185,7 +3386,6 @@ Object       : ${objFileName}
             /**
              * Starts the video export process using CCapture.js.
              */
-            // GANTI SELURUH FUNGSI LAMA DENGAN INI
             async function startExport() {
                 isExporting = true;
                 const hasAnyImage = state.object.image.element || state.background.element;
@@ -3204,33 +3404,60 @@ Object       : ${objFileName}
                 exportProgressPopup.classList.remove('hidden');
                 exportProgressPopup.classList.add('flex');
 
+                const exportTitle = exportProgressPopup.querySelector('h3'); // Ambil elemen h3
+                progressBarFill.style.width = '0%';
+                progressBarFill.textContent = '0%'; // Set progress bar hanya dengan angka
+                exportTitle.textContent = translations[state.language].preparingExportCanvas || 'Menyiapkan kanvas ekspor...'; // Set pesan di judul
+                await new Promise(resolve => setTimeout(resolve, 100));
                 cancelAnimationFrame(animationFrameId);
 
-                const originalCanvasWidth = canvas.width;
-                const originalCanvasHeight = canvas.height;
-                const finalExportDims = RESOLUTION_MAPS[state.canvasDisplayResolution.toString()]?.[state.aspectRatio];
+                // --- REVISI FINAL: PENDEKATAN SEDERHANA & BENAR ---
 
+                // 1. Siapkan kanvas untuk resolusi ekspor final.
+                const finalExportDims = RESOLUTION_MAPS[state.canvasDisplayResolution.toString()]?.[state.aspectRatio];
                 if (!finalExportDims) {
-                    console.error("Invalid export resolution.");
+                    console.error("Resolusi ekspor tidak valid.");
                     isExporting = false;
-                    // Kembalikan UI ke keadaan normal
-                    exportProgressPopup.classList.add('hidden');
-                    exportProgressPopup.classList.remove('flex');
-                    animationLoop();
                     return;
                 }
+                canvas.width = finalExportDims.w;
+                canvas.height = finalExportDims.h;
 
-                canvas.width = objectCanvas.width = finalObjectCanvas.width = contentCanvas.width = finalExportDims.w;
-                canvas.height = objectCanvas.height = finalObjectCanvas.height = contentCanvas.height = finalExportDims.h;
+                const previewImageElement = state.object.image.element;
+                const originalImageSize = state.object.image.size; // Simpan skala asli
 
-                // Reset state animasi
-                const obj = state.object;
-                obj.movement.lastRotationUpdateTime = 0;
-                obj.movement.lastPositionUpdateTime = { x: 0, y: 0 };
-                obj.movement.rotation = 0;
-                obj.movement.positionOffset = { x: 0, y: 0 };
-                obj.paperFoldOverlay.lastImageSwitchTime = 0;
-                obj.paperFoldOverlay.currentImageIndex = 0;
+                // 2. Jika ada gambar resolusi tinggi, buat versi BARU yang sudah diberi padding.
+                if (state.object.image.originalElement) {
+                    console.log("Membuat elemen resolusi tinggi dengan padding untuk ekspor...");
+                    
+                    const highResImg = state.object.image.originalElement;
+                    const paddingX = highResImg.width * 0.25;
+                    const paddingY = highResImg.height * 0.25;
+
+                    const paddedCanvas = document.createElement('canvas');
+                    const paddedCtx = paddedCanvas.getContext('2d');
+                    paddedCanvas.width = highResImg.width + paddingX * 2;
+                    paddedCanvas.height = highResImg.height + paddingY * 2;
+                    paddedCtx.drawImage(highResImg, paddingX, paddingY);
+
+                    const highResPaddedImg = new Image();
+                    highResPaddedImg.src = paddedCanvas.toDataURL();
+                    await highResPaddedImg.decode(); // Tunggu hingga gambar siap digunakan.
+
+                    // 3. Gunakan gambar BARU (resolusi tinggi + padding) ini sebagai elemen aktif selama ekspor.
+                    state.object.image.element = highResPaddedImg;
+                }
+                
+                // 4. Buat cache berdasarkan elemen yang benar.
+                isCacheGenerationNeeded = true;
+                await generateTornEdgeCache();
+
+                // BAGIAN BARU 2
+                exportTitle.textContent = translations[state.language].exportingVideo || 'Mengekspor Video...';                await new Promise(resolve => setTimeout(resolve, 100)); 
+                
+                // Sisa fungsi tidak berubah...
+                Object.assign(state.object.movement, DEFAULT_OBJECT_STATE.movement);
+                Object.assign(state.object.paperFoldOverlay, DEFAULT_OBJECT_STATE.paperFoldOverlay);
 
                 const DURATION_S = state.export.duration;
                 const FRAME_RATE = state.export.fps;
@@ -3239,70 +3466,63 @@ Object       : ${objFileName}
                 const capturer = new CCapture({ format: 'webm', framerate: FRAME_RATE, quality: 95, name: FILENAME });
 
                 let isExportCancelled = false;
-                const handleCancel = () => {
-                    isExportCancelled = true;
-                };
+                const handleCancel = () => { isExportCancelled = true; };
                 cancelExportBtn.addEventListener('click', handleCancel, { once: true });
+
+                const cleanupAfterExport = () => {
+                    console.log("Mengembalikan ke gambar pratinjau...");
+                    state.object.image.element = previewImageElement; // Kembalikan elemen pratinjau (resolusi rendah + padding)
+                    state.object.image.size = originalImageSize;     // Kembalikan skala asli
+                    
+                    resizeAndRedrawAll();
+                    exportProgressPopup.classList.add('hidden');
+                    exportProgressPopup.classList.remove('flex');
+                    cancelExportBtn.removeEventListener('click', handleCancel);
+                    isExporting = false;
+                    isCacheGenerationNeeded = true;
+                    needsRedraw = true;
+                    animationFrameId = requestAnimationFrame(animationLoop);
+                };
 
                 capturer.start();
 
-                // Loop Asinkron untuk Perekaman Frame
-                function processFrame(frame) {
-                    // Cek jika dibatalkan
+                async function processFrame(frame) {
                     if (isExportCancelled) {
-                        console.log("Export cancelled by user.");
-                        // Hentikan perekaman tanpa menyimpan
                         capturer.stop();
-                        // Bersihkan dan kembalikan UI
-                        exportProgressPopup.classList.add('hidden');
-                        exportProgressPopup.classList.remove('flex');
-                        cancelExportBtn.removeEventListener('click', handleCancel);
-                        resizeAndRedrawAll(); // Kembalikan resolusi kanvas
-                        isExporting = false;
-                        animationFrameId = requestAnimationFrame(animationLoop);
+                        cleanupAfterExport();
                         return;
                     }
 
-                    // Cek jika sudah selesai
                     if (frame > TOTAL_FRAMES) {
-                        progressBarFill.textContent = `${translations[state.language].completing}...`;
+                        progressBarFill.textContent = '100%';
+                        exportTitle.textContent = `${translations[state.language].completing}...`;
                         capturer.stop();
                         capturer.save(blob => {
-                            exportProgressPopup.classList.add('hidden');
-                            exportProgressPopup.classList.remove('flex');
-                            cancelExportBtn.removeEventListener('click', handleCancel);
-                            resizeAndRedrawAll();
-                            isExporting = false;
-                            animationFrameId = requestAnimationFrame(animationLoop);
-
                             const url = URL.createObjectURL(blob);
                             const a = document.createElement('a');
                             a.href = url;
                             a.download = `${FILENAME}.webm`;
-                            document.body.appendChild(a);
                             a.click();
-                            document.body.removeChild(a);
-                            window.URL.revokeObjectURL(url);
+                            URL.revokeObjectURL(url);
+                            a.remove();
+                            cleanupAfterExport();
                         });
                         return;
                     }
 
-                    // Proses frame saat ini
                     const timestamp = (frame / FRAME_RATE) * 1000;
                     updateMovement(timestamp);
                     updatePaperFoldOverlay(timestamp);
-                    draw(timestamp);
+                    await draw(timestamp);
                     capturer.capture(canvas);
 
                     const percentage = Math.round((frame / TOTAL_FRAMES) * 100);
                     progressBarFill.style.width = `${percentage}%`;
                     progressBarFill.textContent = `${percentage}%`;
 
-                    // Panggil frame berikutnya
                     requestAnimationFrame(() => processFrame(frame + 1));
                 }
 
-                // Mulai dari frame 0
                 processFrame(0);
             }
             /**
@@ -3729,6 +3949,13 @@ Object       : ${objFileName}
                     });
                 });
                 
+                // Mencegah akordeon terbuka saat ikon tooltip diklik
+                document.querySelectorAll('.info-tooltip-trigger').forEach(trigger => {
+                    trigger.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                    });
+                });
+
                 // Effect enable/disable switches
                 const effectSwitches = [
                     { switchId: 'background-color-correction-enabled-switch', stateKey: 'background.effects.colorCorrection' },
@@ -3799,9 +4026,59 @@ Object       : ${objFileName}
                     (val) => { getActiveObject().image.rotation = val; }
                 );
 
-                syncSliderAndInput('stroke-width', 'stroke-width-input', (val) => getActiveObject().stroke.width = val);
-                syncSliderAndInput('stroke-roughness', 'stroke-roughness-input', (val) => getActiveObject().stroke.roughness = val);
-                syncSliderAndInput('stroke-detail', 'stroke-detail-input', (val) => getActiveObject().stroke.detail = val / 1000);
+                const setupTornEdgeSlider = (sliderId, inputId, stateUpdater, isDetail = false) => {
+                    const slider = document.getElementById(sliderId)
+                    const input = document.getElementById(inputId)
+                    if (!slider || !input) return
+
+                    const throttledUpdate = throttle((value) => {
+                        if (!isAdjustingTornEdge) return
+                        const numericValue = parseFloat(value) || 0
+                        stateUpdater(isDetail ? numericValue / 1000 : numericValue)
+                        requestRedraw()
+                    }, 50)
+
+                    const startAdjusting = () => {
+                        if (!state.object.image.element) return
+                        isAdjustingTornEdge = true
+                        isLiveTornEdgePreview = true
+                        originalOverlaySpeed = getActiveObject().paperFoldOverlay.speed
+                        getActiveObject().paperFoldOverlay.speed = 0
+                        toggleProcessingMessage(true, 'processingImageEffect');
+                    }
+
+                    const stopAdjusting = () => {
+                        if (!isAdjustingTornEdge) return
+                        isAdjustingTornEdge = false
+                        isLiveTornEdgePreview = false
+                        getActiveObject().paperFoldOverlay.speed = originalOverlaySpeed
+                        isCacheGenerationNeeded = true
+                        toggleProcessingMessage(false);
+                        requestRedraw()
+                    }
+
+                    slider.addEventListener('pointerdown', startAdjusting)
+                    slider.addEventListener('pointerup', stopAdjusting)
+                    slider.addEventListener('pointerleave', stopAdjusting)
+
+                    slider.addEventListener('input', (e) => {
+                        input.value = e.target.value
+                        throttledUpdate(e.target.value)
+                    })
+
+                    input.addEventListener('change', (e) => {
+                        const finalValue = parseFloat(e.target.value) || 0
+                        slider.value = finalValue
+                        stateUpdater(isDetail ? finalValue / 1000 : finalValue)
+                        isCacheGenerationNeeded = true
+                        requestRedraw()
+                    })
+                }
+
+				setupTornEdgeSlider('stroke-width', 'stroke-width-input', (val) => getActiveObject().stroke.width = val);
+				setupTornEdgeSlider('stroke-roughness', 'stroke-roughness-input', (val) => getActiveObject().stroke.roughness = val);
+				setupTornEdgeSlider('stroke-detail', 'stroke-detail-input', (val) => getActiveObject().stroke.detail = val, true);
+
                 syncSliderAndInput('shadow-blur', 'shadow-blur-input', (val) => getActiveObject().shadow.blur = val);
                 syncSliderAndInput('shadow-opacity', 'shadow-opacity-input', (val) => getActiveObject().shadow.opacity = val);
                 syncInputOnly('shadow-offset-x-input', (val) => getActiveObject().shadow.offsetX = val);
@@ -3973,21 +4250,24 @@ Object       : ${objFileName}
                              
                 document.getElementById('add-keyframe-btn').addEventListener('click', () => {
                     const keyframes = state.object.animation.keyframes;
-                    const lastTime = keyframes.length > 0 ? keyframes.sort((a, b) => a.time - b.time)[keyframes.length - 1].time : 0;
-                    const lastProps = keyframes.length > 0 ? keyframes[keyframes.length - 1] : DEFAULT_OBJECT_STATE.animation.keyframes[0];
+                    const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
+                    const lastKeyframe = sortedKeyframes.length > 0 ? sortedKeyframes[sortedKeyframes.length - 1] : DEFAULT_OBJECT_STATE.animation.keyframes[0];
 
                     const newKeyframe = {
+                        ...JSON.parse(JSON.stringify(lastKeyframe)),
                         id: Date.now(),
-                        time: Math.round((lastTime + 1) * 10) / 10,
-                        x: lastProps.x, y: lastProps.y, scale: lastProps.scale,
-                        easing: 'linear', paperAnim: 'none'
+                        time: Math.round((lastKeyframe.time + 1) * 10) / 10,
+                        easing: 'linear',
+                        paperAnim: 'none'
                     };
+
+                    if (typeof newKeyframe.rotation !== 'number') {
+                        newKeyframe.rotation = 0;
+                    }
+
                     keyframes.push(newKeyframe);
                     state.object.animation.activeKeyframeId = newKeyframe.id;
-                    
-                    // Panggil fungsi untuk memperpanjang durasi
                     checkAndExtendDuration(newKeyframe.time);
-                    
                     renderKeyframeList();
                     requestRedraw();
                 });
@@ -4017,25 +4297,19 @@ Object       : ${objFileName}
                     const kf = state.object.animation.keyframes.find(k => k.id === id);
 
                     if (kf) {
-                        // 1. Atur status animasi ke mode pratinjau/jeda
                         state.object.animation.isPlaying = false;
                         state.object.animation.previewTime = kf.time;
                         pauseStartTime = kf.time * 1000;
 
-                        // 2. Perbarui UI timeline (slider dan teks waktu) secara manual
                         const timelineSlider = document.getElementById('timeline-slider');
                         const timelineCurrentTime = document.getElementById('timeline-current-time');
                         if (timelineSlider) timelineSlider.value = kf.time;
                         if (timelineCurrentTime) timelineCurrentTime.textContent = `${kf.time.toFixed(2)}s`;
 
-                        // 3. Perbarui UI tombol play/pause
                         updatePlayPauseButton();
 
-                        // 4. Minta kanvas untuk menggambar ulang pratinjau
                         needsRedraw = true;
                     }
-
-                    // 5. Selalu perbarui daftar keyframe dan panel propertinya
                     renderKeyframeList();
                 });
 
@@ -4049,7 +4323,6 @@ Object       : ${objFileName}
                             const newTime = Math.max(0, parseFloat(e.target.value) || 0);
                             kf.time = newTime;
                             
-                            // Panggil fungsi untuk memperpanjang durasi
                             checkAndExtendDuration(newTime);
 
                             renderKeyframeList();
@@ -4061,21 +4334,21 @@ Object       : ${objFileName}
                 document.getElementById('play-pause-btn').addEventListener('click', () => {
                     const animState = state.object.animation;
                     if (!state.object.image.element && !animState.isPlaying) {
-                        showTopNotification("notificationWarnObject"); // Tampilkan notifikasi
-                        return; // Hentikan fungsi
+                        showTopNotification("notificationWarnObject");
+                        return;
                     }                    
                     animState.isPlaying = !animState.isPlaying;
 
                     if (animState.isPlaying) {
-                        // Jika melanjutkan, hitung ulang waktu mulai animasi
-                        // untuk menghindari lompatan waktu.
                         animState.previewTime = null;
                         animationStartTime = performance.now() - pauseStartTime;
+                        state.object.paperFoldOverlay.lastImageSwitchTime = performance.now();
+                        
                     } else {
-                        // Jika pause, simpan waktu saat ini
                         pauseStartTime = performance.now() - animationStartTime;
                         animState.previewTime = (pauseStartTime / 1000) % state.export.duration;
-                        needsRedraw = true; // gambar frame terakhir saat pause
+                        needsRedraw = true;
+                        
                     }
                     
                     updatePlayPauseButton();
@@ -4115,31 +4388,31 @@ Object       : ${objFileName}
 
                     timelineSlider.addEventListener('mousedown', startScrub);
                     timelineSlider.addEventListener('touchstart', startScrub, { passive: true });
-                    timelineSlider.addEventListener('input', doScrub);
+                    timelineSlider.addEventListener('input', throttle(doScrub, 40));
                     document.addEventListener('mouseup', stopScrub);
                     document.addEventListener('touchend', stopScrub);
                 }
 
-                let hideTooltipTimeout; // Variabel untuk menampung timer
+                let hideTooltipTimeout;
 
                 document.querySelectorAll('.info-tooltip-trigger').forEach(trigger => {
                     const tooltip = trigger.querySelector('.info-tooltip');
                     if (!tooltip) return;
 
                     const showTooltip = () => {
-                        clearTimeout(hideTooltipTimeout); // Batalkan timer untuk menyembunyikan
-                        tooltip.classList.add('tooltip-visible'); // Tampilkan tooltip
+                        clearTimeout(hideTooltipTimeout);
+                        tooltip.classList.add('tooltip-visible');
                     };
 
                     const startHideTimer = () => {
                         hideTooltipTimeout = setTimeout(() => {
                             tooltip.classList.remove('tooltip-visible');
-                        }, 500); // Sembunyikan setelah 500ms
+                        }, 500);
                     };
 
                     trigger.addEventListener('mouseenter', showTooltip);
                     trigger.addEventListener('mouseleave', startHideTimer);
-                    tooltip.addEventListener('mouseenter', showTooltip); // Jaga agar tetap tampil saat kursor di atas tooltip
+                    tooltip.addEventListener('mouseenter', showTooltip);
                     tooltip.addEventListener('mouseleave', startHideTimer);
                 });
                 
