@@ -9,7 +9,7 @@
     <link rel="shortcut icon" href="./assets/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="Papera.me" />
-    <link rel="manifest" href="./assets/site.webmanifest" />
+    <link rel="manifest" href="./site.webmanifest" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/ccapture.js-npmfixed/build/CCapture.all.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -3461,7 +3461,7 @@ Object       : ${objFileName}
                     resetButton.classList.remove('hidden');
                     resetPrefsButton.classList.add('hidden');
                 }
-                
+
                 document.getElementById('panel-title').textContent = titleText;
                 document.getElementById('mobile-panel-header').textContent = titleText.toUpperCase();
 
@@ -3478,7 +3478,6 @@ Object       : ${objFileName}
                 document.querySelector(`.mobile-tab-btn[data-tab="${tabName}"]`)?.classList.add('active');
                 state.activeTab = tabName;
 
-                // Kembalikan posisi scroll untuk tab yang baru ditampilkan
                 if (controlsPanel) {
                     controlsPanel.scrollTop = tabScrollPositions[tabName] || 0;
                 }

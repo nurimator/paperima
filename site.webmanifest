@@ -1,8 +1,11 @@
 {
   "name": "papera.me",
   "short_name": "Papera",
-  "start_url": "/papera.me/",
-  "scope": "/papera.me/",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "description": "Aplikasi untuk membuat efek sobekan kertas pada foto.",
   "icons": [
     {
       "src": "./assets/web-app-manifest-192x192.png",
@@ -16,8 +19,5 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ],
-  "theme_color": "#0f172a",
-  "background_color": "#0f172a",
-  "display": "standalone"
+  ]
 }
