@@ -1156,7 +1156,7 @@
                         <div class="grid grid-cols-2 gap-2 md:gap-2 mt-2">
                             <button id="pwa-install-button" class="flex items-center justify-center gap-2 px-4 py-2 bg-slate-600/50 text-white text-sm font-semibold text-center hover:bg-slate-500/50 transition-all duration-150 cursor-pointer">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M2.5 7C2.5 9.48528 4.51472 11.5 7 11.5C9.48528 11.5 11.5 9.48528 11.5 7C11.5 4.51472 9.48528 2.5 7 2.5C4.51472 2.5 2.5 4.51472 2.5 7ZM2.5 17C2.5 19.4853 4.51472 21.5 7 21.5C9.48528 21.5 11.5 19.4853 11.5 17C11.5 14.5147 9.48528 12.5 7 12.5C4.51472 12.5 2.5 14.5147 2.5 17ZM12.5 17C12.5 19.4853 14.5147 21.5 17 21.5C19.4853 21.5 21.5 19.4853 21.5 17C21.5 14.5147 19.4853 12.5 17 12.5C14.5147 12.5 12.5 14.5147 12.5 17ZM16 11V8H13V6H16V3H18V6H21V8H18V11H16Z"></path></svg>
-                                <span data-translate-key="installApp">Instal Aplikasi</span>
+                                <span data-translate-key="installApp">Install App</span>
                             </button>
                             <a href="https://www.youtube.com/@nurimator/shorts" target="_blank" class="flex items-center justify-center gap-2 px-4 py-2 bg-slate-600/50 text-white text-sm font-semibold text-center hover:bg-slate-500/50 transition-all duration-150 cursor-pointer">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20 22H6.5C4.567 22 3 20.433 3 18.5V5C3 3.34315 4.34315 2 6 2H20C20.5523 2 21 2.44772 21 3V21C21 21.5523 20.5523 22 20 22ZM19 20V17H6.5C5.67157 17 5 17.6716 5 18.5C5 19.3284 5.67157 20 6.5 20H19ZM10 4V12L13.5 10L17 12V4H10Z"></path></svg>
@@ -1171,11 +1171,10 @@
                                 <span data-translate-key="license">License</span>
                             </a>
                         </div>
-                        
                         <div class="mt-2">
                             <a href="https://lynk.id/nurimator" target="_blank" class="flex items-center justify-center gap-2 w-full px-4 py-2 bg-[var(--accent-color)] text-white text-sm font-semibold text-center hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12.001 4.52853C14.35 2.42 17.98 2.49 20.2426 4.75736C22.5053 7.02472 22.583 10.637 20.4786 12.993L11.9999 21.485L3.52138 12.993C1.41705 10.637 1.49571 7.01901 3.75736 4.75736C6.02157 2.49315 9.64519 2.41687 12.001 4.52853Z"></path></svg>
-                                <span data-translate-key="supportCreator">Dukung Kreator</span>
+                                <span data-translate-key="supportCreator">Support Creator</span>
                             </a>
                         </div>
                     </div>
@@ -4339,13 +4338,10 @@ Object       : ${objFileName}
                 // Simpan event sehingga bisa dipicu nanti
                 deferredPrompt = e;
                 // Tampilkan tombol instalasi kita
-                installButton.classList.remove('hidden');
                 console.log("Event beforeinstallprompt terpicu. Tombol instalasi terlihat.");
             });
             installButton.addEventListener('click', async () => {
                 if (deferredPrompt) {
-                    // Sembunyikan tombol lagi
-                    installButton.classList.add('hidden');
                     // Tampilkan promosi instalasi
                     deferredPrompt.prompt();
                     // Tunggu hingga pengguna merespons
