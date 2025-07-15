@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Editor Gambar dengan Efek Kertas Sobek</title>
+    <title>papera.me | Paperize your Images</title>
     <link rel="icon" type="image/png" href="./assets/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
     <link rel="shortcut icon" href="./assets/favicon.ico" />
@@ -1322,25 +1322,26 @@
 
             // URLs for overlay images from GitHub repository.
             const overlayImageUrls = [
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper_1.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper_2.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper_3.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/paper_4.webp'
+                './assets/texture/paper_overlay_0.webp',
+                './assets/texture/paper_overlay_1.webp',
+                './assets/texture/paper_overlay_2.webp',
+                './assets/texture/paper_overlay_3.webp'
             ];
             const MASK_IMAGE_URLS = [
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask_stage_0.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask_stage_1.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask_stage_2.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask_stage_3.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img//mask_stage_4.webp'
+                './assets/texture/paper_mask_0.webp',
+                './assets/texture/paper_mask_1.webp',
+                './assets/texture/paper_mask_2.webp',
+                './assets/texture/paper_mask_3.webp',
+                './assets/texture/paper_mask_4.webp',
+                './assets/texture/paper_mask_5.webp'
             ];
-
             const LAYER_IMAGE_URLS = [
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/layer_stage_0.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/layer_stage_1.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/layer_stage_2.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/layer_stage_3.webp',
-                'https://raw.githubusercontent.com/nurimator/paperimator/refs/heads/main/img/layer_stage_4.webp'
+                './assets/texture/paper_fold_0.webp',
+                './assets/texture/paper_fold_1.webp',
+                './assets/texture/paper_fold_2.webp',
+                './assets/texture/paper_fold_3.webp',
+                './assets/texture/paper_fold_4.webp',
+                './assets/texture/paper_fold_5.webp'
             ];
 
             let maskImages = [];
@@ -1539,7 +1540,7 @@
                     activeObject: 'Active Object',
                     animationObject: 'Object Animation',
                     dropShadowTooltip: 'We recommend turning off drop shadow when exporting for a greenscreen. <a href="#" target="_blank" class="text-blue-400 hover:underline">Learn more</a>',
-                    easing: 'Easing', installApp: 'Install App',
+                    easing: 'Easing', installApp: 'Install App', appInstalled: 'Installed',
                     linear: 'Linear',
                     easeIn: 'Ease In',
                     easeOut: 'Ease Out',
@@ -1598,7 +1599,7 @@
                     activeObject: 'Objek Aktif',
                     animationObject: 'Animasi Objek',
                     dropShadowTooltip: 'Kami menyarankan dropshadow dimatikan jika ekspor sebagai greenscreen. <a href="#" target="_blank" class="text-blue-400 hover:underline">Pelajari selengkapnya</a>',
-                    easing: 'Easing', installApp: 'Instal Aplikasi',
+                    easing: 'Easing', installApp: 'Instal Aplikasi', appInstalled: 'Terinstal',
                     linear: 'Linear',
                     easeIn: 'Ease In',
                     easeOut: 'Ease Out',
@@ -2003,25 +2004,25 @@
                     let transform, isPaperAnimActive = false, paperFrameIndex = 0, currentLayer = null, currentMask = null;
                     if (isSimpleMode) {
                         transform = { x: objectState.image.offset.x, y: objectState.image.offset.y, scale: objectState.image.size, rotation: objectState.image.rotation };
-                        const animDuration = 1.0, frameDuration = 0.2;
+                        const animDuration = 1.0, frameDuration = animDuration / 6.0;
                         if (animState.simple.previewing) {
                             const timeSincePreviewStart = (performance.now() - animState.simple.previewStartTime) / 1000;
                             if (timeSincePreviewStart < animDuration) {
                                 isPaperAnimActive = true;
-                                let frameIndex = Math.min(4, Math.floor(timeSincePreviewStart / frameDuration));
-                                paperFrameIndex = (animState.simple.previewing === 'close') ? 4 - frameIndex : frameIndex;
+                                let frameIndex = Math.min(5, Math.floor(timeSincePreviewStart / frameDuration));
+                                paperFrameIndex = (animState.simple.previewing === 'close') ? 5 - frameIndex : frameIndex;
                             }
                         } else {
                             if (animState.simple.open && timeInSeconds >= 0 && timeInSeconds < animDuration) {
                                 isPaperAnimActive = true;
-                                paperFrameIndex = Math.min(4, Math.floor(timeInSeconds / frameDuration));
+                                paperFrameIndex = Math.min(5, Math.floor(timeInSeconds / frameDuration));
                             }
                             const closeAnimStartTime = totalDuration - animDuration;
                             if (animState.simple.close && timeInSeconds >= closeAnimStartTime && timeInSeconds <= totalDuration) {
                                 isPaperAnimActive = true;
                                 const timeIntoClose = timeInSeconds - closeAnimStartTime;
-                                const frameIndex = Math.min(4, Math.floor(timeIntoClose / frameDuration));
-                                paperFrameIndex = 4 - frameIndex;
+                                const frameIndex = Math.min(5, Math.floor(timeIntoClose / frameDuration));
+                                paperFrameIndex = 5 - frameIndex;
                             }
                         }
                     } else {
@@ -3623,24 +3624,61 @@ Object       : ${objFileName}
                 }, 500);
             }
 
+            function setInstallButtonToInstalled() {
+                const installButton = document.getElementById('pwa-install-button');
+                if (installButton) {
+                    // Tampilkan tombol jika tersembunyi
+                    installButton.style.display = 'flex';
+
+                    // Nonaktifkan tombol dan ubah tampilannya
+                    installButton.disabled = true;
+                    installButton.classList.add('is-disabled');
+
+                    // Ubah teks di dalam tombol menggunakan terjemahan
+                    const buttonTextSpan = installButton.querySelector('span');
+                    if (buttonTextSpan) {
+                        buttonTextSpan.textContent = translations[state.language].appInstalled || 'Installed';
+                    }
+                }
+            }
+            
             // PWA Installation Logic
             let deferredPrompt;
             const installButton = document.getElementById('pwa-install-button');
             if (installButton) {
+                // BARU: Cek jika aplikasi sudah berjalan dalam mode standalone (terinstal)
+                if (window.matchMedia('(display-mode: standalone)').matches) {
+                    setInstallButtonToInstalled();
+                }
+
                 window.addEventListener('beforeinstallprompt', (e) => {
                     e.preventDefault();
                     deferredPrompt = e;
                     installButton.style.display = 'flex';
+                    installButton.disabled = false;
+                    installButton.classList.remove('is-disabled');
                 });
+
                 installButton.addEventListener('click', async () => {
                     if (deferredPrompt) {
-                        installButton.style.display = 'none';
                         deferredPrompt.prompt();
                         const { outcome } = await deferredPrompt.userChoice;
+
+                        // BARU: Cek apakah pengguna menerima instalasi
+                        if (outcome === 'accepted') {
+                            setInstallButtonToInstalled();
+                        }
+
                         deferredPrompt = null;
                     }
                 });
+
+                // BARU: Listener jika status instalasi aplikasi berubah
+                window.addEventListener('appinstalled', () => {
+                    setInstallButtonToInstalled();
+                });
             }
+
 
             // --- Kode Pendaftaran Service Worker Diletakkan di Sini ---
             if ('serviceWorker' in navigator) {
@@ -3688,7 +3726,6 @@ Object       : ${objFileName}
                 const totalOverlays = overlayImageUrls.length;
                 overlayImageUrls.forEach((url, index) => {
                     const img = new Image();
-                    img.crossOrigin = "Anonymous"; 
                     img.onload = () => {
                         originalOverlayImages[index] = img;
                         loadedOriginalOverlays++;
@@ -3703,7 +3740,6 @@ Object       : ${objFileName}
 
                 function loadImageAsset(url, targetArray, index) {
                     const img = new Image();
-                    img.crossOrigin = "Anonymous";
                     img.onload = () => {
                         targetArray[index] = img;
                         // Mungkin bisa ditambahkan logika preloader di sini jika perlu
@@ -3971,6 +4007,9 @@ Object       : ${objFileName}
                     slider.addEventListener('pointerdown', startAdjusting)
                     slider.addEventListener('pointerup', stopAdjusting)
                     slider.addEventListener('pointerleave', stopAdjusting)
+                    slider.addEventListener('touchstart', startAdjusting, { passive: true });
+                    slider.addEventListener('touchend', stopAdjusting);
+                    slider.addEventListener('touchcancel', stopAdjusting);
 
                     slider.addEventListener('input', (e) => {
                         input.value = e.target.value

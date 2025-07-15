@@ -4,8 +4,8 @@
   "start_url": "./",
   "display": "standalone",
   "background_color": "#0f172a",
-  "theme_color": "#0f172a",
-  "description": "Aplikasi untuk membuat efek sobekan kertas pada foto.",
+  "theme_color": "#283649",
+  "description": "Paperize your Images",
   "icons": [
     {
       "src": "./assets/web-app-manifest-192x192.png",
@@ -18,6 +18,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "./assets/web-app-manifest-any.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
