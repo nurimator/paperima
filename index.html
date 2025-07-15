@@ -79,13 +79,28 @@
         .accordion-open > .accordion-header .accordion-chevron { transform: rotate(180deg); color: var(--text-primary); }
         .accordion-open > .accordion-header { background-color: rgba(51, 65, 85, 0.3); }
         .reset-section-btn { background: none; border: none; color: var(--text-muted); padding: 0.25rem; margin-right: 0.5rem; transition: color 0.2s; }
-        .reset-section-btn:hover { color: var(--text-primary); }
+        .reset-section-btn { 
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.375rem; 
+            margin-right: 0.5rem;
+            transition: color 0.2s, background-color 0.2s;
+        }
+
+        .reset-section-btn:hover {
+            color: var(--text-primary);
+            background-color: var(--border-color-light);
+        }
         .btn-group-toggle button { border-radius: 0; }
         .btn-group-toggle button:hover { border-color: var(--accent-color); color: var(--text-primary); }
         .btn-group-toggle .active { border-color: var(--accent-color); color: var(--accent-color); background-color: rgba(59, 130, 246, 0.1); }
         #canvas-wrapper {
-            line-height: 0; /* Mencegah spasi ekstra di bawah kanvas */
-            box-sizing: border-box; /* Penting! Agar border masuk ke dalam ukuran */
+            aspect-ratio: 16 / 9;
+            line-height: 0;
+            background-color: var(--bg-header); 
+            box-sizing: border-box;
+            width: 100%;
         }
         #main-canvas { display: block; width: 100%; height: 100%; object-fit: contain; cursor: default; border-radius: 0; }
         .drop-zone-delete-btn { position: absolute; top: 0.5rem; right: 0.5rem; z-index: 10; padding: 0.25rem; background-color: rgba(239, 68, 68, 0.8); color: white; transition: background-color 0.15s ease-in-out; line-height: 1; border-radius: 0; }
@@ -95,8 +110,8 @@
         #settings-panel-wrapper.panel-open { transform: translateX(0); }
         .main-handle, .tab-handle { position: absolute; left: -48px; width: 48px; height: 63px; display: var(--panel-handle-display); align-items: center; justify-content: center; border: 1px solid var(--border-color); border-right: none; cursor: pointer; transition: background-color 0.3s, color 0.3s, transform 0.3s ease-in-out; background-color: var(--bg-header); color: var(--text-muted); border-top-left-radius: 0; border-bottom-left-radius: 0; }
         .main-handle { top: 0; }
-        #handle-background { top: 63px; }
-        #handle-object { top: 126px; }
+        #handle-object { top: 63px; }
+        #handle-background { top: 126px; }
         #handle-animasi { top: 187px; }
         #handle-info { top: 250px; }        
         .tab-handle { opacity: 0; pointer-events: none; transition: opacity 0.3s 0.1s, transform 0.3s ease-in-out; }
@@ -176,6 +191,12 @@
         [data-ui-size="luas"] #mobile-footer { height: 5rem; }
         [data-ui-size="luas"] #reset-settings-btn { padding: 1rem 1.5rem; font-size: 1rem; }
         [data-ui-size="luas"] .controls-panel { padding-bottom: 7rem; }
+        @media (min-width: 769px) {
+            [data-ui-size="compact"] #drop-zone,
+            [data-ui-size="compact"] #background-drop-zone {
+                height: 120px;
+            }
+        }        
         #mobile-footer .mobile-tab-btn {
             border: 2px solid transparent;
             border-radius: 0;
@@ -209,7 +230,7 @@
                 
                 /* Atur lebar agar cukup dan tidak melebihi layar */
                 width: 280px; /* Beri lebar yang cukup */
-                max-width: 90vw; /* Batasi agar tidak keluar dari layar */
+                max-width: 75vw; /* Batasi agar tidak keluar dari layar */
 
                 /* BARU: Posisikan rata kiri dari ikon, bukan di tengahnya */
                 left: 0;
@@ -217,8 +238,7 @@
             }
         }
         
-        
-        @media (max-width: 768px) {
+        @media (max-width: 768px) {          
             body:not(.force-desktop) {
                 display: flex;
                 flex-direction: column;
@@ -385,6 +405,12 @@
         @keyframes zoom-out {
             from { transform: scale(1); } to { transform: scale(var(--anim-scale-end, 0)); }
         }
+
+        #filename-container input:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
         .timeline-wrapper {
             position: relative;
             display: flex;
@@ -478,15 +504,15 @@
             position: fixed;
             top: 0.5rem;
             left: 0.5rem;
-            background-color: rgba(15, 23, 42, 0.85); /* --bg-dark dengan transparansi */
+            background-color: rgba(15, 23, 42, 0.85);
             color: var(--text-primary);
             padding: 0.25rem 0.5rem;
             font-family: monospace;
             font-size: 8px;
             line-height: 1.2;
             z-index: 9999;
-            pointer-events: none; /* Penting agar bisa klik menembus elemen ini */
-            white-space: pre;     /* Agar format teks dengan newline terjaga */
+            pointer-events: none;
+            white-space: pre;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s, visibility 0.3s;
@@ -495,8 +521,24 @@
         #debug-screen:not(.hidden) {
             opacity: 1;
             visibility: visible;
-        }        
-        
+        }
+        #processing-notification {
+            position: fixed;
+            top: 0.5rem;
+            left: 0.5rem;
+            background-color: rgba(15, 23, 42, 0.85);
+            color: var(--text-primary);
+            padding: 0.25rem 0.5rem;
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            z-index: 9998;
+            pointer-events: none;
+            white-space: pre;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
     </style>
 </head>
 <body class="bg-slate-900 relative">
@@ -534,28 +576,21 @@
     <div id="settings-panel-wrapper" class="absolute inset-y-0 right-0 h-full w-full transition-transform duration-300 ease-in-out z-40">
         <!-- Handle to open/close the settings panel on desktop -->
         <button id="panel-handle" class="main-handle">
-            <svg id="handle-icon-closed" class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M22 6.5H16" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M6 6.5H2" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M10 10C11.933 10 13.5 8.433 13.5 6.5C13.5 4.567 11.933 3 10 3C8.067 3 6.5 4.567 6.5 6.5C6.5 8.433 8.067 10 10 10Z" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M22 17.5H18" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M8 17.5H2" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M14 21C15.933 21 17.5 19.433 17.5 17.5C17.5 15.567 15.933 14 14 14C12.067 14 10.5 15.567 10.5 17.5C10.5 19.433 12.067 21 14 21Z" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <svg id="handle-icon-open" class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            <svg id="handle-icon-closed" class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L21.5 6.5V17.5L12 23L2.5 17.5V6.5L12 1ZM12 3.311L4.5 7.65311V16.3469L12 20.689L19.5 16.3469V7.65311L12 3.311ZM12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8C14.2091 8 16 9.79086 16 12C16 14.2091 14.2091 16 12 16ZM12 14C13.1046 14 14 13.1046 14 12C14 10.8954 13.1046 10 12 10C10.8954 10 10 10.8954 10 12C10 13.1046 10.8954 14 12 14Z"></path></svg>
+            <svg id="handle-icon-open" class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10.5859 12L2.79297 4.20706L4.20718 2.79285L12.0001 10.5857L19.793 2.79285L21.2072 4.20706L13.4143 12L21.2072 19.7928L19.793 21.2071L12.0001 13.4142L4.20718 21.2071L2.79297 19.7928L10.5859 12Z"></path></svg>
         </button>
         <!-- Tab handles for desktop -->
-        <button id="handle-background" class="tab-handle active">
-            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="0" ry="0"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <button id="handle-object" class="tab-handle active">
+            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M7 3C6.44772 3 6 3.44772 6 4V7H3C2.44772 7 2 7.44772 2 8V20C2 20.5523 2.44772 21 3 21H17C17.5523 21 18 20.5523 18 20V17H21C21.5523 17 22 16.5523 22 16V4C22 3.44772 21.5523 3 21 3H7ZM17 7H8V5H20V15H18V8C18 7.44772 17.5523 7 17 7ZM16 9V15.7394L11.4911 11.6404L4 18.6321V9H16ZM11.5089 14.3596L16 18.4424V19H6.53702L11.5089 14.3596ZM7 13.5C7.82843 13.5 8.5 12.8284 8.5 12C8.5 11.1716 7.82843 10.5 7 10.5C6.17157 10.5 5.5 11.1716 5.5 12C5.5 12.8284 6.17157 13.5 7 13.5Z"></path></svg>
         </button>
-        <button id="handle-object" class="tab-handle">
-            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.01 2.92007L18.91 5.54007C20.61 6.29007 20.61 7.53007 18.91 8.28007L13.01 10.9001C12.34 11.2001 11.24 11.2001 10.57 10.9001L4.67 8.28007C2.97 7.53007 2.97 6.29007 4.67 5.54007L10.57 2.92007C11.24 2.62007 12.34 2.62007 13.01 2.92007Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11C3 11.84 3.63 12.81 4.40 13.15L11.19 16.17C11.71 16.40 12.30 16.40 12.81 16.17L19.60 13.15C20.37 12.81 21 11.84 21 11" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 16C3 16.93 3.55 17.77 4.40 18.15L11.19 21.17C11.71 21.40 12.30 21.40 12.81 21.17L19.60 18.15C20.45 17.77 21 16.93 21 16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <button id="handle-background" class="tab-handle">
+            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M21 3C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H21ZM20 5H4V19H20V5ZM13 17V15H16V12H18V17H13ZM11 7V9H8V12H6V7H11Z"></path></svg>
         </button>
         <button id="handle-animasi" class="tab-handle">
-            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M2 3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44495 22 3.9934V20.0066C22 20.5552 21.5447 21 21.0082 21H2.9918C2.44405 21 2 20.5551 2 20.0066V3.9934ZM4 5V19H20V5H4ZM10.6219 8.41459L15.5008 11.6672C15.6846 11.7897 15.7343 12.0381 15.6117 12.2219C15.5824 12.2658 15.5447 12.3035 15.5008 12.3328L10.6219 15.5854C10.4381 15.708 10.1897 15.6583 10.0672 15.4745C10.0234 15.4088 10 15.3316 10 15.2526V8.74741C10 8.52649 10.1791 8.34741 10.4 8.34741C10.479 8.34741 10.5562 8.37078 10.6219 8.41459Z"></path></svg>
         </button>
         <button id="handle-info" class="tab-handle">
-            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1s1 .45 1 1v4c0 .55-.45 1-1 1zm1-8h-2V7h2v2z"/></svg>
+            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14V16C8.68629 16 6 18.6863 6 22H4C4 17.5817 7.58172 14 12 14ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11ZM14.5946 18.8115C14.5327 18.5511 14.5 18.2794 14.5 18C14.5 17.7207 14.5327 17.449 14.5945 17.1886L13.6029 16.6161L14.6029 14.884L15.5952 15.4569C15.9883 15.0851 16.4676 14.8034 17 14.6449V13.5H19V14.6449C19.5324 14.8034 20.0116 15.0851 20.4047 15.4569L21.3971 14.8839L22.3972 16.616L21.4055 17.1885C21.4673 17.449 21.5 17.7207 21.5 18C21.5 18.2793 21.4673 18.551 21.4055 18.8114L22.3972 19.3839L21.3972 21.116L20.4048 20.543C20.0117 20.9149 19.5325 21.1966 19.0001 21.355V22.5H17.0001V21.3551C16.4677 21.1967 15.9884 20.915 15.5953 20.5431L14.603 21.1161L13.6029 19.384L14.5946 18.8115ZM18 19.5C18.8284 19.5 19.5 18.8284 19.5 18C19.5 17.1716 18.8284 16.5 18 16.5C17.1716 16.5 16.5 17.1716 16.5 18C16.5 18.8284 17.1716 19.5 18 19.5Z"></path></svg>
         </button>
 
         <!-- The actual settings panel -->
@@ -594,15 +629,15 @@
                         <h2 class="text-lg font-bold text-slate-300" data-translate-key="backgroundImage"></h2>
                         <label for="background-image-upload" id="background-drop-zone" class="group relative flex flex-col items-center justify-center w-full h-32 md:h-32 px-4 md:px-4 py-2 md:py-2 border-2 border-dashed border-[var(--border-color)] cursor-pointer transition-colors">
                             <div id="background-drop-zone-prompt" class="flex flex-col items-center justify-center pointer-events-none w-full h-full">
-                                <svg class="w-8 h-8 text-[var(--text-muted)] group-hover:text-[var(--accent-color)] transition-colors" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/></svg>
+                                <svg class="w-8 h-8 text-[var(--text-muted)] group-hover:text-[var(--accent-color)] transition-colors flex-shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M21 15V18H24V20H21V23H19V20H16V18H19V15H21ZM21.0082 3C21.556 3 22 3.44495 22 3.9934V13H20V5H4V18.999L14 9L17 12V14.829L14 11.8284L6.827 19H14V21H2.9918C2.44405 21 2 20.5551 2 20.0066V3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082ZM8 7C9.10457 7 10 7.89543 10 9C10 10.1046 9.10457 11 8 11C6.89543 11 6 10.1046 6 9C6 7.89543 6.89543 7 8 7Z"></path></svg>
                                 <p class="text-sm text-[var(--text-muted)] group-hover:text-[var(--accent-color)] transition-colors text-center mt-2 leading-tight" data-translate-key="dropImagePrompt"></p>
                             </div>
                             <div id="background-drop-zone-filename" class="hidden text-center pointer-events-none p-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-10 h-10 mx-auto mb-2 text-green-500"><rect x="3" y="3" width="18" height="18" rx="0" ry="0"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-10 h-10 mx-auto mb-2 text-green-500"><path d="M5 11.1005L7 9.1005L12.5 14.6005L16 11.1005L19 14.1005V5H5V11.1005ZM5 13.9289V19H8.1005L11.0858 16.0147L7 11.9289L5 13.9289ZM10.9289 19H19V16.9289L16 13.9289L10.9289 19ZM4 3H20C20.5523 3 21 3.44772 21 4V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V4C3 3.44772 3.44772 3 4 3ZM15.5 10C14.6716 10 14 9.32843 14 8.5C14 7.67157 14.6716 7 15.5 7C16.3284 7 17 7.67157 17 8.5C17 9.32843 16.3284 10 15.5 10Z"></path></svg>
                                 <p class="text-sm font-semibold text-slate-300 break-all"></p>
                             </div>
                             <button id="remove-background-image" class="drop-zone-delete-btn hidden">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4V2H17V4H22V6H20V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V6H2V4H7ZM6 6V20H18V6H6ZM9 9H11V17H9V9ZM13 9H15V17H13V9Z"></path></svg>
                             </button>
                         </label>
                         <input type="file" id="background-image-upload" class="hidden" accept="image/png, image/jpeg, image/webp">
@@ -615,7 +650,7 @@
                                 <h2 class="text-base font-semibold text-slate-300" data-translate-key="backgroundTransform"></h2>
                             </div>
                                 <button class="reset-section-btn" data-section-key="background.transform" data-translate-key-title="resetBackgroundTransformTitle">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M22 12C22 17.5228 17.5229 22 12 22C6.4772 22 2 17.5228 2 12C2 6.47715 6.4772 2 12 2V4C7.5817 4 4 7.58172 4 12C4 16.4183 7.5817 20 12 20C16.4183 20 20 16.4183 20 12C20 9.25022 18.6127 6.82447 16.4998 5.38451L16.5 8H14.5V2L20.5 2V4L18.0008 3.99989C20.4293 5.82434 22 8.72873 22 12Z"></path></svg>
                                 </button>
                         </div>
                         <div class="accordion-body space-y-4 md:space-y-4 p-4 md:p-4 border-t border-[var(--border-color)] hidden">
@@ -656,7 +691,7 @@
                             </div>
                             <div class="flex items-center">
                                 <button class="reset-section-btn" data-section-key="background.effects.blur" data-translate-key-title="resetBackgroundBlurTitle">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M22 12C22 17.5228 17.5229 22 12 22C6.4772 22 2 17.5228 2 12C2 6.47715 6.4772 2 12 2V4C7.5817 4 4 7.58172 4 12C4 16.4183 7.5817 20 12 20C16.4183 20 20 16.4183 20 12C20 9.25022 18.6127 6.82447 16.4998 5.38451L16.5 8H14.5V2L20.5 2V4L18.0008 3.99989C20.4293 5.82434 22 8.72873 22 12Z"></path></svg>
                                 </button>
                                 <label class="switch"><input type="checkbox" id="background-blur-enabled-switch"><span class="toggle-slider"></span></label>
                             </div>
@@ -677,7 +712,7 @@
                             </div>
                             <div class="flex items-center">
                                 <button class="reset-section-btn" data-section-key="background.effects.vignette" data-translate-key-title="resetBackgroundVignetteTitle">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M22 12C22 17.5228 17.5229 22 12 22C6.4772 22 2 17.5228 2 12C2 6.47715 6.4772 2 12 2V4C7.5817 4 4 7.58172 4 12C4 16.4183 7.5817 20 12 20C16.4183 20 20 16.4183 20 12C20 9.25022 18.6127 6.82447 16.4998 5.38451L16.5 8H14.5V2L20.5 2V4L18.0008 3.99989C20.4293 5.82434 22 8.72873 22 12Z"></path></svg>
                                 </button>
                                 <label class="switch"><input type="checkbox" id="background-vignette-enabled-switch"><span class="toggle-slider"></span></label>
                             </div>
@@ -711,7 +746,7 @@
                             </div>
                             <div class="flex items-center">
                                 <button class="reset-section-btn" data-section-key="background.effects.colorCorrection" data-translate-key-title="resetBackgroundColorCorrectionTitle">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M22 12C22 17.5228 17.5229 22 12 22C6.4772 22 2 17.5228 2 12C2 6.47715 6.4772 2 12 2V4C7.5817 4 4 7.58172 4 12C4 16.4183 7.5817 20 12 20C16.4183 20 20 16.4183 20 12C20 9.25022 18.6127 6.82447 16.4998 5.38451L16.5 8H14.5V2L20.5 2V4L18.0008 3.99989C20.4293 5.82434 22 8.72873 22 12Z"></path></svg>
                                 </button>
                                 <label class="switch"><input type="checkbox" id="background-color-correction-enabled-switch"><span class="toggle-slider"></span></label>
                             </div>
@@ -747,15 +782,15 @@
                     <!-- Object Image Upload -->
                     <label for="image-upload" id="drop-zone" class="group relative flex flex-col items-center justify-center w-full h-32 md:h-32 px-4 md:px-4 py-2 md:py-2 border-2 border-dashed border-[var(--border-color)] cursor-pointer transition-colors">
                         <div id="drop-zone-prompt" class="flex flex-col items-center justify-center pointer-events-none w-full h-full">
-                           <svg class="w-8 h-8 text-[var(--text-muted)] group-hover:text-[var(--accent-color)] transition-colors" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/></svg>
+                           <svg class="w-8 h-8 text-[var(--text-muted)] group-hover:text-[var(--accent-color)] transition-colors flex-shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M21 15V18H24V20H21V23H19V20H16V18H19V15H21ZM21.0082 3C21.556 3 22 3.44495 22 3.9934V13H20V5H4V18.999L14 9L17 12V14.829L14 11.8284L6.827 19H14V21H2.9918C2.44405 21 2 20.5551 2 20.0066V3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082ZM8 7C9.10457 7 10 7.89543 10 9C10 10.1046 9.10457 11 8 11C6.89543 11 6 10.1046 6 9C6 7.89543 6.89543 7 8 7Z"></path></svg>
                            <p class="text-sm text-[var(--text-muted)] group-hover:text-[var(--accent-color)] transition-colors text-center mt-2 leading-tight" data-translate-key="dropImagePrompt"></p>
                         </div>
                         <div id="drop-zone-filename" class="hidden text-center pointer-events-none p-2">
-                           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mx-auto mb-2 text-green-500"><path d="M13.01 2.92007L18.91 5.54007C20.61 6.29007 20.61 7.53007 18.91 8.28007L13.01 10.9001C12.34 11.2001 11.24 11.2001 10.57 10.9001L4.67 8.28007C2.97 7.53007 2.97 6.29007 4.67 5.54007L10.57 2.92007C11.24 2.62007 12.34 2.62007 13.01 2.92007Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11C3 11.84 3.63 12.81 4.40 13.15L11.19 16.17C11.71 16.40 12.30 16.40 12.81 16.17L19.60 13.15C20.37 12.81 21 11.84 21 11" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 16C3 16.93 3.55 17.77 4.40 18.15L11.19 21.17C11.71 21.40 12.30 21.40 12.81 21.17L19.60 18.15C20.45 17.77 21 16.93 21 16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                           <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mx-auto mb-2 text-green-500"><path d="M7 3C6.44772 3 6 3.44772 6 4V7H3C2.44772 7 2 7.44772 2 8V20C2 20.5523 2.44772 21 3 21H17C17.5523 21 18 20.5523 18 20V17H21C21.5523 17 22 16.5523 22 16V4C22 3.44772 21.5523 3 21 3H7ZM17 7H8V5H20V15H18V8C18 7.44772 17.5523 7 17 7ZM16 9V15.7394L11.4911 11.6404L4 18.6321V9H16ZM11.5089 14.3596L16 18.4424V19H6.53702L11.5089 14.3596ZM7 13.5C7.82843 13.5 8.5 12.8284 8.5 12C8.5 11.1716 7.82843 10.5 7 10.5C6.17157 10.5 5.5 11.1716 5.5 12C5.5 12.8284 6.17157 13.5 7 13.5Z"></path></svg>
                            <p class="text-sm font-semibold text-slate-300 break-all"></p>
                         </div>
                         <button id="delete-image-btn" class="drop-zone-delete-btn hidden">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4V2H17V4H22V6H20V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V6H2V4H7ZM6 6V20H18V6H6ZM9 9H11V17H9V9ZM13 9H15V17H13V9Z"></path></svg>
                         </button>
                     </label>
                     <input type="file" id="image-upload" class="hidden" accept="image/png, image/jpeg, image/webp">
@@ -769,7 +804,7 @@
                                     <h2 class="text-base font-semibold text-slate-300" data-translate-key="transform"></h2>
                                 </div>
                                 <button class="reset-section-btn" data-section-key="image" data-translate-key-title="resetTransformTitle">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M22 12C22 17.5228 17.5229 22 12 22C6.4772 22 2 17.5228 2 12C2 6.47715 6.4772 2 12 2V4C7.5817 4 4 7.58172 4 12C4 16.4183 7.5817 20 12 20C16.4183 20 20 16.4183 20 12C20 9.25022 18.6127 6.82447 16.4998 5.38451L16.5 8H14.5V2L20.5 2V4L18.0008 3.99989C20.4293 5.82434 22 8.72873 22 12Z"></path></svg>
                                 </button>
                             </div>
                             <div class="accordion-body space-y-4 md:space-y-4 p-4 md:p-4 border-t border-[var(--border-color)]">
@@ -803,7 +838,7 @@
                                 </div>
                                 <div class="flex items-center">
                                     <button class="reset-section-btn" data-section-key="stroke" data-translate-key-title="resetTornEdgesTitle">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M22 12C22 17.5228 17.5229 22 12 22C6.4772 22 2 17.5228 2 12C2 6.47715 6.4772 2 12 2V4C7.5817 4 4 7.58172 4 12C4 16.4183 7.5817 20 12 20C16.4183 20 20 16.4183 20 12C20 9.25022 18.6127 6.82447 16.4998 5.38451L16.5 8H14.5V2L20.5 2V4L18.0008 3.99989C20.4293 5.82434 22 8.72873 22 12Z"></path></svg>
                                     </button>
                                     <label class="switch"><input type="checkbox" id="stroke-enabled-switch" checked><span class="toggle-slider"></span></label>
                                 </div>
@@ -832,7 +867,7 @@
                                 </div>
                                 <div class="flex items-center">
                                     <button class="reset-section-btn" data-section-key="paperFoldOverlay" data-translate-key-title="resetPaperTextureTitle">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M22 12C22 17.5228 17.5229 22 12 22C6.4772 22 2 17.5228 2 12C2 6.47715 6.4772 2 12 2V4C7.5817 4 4 7.58172 4 12C4 16.4183 7.5817 20 12 20C16.4183 20 20 16.4183 20 12C20 9.25022 18.6127 6.82447 16.4998 5.38451L16.5 8H14.5V2L20.5 2V4L18.0008 3.99989C20.4293 5.82434 22 8.72873 22 12Z"></path></svg>
                                     </button>
                                     <label class="switch"><input type="checkbox" id="paper-fold-overlay-enabled-switch"><span class="toggle-slider"></span></label>
                                 </div>
@@ -857,10 +892,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="accordion-chevron transition-transform duration-300 text-[var(--text-muted)]"><path d="m6 9 6 6 6-6"/></svg>
                                     <h2 class="text-base font-semibold text-slate-300" data-translate-key="dropShadow"></h2>
                                     <div class="relative info-tooltip-trigger">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle text-[var(--text-muted)] cursor-pointer" viewBox="0 0 16 16">
-                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.064.293.006.399.287.47l.45.082.082-.38-.29-.071a.499.499 0 0 1-.316-.66l.738-3.468a.499.499 0 0 1 .66-.316l.29.071zM8 4.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-                                        </svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="text-[var(--text-muted)] cursor-pointer" width="16" height="16"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 7H13V9H11V7ZM11 11H13V17H11V11Z"></path></svg>
                                         <div class="info-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-xs bg-slate-900/95 p-3 text-xs text-slate-200 border border-[var(--border-color)] shadow-lg z-10 pointer-events-none">
                                             <p data-translate-key="dropShadowTooltip"></p>
                                         </div>
@@ -868,7 +900,7 @@
                                 </div>
                                 <div class="flex items-center">
                                     <button class="reset-section-btn" data-section-key="shadow" data-translate-key-title="resetDropShadowTitle">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M22 12C22 17.5228 17.5229 22 12 22C6.4772 22 2 17.5228 2 12C2 6.47715 6.4772 2 12 2V4C7.5817 4 4 7.58172 4 12C4 16.4183 7.5817 20 12 20C16.4183 20 20 16.4183 20 12C20 9.25022 18.6127 6.82447 16.4998 5.38451L16.5 8H14.5V2L20.5 2V4L18.0008 3.99989C20.4293 5.82434 22 8.72873 22 12Z"></path></svg>
                                     </button>
                                     <label class="switch"><input type="checkbox" id="shadow-enabled-switch" checked><span class="toggle-slider"></span></label>
                                 </div>
@@ -901,7 +933,7 @@
                                 </div>
                                 <div class="flex items-center">
                                     <button class="reset-section-btn" data-section-key="movement" data-translate-key-title="resetMovementTitle">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M22 12C22 17.5228 17.5229 22 12 22C6.4772 22 2 17.5228 2 12C2 6.47715 6.4772 2 12 2V4C7.5817 4 4 7.58172 4 12C4 16.4183 7.5817 20 12 20C16.4183 20 20 16.4183 20 12C20 9.25022 18.6127 6.82447 16.4998 5.38451L16.5 8H14.5V2L20.5 2V4L18.0008 3.99989C20.4293 5.82434 22 8.72873 22 12Z"></path></svg>
                                     </button>
                                     <label class="switch"><input type="checkbox" id="movement-enabled-switch" checked><span class="toggle-slider"></span></label>
                                 </div>
@@ -961,7 +993,7 @@
                                </div>
                                 <div class="flex items-center">
                                     <button class="reset-section-btn" data-section-key="color" data-translate-key-title="resetColorCorrectionTitle">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M22 12C22 17.5228 17.5229 22 12 22C6.4772 22 2 17.5228 2 12C2 6.47715 6.4772 2 12 2V4C7.5817 4 4 7.58172 4 12C4 16.4183 7.5817 20 12 20C16.4183 20 20 16.4183 20 12C20 9.25022 18.6127 6.82447 16.4998 5.38451L16.5 8H14.5V2L20.5 2V4L18.0008 3.99989C20.4293 5.82434 22 8.72873 22 12Z"></path></svg>
                                     </button>
                                     <label class="switch"><input type="checkbox" id="color-enabled-switch"><span class="toggle-slider"></span></label>
                                 </div>
@@ -1090,21 +1122,16 @@
                             <div class="flex items-center gap-2">
                                 <h2 class="text-lg font-bold text-slate-300" data-translate-key="previewResolution"></h2>
                                 <div class="relative info-tooltip-trigger">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle text-[var(--text-muted)] cursor-pointer" viewBox="0 0 16 16">
-                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.064.293.006.399.287.47l.45.082.082-.38-.29-.071a.499.499 0 0 1-.316-.66l.738-3.468a.499.499 0 0 1 .66-.316l.29.071zM8 4.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-                                    </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="text-[var(--text-muted)] cursor-pointer" width="16" height="16"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 7H13V9H11V7ZM11 11H13V17H11V11Z"></path></svg>
                                     <div class="info-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-xs bg-slate-900/95 p-3 text-xs text-slate-200 border border-[var(--border-color)] shadow-lg z-10 pointer-events-none">
                                         <p data-translate-key="previewResolutionWarning"></p>
                                     </div>
                                 </div>
                             </div>
-                            <div id="preview-resolution-btns" class="grid grid-cols-4 gap-2 md:gap-2 mt-2 btn-group-toggle">
-                                <button data-res="auto" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium" data-translate-key="auto"></button>
+                            <div id="preview-resolution-btns" class="grid grid-cols-3 gap-2 md:gap-2 mt-2 btn-group-toggle">
                                 <button data-res="360" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium">360p</button>
                                 <button data-res="540" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium">540p</button>
                                 <button data-res="720" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium">720p</button>
-                            </div>
                             </div>
                         <div class="pt-4 border-t border-[var(--border-color)] flex items-center justify-between">
                             <label for="debug-screen-switch" class="text-sm font-medium text-slate-300" data-translate-key="debugScreen"></label>
@@ -1120,23 +1147,22 @@
                         <p class="text-sm" data-translate-key="appDescription"></p>
                         <p class="text-sm pt-2" data-translate-key="creatorInfo2"></p>
                     </div>
-
                     <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
                         <a href="https://www.youtube.com/@nurimator/shorts" target="_blank" class="flex items-center justify-center gap-2 w-full px-4 py-2 bg-slate-600/50 text-white text-sm font-semibold text-center hover:bg-slate-500/50 transition-all duration-150 cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-youtube" viewBox="0 0 16 16"><path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.188-.01.957-.074 1.957l-.008.104-.022.26-.01.104c-.048.519-.119 1.023-.22 1.402a2.01 2.01 0 0 1-1.415 1.42c-1.16.308-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.01 2.01 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31.4 31.4 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.908l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.01 2.01 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.004.171-.007A99.788 99.788 0 0 1 7.858 2h.193zM6.4 5.209v4.818l4.157-2.408L6.4 5.209z"/></svg>
-                            Tutorial
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20 22H6.5C4.567 22 3 20.433 3 18.5V5C3 3.34315 4.34315 2 6 2H20C20.5523 2 21 2.44772 21 3V21C21 21.5523 20.5523 22 20 22ZM19 20V17H6.5C5.67157 17 5 17.6716 5 18.5C5 19.3284 5.67157 20 6.5 20H19ZM10 4V12L13.5 10L17 12V4H10Z"></path></svg>
+                            <span data-translate-key="tutorial">Tutorial</span>
                         </a>
                         <a href="https://github.com/your-repo/papera-me" target="_blank" class="flex items-center justify-center gap-2 w-full px-4 py-2 bg-slate-600/50 text-white text-sm font-semibold text-center hover:bg-slate-500/50 transition-all duration-150 cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-                            Source Code
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12.001 2C6.47598 2 2.00098 6.475 2.00098 12C2.00098 16.425 4.86348 20.1625 8.83848 21.4875C9.33848 21.575 9.52598 21.275 9.52598 21.0125C9.52598 20.775 9.51348 19.9875 9.51348 19.15C7.00098 19.6125 6.35098 18.5375 6.15098 17.975C6.03848 17.6875 5.55098 16.8 5.12598 16.5625C4.77598 16.375 4.27598 15.9125 5.11348 15.9C5.90098 15.8875 6.46348 16.625 6.65098 16.925C7.55098 18.4375 8.98848 18.0125 9.56348 17.75C9.65098 17.1 9.91348 16.6625 10.201 16.4125C7.97598 16.1625 5.65098 15.3 5.65098 11.475C5.65098 10.3875 6.03848 9.4875 6.67598 8.7875C6.57598 8.5375 6.22598 7.5125 6.77598 6.1375C6.77598 6.1375 7.61348 5.875 9.52598 7.1625C10.326 6.9375 11.176 6.825 12.026 6.825C12.876 6.825 13.726 6.9375 14.526 7.1625C16.4385 5.8625 17.276 6.1375 17.276 6.1375C17.826 7.5125 17.476 8.5375 17.376 8.7875C18.0135 9.4875 18.401 10.375 18.401 11.475C18.401 15.3125 16.0635 16.1625 13.8385 16.4125C14.201 16.725 14.5135 17.325 14.5135 18.2625C14.5135 19.6 14.501 20.675 14.501 21.0125C14.501 21.275 14.6885 21.5875 15.1885 21.4875C19.259 20.1133 21.9999 16.2963 22.001 12C22.001 6.475 17.526 2 12.001 2Z"></path></svg>
+                            <span data-translate-key="sourceCode">Source Code</span>
                         </a>
                         <a href="https://github.com/your-repo/papera-me/blob/main/LICENSE" target="_blank" class="flex items-center justify-center gap-2 w-full px-4 py-2 bg-slate-600/50 text-white text-sm font-semibold text-center hover:bg-slate-500/50 transition-all duration-150 cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-text" viewBox="0 0 16 16"><path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"/><path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5L9.5 0zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/></svg>
-                            Lisensi
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M21 9V20.9925C21 21.5511 20.5552 22 20.0066 22H3.9934C3.44495 22 3 21.556 3 21.0082V2.9918C3 2.45531 3.44694 2 3.99826 2H14V8C14 8.55228 14.4477 9 15 9H21ZM21 7H16V2.00318L21 7ZM8 7V9H11V7H8ZM8 11V13H16V11H8ZM8 15V17H16V15H8Z"></path></svg>
+                            <span data-translate-key="license">License</span>
                         </a>
                         <a href="https://lynk.id/nurimator" target="_blank" class="flex items-center justify-center gap-2 w-full px-4 py-2 bg-[var(--accent-color)] text-white text-sm font-semibold text-center hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/></svg>
-                            Dukung Kreator
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12.001 4.52853C14.35 2.42 17.98 2.49 20.2426 4.75736C22.5053 7.02472 22.583 10.637 20.4786 12.993L11.9999 21.485L3.52138 12.993C1.41705 10.637 1.49571 7.01901 3.75736 4.75736C6.02157 2.49315 9.64519 2.41687 12.001 4.52853Z"></path></svg>
+                            <span data-translate-key="supportCreator">Support Creator</span>
                         </a>
                     </div>
                 </div>                <!-- Reset All Settings Button -->
@@ -1151,17 +1177,17 @@
 
     <!-- Mobile footer with tabs and export button -->
     <footer id="mobile-footer" class="fixed bottom-0 left-0 right-0 h-16 bg-[var(--bg-header)] border-t border-[var(--border-color)] z-50 flex justify-around items-center" style="display: var(--mobile-footer-display);">
-        <button id="mobile-tab-background" data-tab="background" class="mobile-tab-btn p-2 text-slate-300 hover:text-white active">
-            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="0" ry="0"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <button id="mobile-tab-object" data-tab="object" class="mobile-tab-btn p-2 text-slate-300 hover:text-white active">
+            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M7 3C6.44772 3 6 3.44772 6 4V7H3C2.44772 7 2 7.44772 2 8V20C2 20.5523 2.44772 21 3 21H17C17.5523 21 18 20.5523 18 20V17H21C21.5523 17 22 16.5523 22 16V4C22 3.44772 21.5523 3 21 3H7ZM17 7H8V5H20V15H18V8C18 7.44772 17.5523 7 17 7ZM16 9V15.7394L11.4911 11.6404L4 18.6321V9H16ZM11.5089 14.3596L16 18.4424V19H6.53702L11.5089 14.3596ZM7 13.5C7.82843 13.5 8.5 12.8284 8.5 12C8.5 11.1716 7.82843 10.5 7 10.5C6.17157 10.5 5.5 11.1716 5.5 12C5.5 12.8284 6.17157 13.5 7 13.5Z"></path></svg>
         </button>
-        <button id="mobile-tab-object" data-tab="object" class="mobile-tab-btn p-2 text-slate-300 hover:text-white">
-            <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.01 2.92007L18.91 5.54007C20.61 6.29007 20.61 7.53007 18.91 8.28007L13.01 10.9001C12.34 11.2001 11.24 11.2001 10.57 10.9001L4.67 8.28007C2.97 7.53007 2.97 6.29007 4.67 5.54007L10.57 2.92007C11.24 2.62007 12.34 2.62007 13.01 2.92007Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11C3 11.84 3.63 12.81 4.40 13.15L11.19 16.17C11.71 16.40 12.30 16.40 12.81 16.17L19.60 13.15C20.37 12.81 21 11.84 21 11" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 16C3 16.93 3.55 17.77 4.40 18.15L11.19 21.17C11.71 21.40 12.30 21.40 12.81 21.17L19.60 18.15C20.45 17.77 21 16.93 21 16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <button id="mobile-tab-background" data-tab="background" class="mobile-tab-btn p-2 text-slate-300 hover:text-white">
+            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M21 3C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H21ZM20 5H4V19H20V5ZM13 17V15H16V12H18V17H13ZM11 7V9H8V12H6V7H11Z"></path></svg>
         </button>
         <button id="mobile-tab-animasi" data-tab="animasi" class="mobile-tab-btn p-2 text-slate-300 hover:text-white">
-            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M2 3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44495 22 3.9934V20.0066C22 20.5552 21.5447 21 21.0082 21H2.9918C2.44405 21 2 20.5551 2 20.0066V3.9934ZM4 5V19H20V5H4ZM10.6219 8.41459L15.5008 11.6672C15.6846 11.7897 15.7343 12.0381 15.6117 12.2219C15.5824 12.2658 15.5447 12.3035 15.5008 12.3328L10.6219 15.5854C10.4381 15.708 10.1897 15.6583 10.0672 15.4745C10.0234 15.4088 10 15.3316 10 15.2526V8.74741C10 8.52649 10.1791 8.34741 10.4 8.34741C10.479 8.34741 10.5562 8.37078 10.6219 8.41459Z"></path></svg>
         </button>
         <button id="mobile-tab-info" data-tab="info" class="mobile-tab-btn p-2 text-slate-300 hover:text-white">
-            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1s1 .45 1 1v4c0 .55-.45 1-1 1zm1-8h-2V7h2v2z"/></svg>
+            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14V16C8.68629 16 6 18.6863 6 22H4C4 17.5817 7.58172 14 12 14ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11ZM14.5946 18.8115C14.5327 18.5511 14.5 18.2794 14.5 18C14.5 17.7207 14.5327 17.449 14.5945 17.1886L13.6029 16.6161L14.6029 14.884L15.5952 15.4569C15.9883 15.0851 16.4676 14.8034 17 14.6449V13.5H19V14.6449C19.5324 14.8034 20.0116 15.0851 20.4047 15.4569L21.3971 14.8839L22.3972 16.616L21.4055 17.1885C21.4673 17.449 21.5 17.7207 21.5 18C21.5 18.2793 21.4673 18.551 21.4055 18.8114L22.3972 19.3839L21.3972 21.116L20.4048 20.543C20.0117 20.9149 19.5325 21.1966 19.0001 21.355V22.5H17.0001V21.3551C16.4677 21.1967 15.9884 20.915 15.5953 20.5431L14.603 21.1161L13.6029 19.384L14.5946 18.8115ZM18 19.5C18.8284 19.5 19.5 18.8284 19.5 18C19.5 17.1716 18.8284 16.5 18 16.5C17.1716 16.5 16.5 17.1716 16.5 18C16.5 18.8284 17.1716 19.5 18 19.5Z"></path></svg>
         </button>
         <button id="mobile-export-btn" class="px-5 py-2.5 bg-[var(--accent-color)] text-white text-sm font-semibold hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="export">
         </button>
@@ -1203,16 +1229,16 @@
                     <div class="flex items-center gap-2 mt-4 mb-2">
                         <label for="export-filename-input" class="block text-sm font-medium text-[var(--text-muted)]" data-translate-key="fileName"></label>
                         <div class="relative info-tooltip-trigger">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle text-[var(--text-muted)] cursor-pointer" viewBox="0 0 16 16">
-                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.064.293.006.399.287.47l.45.082.082-.38-.29-.071a.499.499 0 0 1-.316-.66l.738-3.468a.499.499 0 0 1 .66-.316l.29.071zM8 4.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="text-[var(--text-muted)] cursor-pointer" width="16" height="16"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 7H13V9H11V7ZM11 11H13V17H11V11Z"></path></svg>
                             <div class="info-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-xs bg-slate-900/95 p-3 text-xs text-slate-200 border border-[var(--border-color)] shadow-lg z-10 pointer-events-none">
                                 <p data-translate-key="exportInfoTooltip"></p>
                             </div>
                         </div>
                     </div>
-                    <input type="text" id="export-filename-input" value="papera-me" class="w-full mt-1 p-2 bg-slate-700 border border-[var(--border-color-light)]">
+                    <div id="filename-container" class="w-full mt-1 flex items-center p-2 bg-slate-700 border border-[var(--border-color-light)]">
+                        <input type="text" id="export-filename-input" value="papera-me" class="flex-grow bg-transparent border-none outline-none p-0">
+                        <span class="text-[var(--text-muted)] pointer-events-none">.webm</span>
+                    </div>
                 </div>
             </div>
             <div class="mt-8 flex justify-end space-x-4">
@@ -1247,6 +1273,7 @@
         </div>
     </div>
 <div id="debug-screen" class="hidden"></div>
+<div id="processing-notification" class="hidden"></div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Main canvas and context
@@ -1404,11 +1431,10 @@
 
             // Default state for the entire application
             const DEFAULT_STATE = {
-                activeTab: 'background',
+                activeTab: 'object',
                 language: 'en',
                 displayMode: 'auto', 
                 uiSize: 'normal',
-                previewResolutionMode: 'auto', // Mode pilihan pengguna: 'auto', '360', '540', '720'
                 activePreviewResolution: '540',
                 debugScreenEnabled: false,                
                 background: {
@@ -1509,11 +1535,11 @@
                     easeInOut: 'Ease In Out',
                     backInOut: 'Back In Out',
                     keyframeProperties: 'Keyframe Properties', rotation: 'Rotation', easingToNext: 'Easing to Next', keyframeAnim: 'Paper Animation', animNone: 'None', animOpen: 'Open', animClose: 'Close',
-                    addKeyframe: 'Add Keyframe',
+                    addKeyframe: 'Add Keyframe', keyframePropertiesTitle: 'Keyframe Properties #',
                     simple: 'Simple',
                     advanced: 'Advanced',
-                    openAnim: 'Opening Animation',
-                    closeAnim: 'Closing Animation', timeline: 'Timeline', processingImageEffect: 'Processing image effect...',
+                    openAnim: 'Opening Animation', tutorial: 'Tutorial', sourceCode: 'Source Code', license: 'License', supportCreator: 'Support Creator',
+                    closeAnim: 'Closing Animation', timeline: 'Timeline',
                     resetPreferences: 'Reset Preferences', preparingExportCanvas: 'Preparing export canvas...',
                     confirmResetPrefsTitle: 'Confirm Preferences Reset', completing: 'Completing',
                     previewResolution: 'Preview Resolution', debugScreen: 'Debug Screen',
@@ -1568,11 +1594,11 @@
                     easeInOut: 'Ease In Out',
                     backInOut: 'Back In Out',
                     keyframeProperties: 'Properti Keyframe', rotation: 'Rotasi', easingToNext: 'Easing Berikutnya', keyframeAnim: 'Animasi Kertas', animNone: 'Tidak Ada', animOpen: 'Buka', animClose: 'Tutup',
-                    addKeyframe: 'Tambah Keyframe',       
+                    addKeyframe: 'Tambah Keyframe', keyframePropertiesTitle: 'Properti Keyframe ke-',
                     simple: 'Simpel',
                     advanced: 'Lanjutan',
-                    openAnim: 'Animasi Terbuka',
-                    closeAnim: 'Animasi Tertutup', timeline: 'Timeline', processingImageEffect: 'Memproses efek gambar...',
+                    openAnim: 'Animasi Terbuka', tutorial: 'Tutorial', sourceCode: 'Kode Sumber', license: 'Lisensi', supportCreator: 'Dukung Kreator',
+                    closeAnim: 'Animasi Tertutup', timeline: 'Timeline',
                     resetPreferences: 'Reset Preferensi', preparingExportCanvas: 'Menyiapkan kanvas ekspor...',
                     confirmResetPrefsTitle: 'Konfirmasi Reset Preferensi', completing: 'Menyelesaikan',
                     previewResolution: 'Resolusi Pratinjau', debugScreen: 'Layar Debug',
@@ -1604,48 +1630,7 @@
                         inProgress = false;
                     }, delay);
                 };
-            }   
-            
-            // Elemen untuk notifikasi pemrosesan
-            const processingNotificationEl = document.getElementById('processing-notification');            
-            function showProcessingMessage(messageKey) {
-                if (processingNotificationEl) {
-                    const message = translations[state.language][messageKey] || messageKey;
-                    processingNotificationEl.textContent = message;
-                    processingNotificationEl.classList.remove('hidden');
-                }
             }
-
-            /**
-             * Menyembunyikan pesan pemrosesan.
-             */
-            function hideProcessingMessage() {
-                if (processingNotificationEl) {
-                    processingNotificationEl.classList.add('hidden');
-                }
-            }
-
-            function toggleProcessingMessage(show, messageKey) {
-                const debugScreenEl = document.getElementById('debug-screen');
-                if (!debugScreenEl) return;
-
-                if (show) {
-                    if (state.debugScreenEnabled) {
-                        originalDebugContent = debugScreenEl.textContent;
-                    }
-                    const message = translations[state.language][messageKey] || messageKey;
-                    debugScreenEl.textContent = message;
-                    debugScreenEl.classList.remove('hidden');
-
-                } else {
-                    if (state.debugScreenEnabled && originalDebugContent) {
-                        debugScreenEl.textContent = originalDebugContent;
-                        originalDebugContent = null;
-                    } else {
-                        debugScreenEl.classList.add('hidden');
-                    }
-                }
-            }            
 
             function getVisualStateAtTime(timeInSeconds, keyframes) {
                 const sortedKeyframes = [...keyframes].sort((a, b) => a.time - b.time);
@@ -1730,13 +1715,9 @@
                 if (isGeneratingCache || !state.object.image.element || !state.object.stroke.enabled) {
                     return
                 }
-
-                toggleProcessingMessage(true, 'processingImageEffect');
                 isGeneratingCache = true
                 isCacheGenerationNeeded = false
                 console.log("Memulai pembuatan cache progresif...")
-
-                                
                 tornEdgeCache = [];
                 console.log("Cache lama dikosongkan, memulai pembuatan cache baru...");
 
@@ -1780,7 +1761,6 @@
                 }
 
                 isGeneratingCache = false
-                toggleProcessingMessage(false);
                 console.log("Pembuatan cache progresif selesai.")
             }
 
@@ -1947,11 +1927,19 @@
                     bgFilterString += ` blur(${state.background.effects.blur.intensity}px)`;
                 }
                 ctx.filter = bgFilterString.trim();
+
+                // SELALU GAMBAR WARNA SOLID SEBAGAI LAPISAN DASAR
+                ctx.fillStyle = state.background.color;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
                 const bgOffsetX = (canvas.width * state.background.transform.offset.x) / 100;
                 const bgOffsetY = (canvas.height * (state.background.transform.offset.y * -1)) / 100;
+
+                // JIKA ADA GAMBAR LATAR, GAMBAR DI ATAS WARNA SOLID
                 if (state.background.element) {
                     ctx.save();
                     if (state.background.transform.mode === 'fill') {
+                        // ... (logika menggambar gambar latar - TIDAK ADA YANG BERUBAH DI SINI) ...
                         ctx.translate(canvas.width / 2 + bgOffsetX, canvas.height / 2 + bgOffsetY);
                         ctx.rotate(state.background.transform.rotation * Math.PI / 180);
                         const userScale = state.background.transform.size / 100;
@@ -1964,12 +1952,9 @@
                         ctx.drawImage(state.background.element, 0, 0, canvas.width, canvas.height);
                     }
                     ctx.restore();
-                } else {
-                    ctx.fillStyle = state.background.color;
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
                 }
-                ctx.filter = 'none';
-                if (state.background.effects.vignette.enabled) {
+
+                ctx.filter = 'none';                if (state.background.effects.vignette.enabled) {
                     ctx.save();
                     const centerX = canvas.width / 2;
                     const centerY = canvas.height / 2;
@@ -2244,33 +2229,6 @@
 					requestRedraw();
 				}
 			}
-            
-            /**
-             * Menyesuaikan resolusi pratinjau secara otomatis berdasarkan lebar layar.
-             */
-            function handleAutoResolutionByWidth() {
-                if (state.previewResolutionMode !== 'auto') {
-                    return;
-                }
-
-                const screenWidth = window.innerWidth;
-                let newResolution;
-
-                if (screenWidth <= 480) {
-                    newResolution = '360';
-                } else if (screenWidth > 480 && screenWidth < 1440) {
-                    newResolution = '540';
-                } else {
-                    newResolution = '720';
-                }
-
-                if (newResolution !== state.activePreviewResolution) {
-                    state.activePreviewResolution = newResolution;
-                    console.log(`Resolusi otomatis diubah ke: ${newResolution}p berdasarkan lebar layar.`);
-                    resizeAndRedrawAll();
-                    updateUIFromState();
-                }
-            }
 
             /**
              * Memperbarui konten pada layar debug dengan informasi yang lebih relevan.
@@ -2289,13 +2247,7 @@
                     uiModeText = state.displayMode;
                 }
 
-                let resPreviewText;
-                if (state.previewResolutionMode === 'auto') {
-                    resPreviewText = `auto (${state.activePreviewResolution}p)`;
-                } else {
-                    resPreviewText = `${state.activePreviewResolution}p`;
-                }
-
+                const resPreviewText = `${state.previewResolution}p`;
                 const bgFileName = state.background.file ? truncateFilename(state.background.file.name, 20) : 'null';
                 const objFileName = state.object.image.file ? truncateFilename(state.object.image.file.name, 20) : 'null';
 
@@ -2312,7 +2264,7 @@ Object       : ${objFileName}
             
             function updateInternalCanvasResolution() {
                 // Gunakan resolusi aktif dari state, bukan nilai statis
-                const PREVIEW_RESOLUTION_KEY = state.activePreviewResolution;
+                const PREVIEW_RESOLUTION_KEY = state.PreviewResolution;
                 const aspectRatioKey = state.aspectRatio;
                 
                 // Temukan dimensi yang sesuai dari map resolusi
@@ -2407,11 +2359,11 @@ Object       : ${objFileName}
             }
 
             function getIconForKeyframe(currentKeyframe, currentIndex, sortedKeyframes) {
-                const iconStyle = 'stroke="white" stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round"';
-                const openIcon = `<svg viewBox="0 0 24 24" ${iconStyle}><path d="M5 15l7-7 7 7z"/></svg>`;
-                const closeIcon = `<svg viewBox="0 0 24 24" ${iconStyle}><path d="M5 9l7 7 7-7z"/></svg>`;
-                const squareIcon = `<svg viewBox="0 0 24 24" ${iconStyle}><rect x="6" y="6" width="12" height="12"/></svg>`;
-                const lineIcon = `<svg viewBox="0 0 24 24" ${iconStyle}><path d="M12 5v14"/></svg>`;
+                const iconStyle = 'fill="currentColor"';
+                const openIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ${iconStyle}><path d="M12.8659 3.00017L22.3922 19.5002C22.6684 19.9785 22.5045 20.5901 22.0262 20.8662C21.8742 20.954 21.7017 21.0002 21.5262 21.0002H2.47363C1.92135 21.0002 1.47363 20.5525 1.47363 20.0002C1.47363 19.8246 1.51984 19.6522 1.60761 19.5002L11.1339 3.00017C11.41 2.52187 12.0216 2.358 12.4999 2.63414C12.6519 2.72191 12.7782 2.84815 12.8659 3.00017ZM4.20568 19.0002H19.7941L11.9999 5.50017L4.20568 19.0002Z"></path></svg>`;
+                const closeIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ${iconStyle} style="transform: rotate(180deg);"><path d="M12.8659 3.00017L22.3922 19.5002C22.6684 19.9785 22.5045 20.5901 22.0262 20.8662C21.8742 20.954 21.7017 21.0002 21.5262 21.0002H2.47363C1.92135 21.0002 1.47363 20.5525 1.47363 20.0002C1.47363 19.8246 1.51984 19.6522 1.60761 19.5002L11.1339 3.00017C11.41 2.52187 12.0216 2.358 12.4999 2.63414C12.6519 2.72191 12.7782 2.84815 12.8659 3.00017ZM4.20568 19.0002H19.7941L11.9999 5.50017L4.20568 19.0002Z"></path></svg>`;
+                const squareIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ${iconStyle}><path d="M4 3H20C20.5523 3 21 3.44772 21 4V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V4C3 3.44772 3.44772 3 4 3ZM5 5V19H19V5H5Z"></path></svg>`;
+                const lineIcon = `<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/></svg>`;
 
                 if (currentKeyframe.paperAnim === 'open') return openIcon;
                 if (currentKeyframe.paperAnim === 'close') return closeIcon;
@@ -2707,7 +2659,7 @@ Object       : ${objFileName}
             /**
              * Truncates a filename for display purposes.
              */
-            function truncateFilename(filename, maxLength = 8) {
+            function truncateFilename(filename, maxLength = 12) {
                 const lastDotIndex = filename.lastIndexOf('.');
                 if (lastDotIndex === -1) {
                     return filename.length > maxLength ? filename.substring(0, maxLength) + '...' : filename;
@@ -2751,7 +2703,7 @@ Object       : ${objFileName}
                             <input type="number" min="0" step="0.1" value="${kf.time.toFixed(2)}" class="keyframe-time-input number-input-uniform bg-slate-900 border border-[var(--border-color-light)] py-1 px-2 text-sm focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)]">
                             <span class="text-sm text-[var(--text-muted)]">s</span>
                             <button class="delete-keyframe-btn p-1.5 text-red-400 hover:text-white hover:bg-red-500/80 transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 4V2H17V4H22V6H20V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V6H2V4H7ZM6 6V20H18V6H6ZM9 9H11V17H9V9ZM13 9H15V17H13V9Z"></path></svg>
                             </button>
                         </div>
                     `;
@@ -2787,16 +2739,16 @@ Object       : ${objFileName}
                 panel.innerHTML = `
                 <div class="accordion-section border border-[var(--border-color)] accordion-open">
                     <div class="accordion-header w-full flex items-center justify-between p-4 bg-slate-700/30">
-                        <h2 class="text-base font-semibold text-slate-300" data-translate-key="keyframeProperties"></h2>
+                        <h2 id="keyframe-properties-title" class="text-base font-semibold text-slate-300"></h2>
                         <div class="flex items-center gap-2">
-                            <button id="kf-reset-btn" title="Reset Properti Keyframe" class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-600 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg>
+                            <button id="kf-reset-btn" title="Reset Properties" class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-600 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M22 12C22 17.5228 17.5229 22 12 22C6.4772 22 2 17.5228 2 12C2 6.47715 6.4772 2 12 2V4C7.5817 4 4 7.58172 4 12C4 16.4183 7.5817 20 12 20C16.4183 20 20 16.4183 20 12C20 9.25022 18.6127 6.82447 16.4998 5.38451L16.5 8H14.5V2L20.5 2V4L18.0008 3.99989C20.4293 5.82434 22 8.72873 22 12Z"></path></svg>
                             </button>
-                            <button id="kf-copy-btn" title="Salin Properti" class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-600 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM9 1.5H7v1h2v-1z"/></svg>
+                            <button id="kf-copy-btn" title="Copy Properties" class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-600 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6Z"></path></svg>
                             </button>
-                            <button id="kf-paste-btn" title="Tempel Properti" class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-600 transition-colors ${keyframeClipboard === null ? 'is-disabled' : ''}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 1.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-1Zm-5 0A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5v1A1.5 1.5 0 0 1 9.5 4h-3A1.5 1.5 0 0 1 5 2.5v-1Zm.5 4a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3Z"/><path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2Zm13 2v5H1V4a1 1 0 0 1 1-1h12ZM1 10.5v1.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V10.5H1Z"/></svg>
+                            <button id="kf-paste-btn" title="Paste Properties" class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-600 transition-colors ${keyframeClipboard === null ? 'is-disabled' : ''}">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M7 4V2H17V4H20.0066C20.5552 4 21 4.44495 21 4.9934V21.0066C21 21.5552 20.5551 22 20.0066 22H3.9934C3.44476 22 3 21.5551 3 21.0066V4.9934C3 4.44476 3.44495 4 3.9934 4H7ZM7 6H5V20H19V6H17V8H7V6ZM9 4V6H15V4H9Z"></path></svg>
                             </button>
                         </div>
                     </div>
@@ -2860,6 +2812,11 @@ Object       : ${objFileName}
                         </div>
                     </div>
                 </div>`;
+
+                // Membuat judul dinamis
+                const titleTemplate = translations[state.language].keyframePropertiesTitle || 'Keyframe Properties #';
+                const dynamicTitle = `${titleTemplate}${currentIndex + 1}`;
+                document.getElementById('keyframe-properties-title').textContent = dynamicTitle;                
 
                 updateUIText(state.language);
 
@@ -2979,25 +2936,18 @@ Object       : ${objFileName}
 				const removeBackgroundImageBtn = document.getElementById('remove-background-image');
 				const bgDependentAccordions = ['background-transform-accordion', 'background-blur-accordion'];
 
-				const hasBgImage = !!state.background.element;
-				bgDependentAccordions.forEach(id => {
-					document.getElementById(id).classList.toggle('controls-disabled-for-bg', !hasBgImage);
-				});
+                const hasBgImage = !!state.background.element;
 
-				if (hasBgImage) {
-					backgroundColorControl.classList.add('is-disabled');
-					backgroundDropZonePrompt.classList.add('hidden');
-					backgroundDropZoneFilename.classList.remove('hidden');
-					if (backgroundDropZoneFilename.querySelector('p') && state.background.file) {
-						backgroundDropZoneFilename.querySelector('p').textContent = truncateFilename(state.background.file.name);
-					}
-					removeBackgroundImageBtn.classList.remove('hidden');
-				} else {
-					backgroundColorControl.classList.remove('is-disabled');
-					backgroundDropZonePrompt.classList.remove('hidden');
-					backgroundDropZoneFilename.classList.add('hidden');
-					removeBackgroundImageBtn.classList.add('hidden');
-				}
+                backgroundDropZonePrompt.classList.toggle('hidden', hasBgImage);
+                backgroundDropZoneFilename.classList.toggle('hidden', !hasBgImage);
+                if (hasBgImage && backgroundDropZoneFilename.querySelector('p') && state.background.file) {
+                    backgroundDropZoneFilename.querySelector('p').textContent = truncateFilename(state.background.file.name);
+                }
+                removeBackgroundImageBtn.classList.toggle('hidden', !hasBgImage);
+
+                bgDependentAccordions.forEach(id => {
+                    document.getElementById(id).classList.toggle('controls-disabled-for-bg', !hasBgImage);
+                });
 
 				const paperFoldOverlayControls = document.getElementById('overlay-controls');
 				const anyOverlayImageLoaded = originalOverlayImages.length > 0 && originalOverlayImages.some(img => img !== null);
@@ -3050,7 +3000,7 @@ Object       : ${objFileName}
 					{ id: 'overlay-opacity-input', value: activeObjectState.paperFoldOverlay.opacity },
 					{ id: 'overlay-speed-input', value: activeObjectState.paperFoldOverlay.speed },
 					{ id: 'export-duration-input', value: state.export.duration },
-					{ id: 'export-filename-input', value: state.export.filename + '.webm' }
+					{ id: 'export-filename-input', value: state.export.filename }
 				];
 
 				inputsToUpdate.forEach(item => {
@@ -3118,7 +3068,7 @@ Object       : ${objFileName}
 				});
 
 				document.querySelectorAll('#preview-resolution-btns button').forEach(button => {
-					button.classList.toggle('active', button.dataset.res === state.previewResolutionMode);
+					button.classList.toggle('active', button.dataset.res === state.previewResolution);
 				});
 
 				document.getElementById('debug-screen-switch').checked = state.debugScreenEnabled;
@@ -3663,24 +3613,23 @@ Object       : ${objFileName}
              * Initializes the application, sets up event listeners, and starts the animation loop.
              */
             function init() {
-                // Open panel by default on desktop
-                if (!window.matchMedia('(max-width: 768px)').matches) {
-                   panelWrapper.classList.add('panel-open');
-                   body.classList.add('desktop-panel-open');
-                   animateCanvasResize();
-                }
-
                 // Set initial language based on browser setting
                 if (navigator.language.startsWith('id')) {
                     state.language = 'id';
                 }
                 
                 // Set initial UI size and display mode
-                const isCurrentlyMobile = !window.matchMedia('(min-width: 769px)').matches;
-                state.displayMode = 'auto'; 
-                state.uiSize = isCurrentlyMobile ? 'compact' : 'normal';
-                handleAutoResolutionByWidth();
+                state.displayMode = 'auto';
+                state.uiSize = window.innerWidth < 1280 ? 'compact' : 'normal';
 
+                const screenWidth = window.innerWidth;
+                if (screenWidth <= 480) {
+                    state.previewResolution = '360';
+                } else if (screenWidth > 480 && screenWidth < 1440) {
+                    state.previewResolution = '540';
+                } else {
+                    state.previewResolution = '720';
+                }
                 resizeAndRedrawAll();
                 animationFrameId = requestAnimationFrame(animationLoop);
                 requestAnimationFrame(fpsLoop);
@@ -3722,31 +3671,23 @@ Object       : ${objFileName}
                 // --- EVENT LISTENERS ---
                 window.addEventListener('resize', () => {
                     if (state.displayMode === 'auto') {
-                         const isMobile = !window.matchMedia('(min-width: 769px)').matches;
-                         applyUISize(isMobile ? 'compact' : 'normal');
+                        const newSize = window.innerWidth < 1280 ? 'compact' : 'normal';
+                        if (newSize !== state.uiSize) {
+                            applyUISize(newSize);
+                        }
                     }
-                    handleAutoResolutionByWidth();
                     resizeAndRedrawAll();
                 });
 
                 document.getElementById('preview-resolution-btns').addEventListener('click', (e) => {
                     const button = e.target.closest('button');
                     if (button && button.dataset.res) {
-                        const newResMode = button.dataset.res;
-                        state.previewResolutionMode = newResMode;
-
-                        if (newResMode !== 'auto') {
-                            // Jika pengguna memilih resolusi manual, langsung set resolusi aktif
-                            state.activePreviewResolution = newResMode;
-                        } else {
-                            // Jika kembali ke 'auto', mulai lagi dari 540p
-                            state.activePreviewResolution = '540';
-                        }
-
-                        updateUIFromState(); // Perbarui UI tombol
-                        resizeAndRedrawAll(); // Terapkan resolusi baru
+                        state.previewResolution = button.dataset.res; // Langsung atur resolusi
+                        updateUIFromState();
+                        resizeAndRedrawAll();
                     }
                 });
+
                 document.getElementById('debug-screen-switch').addEventListener('change', (e) => {
                     state.debugScreenEnabled = e.target.checked;
                     updateUIFromState(); // Update UI untuk menampilkan/menyembunyikan layar
@@ -3818,13 +3759,7 @@ Object       : ${objFileName}
                     e.target.value = state.export.duration;
                 });
                 document.getElementById('export-filename-input').addEventListener('input', (e) => {
-                    let currentVal = e.target.value;
-                    
-                    let baseName = currentVal.endsWith('.webm')
-                        ? currentVal.slice(0, -5)
-                        : currentVal;
-                    
-                    state.export.filename = baseName.trim();
+                    state.export.filename = e.target.value.trim();
                 });
 
                 // Setup drag and drop zones
@@ -3976,7 +3911,6 @@ Object       : ${objFileName}
                         isLiveTornEdgePreview = true
                         originalOverlaySpeed = getActiveObject().paperFoldOverlay.speed
                         getActiveObject().paperFoldOverlay.speed = 0
-                        toggleProcessingMessage(true, 'processingImageEffect');
                     }
 
                     const stopAdjusting = () => {
@@ -3985,7 +3919,6 @@ Object       : ${objFileName}
                         isLiveTornEdgePreview = false
                         getActiveObject().paperFoldOverlay.speed = originalOverlaySpeed
                         isCacheGenerationNeeded = true
-                        toggleProcessingMessage(false);
                         requestRedraw()
                     }
 
@@ -4358,10 +4291,27 @@ Object       : ${objFileName}
                 if (timelineDurationInput) {
                     timelineDurationInput.addEventListener('change', (e) => syncDurationInputs(e.target.value));
                 }     
-                setTimeout(autoAdjustMobileLayout, 500);                  
+                setTimeout(autoAdjustMobileLayout, 500);
+                // Open panel by default on desktop with a delay
+                if (!window.matchMedia('(max-width: 768px)').matches) {
+                    setTimeout(() => {
+                        panelWrapper.classList.add('panel-open');
+                        body.classList.add('desktop-panel-open');
+                        animateCanvasResize();
+                    }, 500); // Delay 500 milidetik
+                }                
                 updateUIFromState();
             }
-            init(); 
+            init();
+            window.addEventListener('load', () => {
+                // Hanya jalankan di desktop
+                if (!window.matchMedia('(max-width: 768px)').matches) {
+                    // Menggunakan variabel yang sudah dideklarasikan di lingkup atas
+                    panelWrapper.classList.add('panel-open');
+                    body.classList.add('desktop-panel-open');
+                    animateCanvasResize();
+                }
+            });            
         });
     </script>
 </body>
