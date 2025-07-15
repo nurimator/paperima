@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Editor Gambar dengan Efek Kertas Sobek</title>
-    <link rel="icon" type="image/png" href="assets/favicon-96x96.png" sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
-    <link rel="shortcut icon" href="assets/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" href="./assets/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+    <link rel="shortcut icon" href="./assets/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="Papera.me" />
-    <link rel="manifest" href="assets/site.webmanifest" />
+    <link rel="manifest" href="./assets/site.webmanifest" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/ccapture.js-npmfixed/build/CCapture.all.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -3622,7 +3622,40 @@ Object       : ${objFileName}
                     panelWrapper.style.transition = '';
                     resizeAndRedrawAll();
                 }, 500);
-            }       
+            }
+
+            // PWA Installation Logic
+            let deferredPrompt;
+            const installButton = document.getElementById('pwa-install-button');
+            if (installButton) {
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    deferredPrompt = e;
+                    installButton.style.display = 'flex';
+                });
+                installButton.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        installButton.style.display = 'none';
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        deferredPrompt = null;
+                    }
+                });
+            }
+
+            // --- Kode Pendaftaran Service Worker Diletakkan di Sini ---
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/service-worker.js', { scope: '/papera.me/' })
+                        .then((registration) => {
+                            console.log('Service Worker berhasil terdaftar dengan cakupan:', registration.scope);
+                        })
+                        .catch((error) => {
+                            console.error('Pendaftaran Service Worker gagal:', error);
+                        });
+                });
+            }
+
             /**
              * Initializes the application, sets up event listeners, and starts the animation loop.
              */
@@ -4327,31 +4360,6 @@ Object       : ${objFileName}
                 }
             });            
         });
-
-        // PWA Installation Logic
-        let deferredPrompt;
-        const installButton = document.getElementById('pwa-install-button');
-        if (installButton) {
-            window.addEventListener('beforeinstallprompt', (e) => {
-                // Mencegah promosi otomatis dari browser
-                e.preventDefault();
-                // Simpan event sehingga bisa dipicu nanti
-                deferredPrompt = e;
-                // Tampilkan tombol instalasi kita
-                console.log("Event beforeinstallprompt terpicu. Tombol instalasi terlihat.");
-            });
-            installButton.addEventListener('click', async () => {
-                if (deferredPrompt) {
-                    // Tampilkan promosi instalasi
-                    deferredPrompt.prompt();
-                    // Tunggu hingga pengguna merespons
-                    const { outcome } = await deferredPrompt.userChoice;
-                    // Reset deferredPrompt karena hanya bisa digunakan sekali
-                    deferredPrompt = null;
-                    console.log(`Respon pengguna: ${outcome}`);
-                }
-            });
-        }
     </script>
 </body>
 </html>
