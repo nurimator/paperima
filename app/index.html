@@ -3822,7 +3822,7 @@ Object       : ${objFileName}
             // --- Kode Pendaftaran Service Worker Diletakkan di Sini ---
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/service-worker.js', { scope: '/papera.me/' })
+                    navigator.serviceWorker.register('./service-worker.js', { scope: '/papera.me/app/' })
                         .then((registration) => {
                             console.log('Service Worker berhasil terdaftar dengan cakupan:', registration.scope);
                         })
