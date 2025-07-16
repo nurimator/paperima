@@ -3321,51 +3321,99 @@ Object       : ${objFileName}
                 await new Promise(resolve => setTimeout(resolve, 100));
                 cancelAnimationFrame(animationFrameId);
 
-                // --- REVISI FINAL: PENDEKATAN SEDERHANA & BENAR ---
+                // 1. Tentukan dimensi kanvas ekspor final dari UI
+                const exportResolutionKey = document.querySelector('#canvas-resolution-btns button.active')?.dataset.res || state.previewResolution;
+                const finalExportDims = RESOLUTION_MAPS[exportResolutionKey]?.[state.aspectRatio];
 
-                // 1. Siapkan kanvas untuk resolusi ekspor final.
-                const finalExportDims = RESOLUTION_MAPS[state.canvasDisplayResolution.toString()]?.[state.aspectRatio];
                 if (!finalExportDims) {
                     console.error("Resolusi ekspor tidak valid.");
                     isExporting = false;
+                    exportProgressPopup.classList.add('hidden');
+                    exportProgressPopup.classList.remove('flex');
                     return;
                 }
+
+                // Simpan state kanvas & gambar pratinjau untuk dikembalikan nanti
+                const originalCanvasWidth = canvas.width;
+                const originalCanvasHeight = canvas.height;
+                const previewImageElement = state.object.image.element;
+                const originalImageSize = state.object.image.size; 
+
+                // 2. Atur kanvas UTAMA ke resolusi ekspor
                 canvas.width = finalExportDims.w;
                 canvas.height = finalExportDims.h;
 
-                const previewImageElement = state.object.image.element;
-                const originalImageSize = state.object.image.size; // Simpan skala asli
+                // 3. Atur kanvas OFFSCREEN agar ukurannya proporsional, termasuk padding
+                const imageSizeSlider = document.getElementById('image-size');
+                const maxScalePercent = imageSizeSlider ? parseFloat(imageSizeSlider.max) : 200;
+                const offscreenMultiplier = (maxScalePercent / 100.0) + 0.1;
 
-                // 2. Jika ada gambar resolusi tinggi, buat versi BARU yang sudah diberi padding.
+                const offscreenCanvasWidth = Math.round(canvas.width * offscreenMultiplier);
+                const offscreenCanvasHeight = Math.round(canvas.height * offscreenMultiplier);
+
+                objectCanvas.width = contentCanvas.width = finalObjectCanvas.width = offscreenCanvasWidth;
+                objectCanvas.height = contentCanvas.height = finalObjectCanvas.height = offscreenCanvasHeight;
+
+                // 4. Siapkan gambar objek resolusi tinggi dengan padding (jika ada)
                 if (state.object.image.originalElement) {
-                    console.log("Membuat elemen resolusi tinggi dengan padding untuk ekspor...");
-                    
-                    const highResImg = state.object.image.originalElement;
+                    let highResImg = state.object.image.originalElement;
+                    const exportTargetsForUpscale = ['1080', '1440'];
+                    if (exportTargetsForUpscale.includes(exportResolutionKey)) {
+                        const exportWidth = finalExportDims.w;
+                        const exportHeight = finalExportDims.h;
+                        const sourceWidth = highResImg.width;
+                        const sourceHeight = highResImg.height;
+
+                        const targetWidth = exportWidth * 0.8;
+                        const targetHeight = exportHeight * 0.8;
+
+                        const sourceAspectRatio = sourceWidth / sourceHeight;
+                        const targetAspectRatio = targetWidth / targetHeight;
+
+                        let newWidth, newHeight;
+                        if (sourceAspectRatio > targetAspectRatio) {
+                            newWidth = targetWidth;
+                            newHeight = newWidth / sourceAspectRatio;
+                        } else {
+                            newHeight = targetHeight;
+                            newWidth = newHeight * sourceAspectRatio;
+                        }
+
+                        if (newWidth > sourceWidth || newHeight > sourceHeight) {
+                            console.log("Gambar objek terlalu kecil, melakukan upscale...");
+
+                            const upscaleCanvas = document.createElement('canvas');
+                            upscaleCanvas.width = newWidth;
+                            upscaleCanvas.height = newHeight;
+                            const upscaleCtx = upscaleCanvas.getContext('2d');
+                            upscaleCtx.drawImage(highResImg, 0, 0, newWidth, newHeight);
+
+                            const upscaledImage = new Image();
+                            upscaledImage.src = upscaleCanvas.toDataURL();
+                            await upscaledImage.decode();
+                            highResImg = upscaledImage;
+                        }
+                    }                    
                     const paddingX = highResImg.width * 0.25;
                     const paddingY = highResImg.height * 0.25;
-
                     const paddedCanvas = document.createElement('canvas');
                     const paddedCtx = paddedCanvas.getContext('2d');
                     paddedCanvas.width = highResImg.width + paddingX * 2;
                     paddedCanvas.height = highResImg.height + paddingY * 2;
                     paddedCtx.drawImage(highResImg, paddingX, paddingY);
-
                     const highResPaddedImg = new Image();
                     highResPaddedImg.src = paddedCanvas.toDataURL();
-                    await highResPaddedImg.decode(); // Tunggu hingga gambar siap digunakan.
-
-                    // 3. Gunakan gambar BARU (resolusi tinggi + padding) ini sebagai elemen aktif selama ekspor.
+                    await highResPaddedImg.decode();
                     state.object.image.element = highResPaddedImg;
                 }
-                
-                // 4. Buat cache berdasarkan elemen yang benar.
+
+                // 5. Buat ulang cache dengan gambar & resolusi yang benar
                 isCacheGenerationNeeded = true;
                 await generateTornEdgeCache();
 
-                // BAGIAN BARU 2
-                exportTitle.textContent = translations[state.language].exportingVideo || 'Mengekspor Video...';                await new Promise(resolve => setTimeout(resolve, 100)); 
-                
-                // Sisa fungsi tidak berubah...
+                exportTitle.textContent = translations[state.language].exportingVideo || 'Mengekspor Video...';
+                await new Promise(resolve => setTimeout(resolve, 100));
+
                 Object.assign(state.object.movement, DEFAULT_OBJECT_STATE.movement);
                 Object.assign(state.object.paperFoldOverlay, DEFAULT_OBJECT_STATE.paperFoldOverlay);
 
@@ -3381,9 +3429,12 @@ Object       : ${objFileName}
 
                 const cleanupAfterExport = () => {
                     console.log("Mengembalikan ke gambar pratinjau...");
-                    state.object.image.element = previewImageElement; // Kembalikan elemen pratinjau (resolusi rendah + padding)
-                    state.object.image.size = originalImageSize;     // Kembalikan skala asli
+                    state.object.image.element = previewImageElement;
+                    state.object.image.size = originalImageSize;
                     
+                    canvas.width = originalCanvasWidth;
+                    canvas.height = originalCanvasHeight;
+
                     resizeAndRedrawAll();
                     exportProgressPopup.classList.add('hidden');
                     exportProgressPopup.classList.remove('flex');
