@@ -159,12 +159,10 @@
         [data-ui-size="compact"] #settings-panel .desktop-header { height: 3rem; }
         [data-ui-size="compact"] #mobile-panel-header { height: 2.5rem; font-size: 0.8rem; }
         [data-ui-size="compact"] #mobile-footer { height: 3.5rem; }
-        [data-ui-size="compact"] #reset-settings-btn { padding: 0.5rem 1rem; font-size: 0.875rem; }
         [data-ui-size="compact"] .controls-panel { padding-bottom: 5rem; }
         [data-ui-size="normal"] #settings-panel .desktop-header { height: 4rem; }
         [data-ui-size="normal"] #mobile-panel-header { height: 3rem; font-size: 0.9rem; }
         [data-ui-size="normal"] #mobile-footer { height: 4rem; }
-        [data-ui-size="normal"] #reset-settings-btn { padding: 0.75rem 1.25rem; }
         [data-ui-size="normal"] .controls-panel { padding-bottom: 6rem; }
         [data-ui-size="luas"] .p-4, [data-ui-size="luas"] .md\:p-4 { padding: 1.5rem; }
         [data-ui-size="luas"] .px-4 { padding-left: 1.5rem; padding-right: 1.5rem; }
@@ -195,8 +193,13 @@
         [data-ui-size="luas"] #settings-panel .desktop-header { height: 5rem; }
         [data-ui-size="luas"] #mobile-panel-header { height: 3.5rem; font-size: 1.1rem; }
         [data-ui-size="luas"] #mobile-footer { height: 5rem; }
-        [data-ui-size="luas"] #reset-settings-btn { padding: 1rem 1.5rem; font-size: 1rem; }
         [data-ui-size="luas"] .controls-panel { padding-bottom: 7rem; }
+        [data-ui-size="compact"] .reset-all-btn,
+        [data-ui-size="compact"] #reset-preferences-btn { padding: 0.5rem 1rem; font-size: 0.875rem; }
+        [data-ui-size="normal"] .reset-all-btn,
+        [data-ui-size="normal"] #reset-preferences-btn { padding: 0.75rem 1.25rem; }
+        [data-ui-size="luas"] .reset-all-btn,
+        [data-ui-size="luas"] #reset-preferences-btn { padding: 1rem 1.5rem; font-size: 1rem; }
         @media (min-width: 769px) {
             [data-ui-size="compact"] #drop-zone,
             [data-ui-size="compact"] #background-drop-zone {
@@ -778,6 +781,9 @@
                             </div>
                         </div>
                     </div>
+                    <div class="space-y-4 md:space-y-4 pt-4 border-t border-[var(--border-color)] mt-4">
+                        <button id="reset-settings-btn-background" class="reset-all-btn flex items-center justify-center gap-2 md:gap-2 w-full px-5 py-3 bg-[var(--danger-color)] text-white text-sm font-semibold hover:bg-[var(--danger-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="resetAll"></button>
+                    </div>                    
                 </div>
                 <!-- Object Tab Content -->
                 <div id="object-tab-content" class="tab-content space-y-4 md:space-y-4">
@@ -1026,6 +1032,9 @@
                             </div>
                         </div>
                     </div>
+                    <div class="space-y-4 md:space-y-4 pt-4 border-t border-[var(--border-color)] mt-4">
+                        <button id="reset-settings-btn-object" class="reset-all-btn flex items-center justify-center gap-2 md:gap-2 w-full px-5 py-3 bg-[var(--danger-color)] text-white text-sm font-semibold hover:bg-[var(--danger-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="resetAll"></button>
+                    </div>                    
                 </div>
 
                 <div id="animasi-tab-content" class="tab-content hidden space-y-4 md:space-y-4">
@@ -1095,6 +1104,9 @@
                             </div>
                         </div>
                     </div>
+                    <div class="space-y-4 md:space-y-4 pt-4 border-t border-[var(--border-color)] mt-4">
+                        <button id="reset-settings-btn-animasi" class="reset-all-btn flex items-center justify-center gap-2 md:gap-2 w-full px-5 py-3 bg-[var(--danger-color)] text-white text-sm font-semibold hover:bg-[var(--danger-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="resetAll"></button>
+                    </div>                    
                 </div>
 
                 <!-- Info/Settings Tab Content -->            
@@ -1178,12 +1190,9 @@
                             </a>
                         </div>
                     </div>
-                </div>
-                <!-- Reset All Settings Button -->
-                <div class="space-y-4 md:space-y-4 pt-4 border-t border-[var(--border-color)] mt-4">
-                    <button id="reset-settings-btn" class="flex items-center justify-center gap-2 md:gap-2 w-full px-5 py-3 bg-[var(--danger-color)] text-white text-sm font-semibold hover:bg-[var(--danger-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="resetAll"></button>
-
-                    <button id="reset-preferences-btn" class="hidden flex items-center justify-center gap-2 md:gap-2 w-full px-5 py-3 bg-[var(--danger-color)] text-white text-sm font-semibold hover:bg-[var(--danger-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="resetPreferences"></button>
+                    <div class="space-y-4 md:space-y-4 pt-4 border-t border-[var(--border-color)] mt-4">
+                        <button id="reset-preferences-btn" class="flex items-center justify-center gap-2 md:gap-2 w-full px-5 py-3 bg-[var(--danger-color)] text-white text-sm font-semibold hover:bg-[var(--danger-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="resetPreferences"></button>
+                    </div>                    
                 </div>
             </div>
         </aside>
@@ -3426,13 +3435,13 @@ Object       : ${objFileName}
 
                 processFrame(0);
             }
+
             /**
              * Shows the content for a specific tab and updates the active state of tab buttons.
              */
             const tabScrollPositions = {};
             const controlsPanel = document.querySelector('.controls-panel');            
             function showTab(tabName) {
-                // Simpan posisi scroll tab saat ini sebelum beralih
                 const currentActiveTab = state.activeTab;
                 if (controlsPanel) {
                     tabScrollPositions[currentActiveTab] = controlsPanel.scrollTop;
@@ -3448,21 +3457,6 @@ Object       : ${objFileName}
                 };
                 
                 const titleText = tabTitles[tabName] || translations[lang].settings;
-                document.getElementById('panel-title').textContent = titleText;
-                document.getElementById('mobile-panel-header').textContent = titleText.toUpperCase();
-
-                // DIUBAH: Logika untuk menampilkan/menyembunyikan tombol reset
-                const resetButton = document.getElementById('reset-settings-btn');
-                const resetPrefsButton = document.getElementById('reset-preferences-btn');
-
-                if (tabName === 'info') {
-                    resetButton.classList.add('hidden');
-                    resetPrefsButton.classList.remove('hidden');
-                } else {
-                    resetButton.classList.remove('hidden');
-                    resetPrefsButton.classList.add('hidden');
-                }
-
                 document.getElementById('panel-title').textContent = titleText;
                 document.getElementById('mobile-panel-header').textContent = titleText.toUpperCase();
 
@@ -3796,15 +3790,17 @@ Object       : ${objFileName}
                 });
 
                 // DIUBAH: Event listener untuk tombol Reset All
-                document.getElementById('reset-settings-btn').addEventListener('click', async () => {
-                    const { confirmed, deleteImages } = await showConfirmationPopup(
-                        "confirmResetTitle", 
-                        "confirmResetMessage",
-                        { showDeleteImagesCheckbox: true }
-                    );
-                    if (confirmed) {
-                        resetMainSettings(deleteImages); // Panggil fungsi reset yang baru
-                    }
+                document.querySelectorAll('.reset-all-btn').forEach(button => {
+                    button.addEventListener('click', async () => {
+                        const { confirmed, deleteImages } = await showConfirmationPopup(
+                            "confirmResetTitle", 
+                            "confirmResetMessage",
+                            { showDeleteImagesCheckbox: true }
+                        );
+                        if (confirmed) {
+                            resetMainSettings(deleteImages);
+                        }
+                    });
                 });
 
                 // BARU: Event listener untuk tombol Reset Preferensi
@@ -3976,54 +3972,60 @@ Object       : ${objFileName}
                 );
 
                 const setupTornEdgeSlider = (sliderId, inputId, stateUpdater, isDetail = false) => {
-                    const slider = document.getElementById(sliderId)
-                    const input = document.getElementById(inputId)
-                    if (!slider || !input) return
+                    const slider = document.getElementById(sliderId);
+                    const input = document.getElementById(inputId);
+                    if (!slider || !input) return;
 
-                    const throttledUpdate = throttle((value) => {
-                        if (!isAdjustingTornEdge) return
-                        const numericValue = parseFloat(value) || 0
-                        stateUpdater(isDetail ? numericValue / 1000 : numericValue)
-                        requestRedraw()
-                    }, 50)
+                    let cacheDebounceTimeout;
+                    let finalDebounceTimeout;
 
                     const startAdjusting = () => {
-                        if (!state.object.image.element) return
-                        isAdjustingTornEdge = true
-                        isLiveTornEdgePreview = true
-                        originalOverlaySpeed = getActiveObject().paperFoldOverlay.speed
-                        getActiveObject().paperFoldOverlay.speed = 0
-                    }
+                        if (!state.object.image.element) return;
+                        if (!isAdjustingTornEdge) {
+                            isAdjustingTornEdge = true;
+                            originalOverlaySpeed = getActiveObject().paperFoldOverlay.speed;
+                            getActiveObject().paperFoldOverlay.speed = 0;
+                        }
+                        isLiveTornEdgePreview = true;
+                    };
 
-                    const stopAdjusting = () => {
-                        if (!isAdjustingTornEdge) return
-                        isAdjustingTornEdge = false
-                        isLiveTornEdgePreview = false
-                        getActiveObject().paperFoldOverlay.speed = originalOverlaySpeed
-                        isCacheGenerationNeeded = true
-                        requestRedraw()
-                    }
-
-                    slider.addEventListener('pointerdown', startAdjusting)
-                    slider.addEventListener('pointerup', stopAdjusting)
-                    slider.addEventListener('pointerleave', stopAdjusting)
-                    slider.addEventListener('touchstart', startAdjusting, { passive: true });
-                    slider.addEventListener('touchend', stopAdjusting);
-                    slider.addEventListener('touchcancel', stopAdjusting);
+                    const stopAdjustingAndFinalize = () => {
+                        if (!isAdjustingTornEdge) return;
+                        isAdjustingTornEdge = false;
+                        isLiveTornEdgePreview = false;
+                        getActiveObject().paperFoldOverlay.speed = originalOverlaySpeed;
+                        requestRedraw();
+                        console.log("1000ms: Penyesuaian selesai, animasi lanjut, cache ditampilkan.");
+                    };
 
                     slider.addEventListener('input', (e) => {
-                        input.value = e.target.value
-                        throttledUpdate(e.target.value)
-                    })
+                        startAdjusting();
+
+                        const numericValue = parseFloat(e.target.value) || 0;
+                        input.value = numericValue;
+                        stateUpdater(isDetail ? numericValue / 1000 : numericValue);
+                        requestRedraw();
+
+                        clearTimeout(cacheDebounceTimeout);
+                        clearTimeout(finalDebounceTimeout);
+                        cacheDebounceTimeout = setTimeout(generateTornEdgeCache, 500);
+                        finalDebounceTimeout = setTimeout(stopAdjustingAndFinalize, 1000);
+                    });
 
                     input.addEventListener('change', (e) => {
-                        const finalValue = parseFloat(e.target.value) || 0
-                        slider.value = finalValue
-                        stateUpdater(isDetail ? finalValue / 1000 : finalValue)
-                        isCacheGenerationNeeded = true
-                        requestRedraw()
-                    })
-                }
+                        clearTimeout(cacheDebounceTimeout);
+                        clearTimeout(finalDebounceTimeout);
+
+                        const finalValue = parseFloat(e.target.value) || 0;
+                        slider.value = finalValue;
+                        stateUpdater(isDetail ? finalValue / 1000 : finalValue);
+
+                        startAdjusting();
+                        generateTornEdgeCache().then(() => {
+                            stopAdjustingAndFinalize();
+                        });
+                    });
+                };
 
 				setupTornEdgeSlider('stroke-width', 'stroke-width-input', (val) => getActiveObject().stroke.width = val);
 				setupTornEdgeSlider('stroke-roughness', 'stroke-roughness-input', (val) => getActiveObject().stroke.roughness = val);
