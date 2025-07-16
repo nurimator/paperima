@@ -230,23 +230,6 @@
             cursor: ns-resize;
         }
 
-        @media (max-width: 480px) {
-            #export-settings-popup .info-tooltip {
-                /* Tetap muncul di atas ikon */
-                bottom: 100%;
-                top: auto;
-                margin-bottom: 0.5rem;
-                
-                /* Atur lebar agar cukup dan tidak melebihi layar */
-                width: 280px; /* Beri lebar yang cukup */
-                max-width: 75vw; /* Batasi agar tidak keluar dari layar */
-
-                /* BARU: Posisikan rata kiri dari ikon, bukan di tengahnya */
-                left: 0;
-                transform: translateX(0);
-            }
-        }
-        
         @media (max-width: 768px) {          
             body:not(.force-desktop) {
                 display: flex;
@@ -259,7 +242,7 @@
                 --panel-transform: none;
             }
             body:not(.force-desktop) #canvas-container {
-                flex-basis: 50%;
+                flex-basis: 100%;
                 width: 100%;
                 flex-shrink: 0;
                 padding: 0.5rem;
@@ -273,7 +256,7 @@
             }
             body:not(.force-desktop) #settings-panel-wrapper {
                 position: relative;
-                flex-basis: 50%;
+                flex-basis: 0%;
                 width: 100vw;
                 max-width: 100vw;
                 transform: none !important;
@@ -351,7 +334,6 @@
         body.force-desktop #settings-panel-wrapper {
             inset: 0 0 0 auto;
             height: 100%;
-            max-width: 24rem;
             border-radius: 0;
         }
         body.force-desktop #settings-panel {
@@ -548,6 +530,54 @@
             visibility: hidden;
             transition: opacity 0.3s, visibility 0.3s;
         }
+        #desktop-resizer {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: var(--panel-width);
+            width: 4px;
+            transform: translateX(50%);
+            cursor: ew-resize;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #desktop-resizer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background-color: var(--accent-color-hover);
+            border-radius: 2px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        #desktop-resizer:hover::after,
+        body.is-resizing #desktop-resizer::after {
+            opacity: 1;
+        }
+
+        body:not(.desktop-panel-open) #desktop-resizer {
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.desktop-panel-open #desktop-resizer {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #desktop-resizer:hover {
+            background-color: var(--border-color-light);
+        }
+        body.is-resizing {
+            cursor: ew-resize !important;
+            user-select: none !important;
+        }        
+        body.force-mobile #desktop-resizer {
+            display: none !important;
+        }        
     </style>
 </head>
 <body class="bg-slate-900 relative">
@@ -582,6 +612,7 @@
     </main>
 
     <!-- Settings panel wrapper -->
+    <div id="desktop-resizer" class="desktop-only z-50"></div>
     <div id="settings-panel-wrapper" class="absolute inset-y-0 right-0 h-full w-full transition-transform duration-300 ease-in-out z-40">
         <!-- Handle to open/close the settings panel on desktop -->
         <button id="panel-handle" class="main-handle">
@@ -1212,7 +1243,7 @@
         <button id="mobile-tab-info" data-tab="info" class="mobile-tab-btn p-2 text-slate-300 hover:text-white">
             <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14V16C8.68629 16 6 18.6863 6 22H4C4 17.5817 7.58172 14 12 14ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11ZM14.5946 18.8115C14.5327 18.5511 14.5 18.2794 14.5 18C14.5 17.7207 14.5327 17.449 14.5945 17.1886L13.6029 16.6161L14.6029 14.884L15.5952 15.4569C15.9883 15.0851 16.4676 14.8034 17 14.6449V13.5H19V14.6449C19.5324 14.8034 20.0116 15.0851 20.4047 15.4569L21.3971 14.8839L22.3972 16.616L21.4055 17.1885C21.4673 17.449 21.5 17.7207 21.5 18C21.5 18.2793 21.4673 18.551 21.4055 18.8114L22.3972 19.3839L21.3972 21.116L20.4048 20.543C20.0117 20.9149 19.5325 21.1966 19.0001 21.355V22.5H17.0001V21.3551C16.4677 21.1967 15.9884 20.915 15.5953 20.5431L14.603 21.1161L13.6029 19.384L14.5946 18.8115ZM18 19.5C18.8284 19.5 19.5 18.8284 19.5 18C19.5 17.1716 18.8284 16.5 18 16.5C17.1716 16.5 16.5 17.1716 16.5 18C16.5 18.8284 17.1716 19.5 18 19.5Z"></path></svg>
         </button>
-        <button id="mobile-export-btn" class="px-5 py-2.5 bg-[var(--accent-color)] text-white text-sm font-semibold hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="export">
+        <button id="mobile-export-btn" class="px-5 py-2.5 bg-[var(--accent-color)] text-white text-sm font-semibold hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="export">Export
         </button>
     </footer>
 
@@ -1258,9 +1289,9 @@
                             </div>
                         </div>
                     </div>
-                    <div id="filename-container" class="w-full mt-1 flex items-center p-2 bg-slate-700 border border-[var(--border-color-light)]">
-                        <input type="text" id="export-filename-input" value="papera-me" class="flex-grow bg-transparent border-none outline-none p-0">
-                        <span class="text-[var(--text-muted)] pointer-events-none">.webm</span>
+                    <div id="filename-container" class="w-full mt-1 flex items-center justify-between p-2 bg-slate-700 border border-[var(--border-color-light)]">
+                        <input type="text" id="export-filename-input" value="papera-me" class="flex-1 bg-transparent border-none outline-none p-0 min-w-0">
+                        <span class="flex-shrink-0 text-[var(--text-muted)] pointer-events-none ml-2">.webm</span>
                     </div>
                 </div>
             </div>
@@ -3126,10 +3157,14 @@ Object       : ${objFileName}
                     warningElement.classList.toggle('hidden', state.displayMode === 'auto');
                 }
                 body.classList.remove('force-mobile', 'force-desktop');
+                
                 if (state.displayMode === 'mobile') {
                     body.classList.add('force-mobile');
                 } else if (state.displayMode === 'desktop') {
                     body.classList.add('force-desktop');
+                    if (userDesktopPanelWidth) {
+                        body.style.setProperty('--panel-width', `${userDesktopPanelWidth}px`);
+                    }
                 }
                 resizeAndRedrawAll();
             }
@@ -3644,22 +3679,15 @@ Object       : ${objFileName}
                 
                 const canvasHeightPercentage = (requiredContainerHeight / totalLayoutHeight) * 100;
 
-                // BARU: Cek apakah hasil perhitungan melebihi 50%
-                if (canvasHeightPercentage > 50) {
-                    // Jika ya, hentikan fungsi dan biarkan layout default 50/50.
-                    return; 
-                }
-
-                // Kode di bawah ini hanya akan berjalan jika persentase kanvas <= 50%
+                const finalCanvasPercentage = Math.min(canvasHeightPercentage, 50);
 
                 // Logika Animasi
                 const transitionStyle = 'flex-basis 0.5s ease-in-out';
                 canvasContainer.style.transition = transitionStyle;
                 panelWrapper.style.transition = transitionStyle;
 
-                // Terapkan persentase baru
-                canvasContainer.style.flexBasis = `${canvasHeightPercentage}%`;
-                panelWrapper.style.flexBasis = `${100 - canvasHeightPercentage}%`;
+                canvasContainer.style.flexBasis = `${finalCanvasPercentage}%`;
+                panelWrapper.style.flexBasis = `${100 - finalCanvasPercentage}%`;
 
                 // Hapus style transisi setelah animasi selesai
                 setTimeout(() => {
@@ -3686,6 +3714,66 @@ Object       : ${objFileName}
                     }
                 }
             }
+            let userDesktopPanelWidth = null;
+            function desktopPanelResizer() {
+                const resizer = document.getElementById('desktop-resizer');
+                const panelWrapper = document.getElementById('settings-panel-wrapper');
+                const canvasContainer = document.getElementById('canvas-container');
+                const body = document.body;
+
+                if (!resizer || !panelWrapper || !canvasContainer) return;
+
+                if(userDesktopPanelWidth) {
+                    body.style.setProperty('--panel-width', `${userDesktopPanelWidth}px`);
+                }
+
+                const handleMove = (e) => {
+                    // Satu fungsi untuk menangani mouse dan sentuhan
+                    const currentX = e.touches ? e.touches[0].clientX : e.clientX;
+                    const viewportWidth = window.innerWidth;
+                    const newPanelWidth = viewportWidth - currentX;
+                    const minWidth = viewportWidth * 0.20;
+                    const maxWidth = viewportWidth * 0.50;
+
+                    if (newPanelWidth >= minWidth && newPanelWidth <= maxWidth) {
+                        userDesktopPanelWidth = newPanelWidth;
+                        body.style.setProperty('--panel-width', `${userDesktopPanelWidth}px`);
+                        updateCanvasDisplaySize();
+                        requestRedraw();
+                    }
+                };
+
+                const handleMouseUp = () => {
+                    body.classList.remove('is-resizing');
+                    document.removeEventListener('mousemove', handleMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                    document.removeEventListener('touchmove', handleMove);
+                    document.removeEventListener('touchend', handleMouseUp);
+                    canvasContainer.style.transition = 'width 0.3s ease-out';
+                    panelWrapper.style.transition = 'transform 0.3s ease-in-out';
+                };
+
+                const handleMouseDown = (e) => {
+                    e.preventDefault(); // Mencegah perilaku default browser
+                    body.classList.add('is-resizing');
+                    panelWrapper.style.transition = 'none';
+                    canvasContainer.style.transition = 'none';
+                    document.addEventListener('mousemove', handleMove);
+                    document.addEventListener('mouseup', handleMouseUp);
+                };
+                
+                // Tambahkan listener untuk mouse
+                resizer.addEventListener('mousedown', handleMouseDown);
+                
+                // Tambahkan listener untuk sentuhan
+                resizer.addEventListener('touchstart', (e) => {
+                    // Panggil fungsi yang sama dengan mousedown
+                    handleMouseDown(e); 
+                    // Tambahkan listener untuk pergerakan sentuhan
+                    document.addEventListener('touchmove', handleMove, { passive: false }); // passive: false penting
+                    document.addEventListener('touchend', handleMouseUp);
+                }, { passive: false });
+            }      
             
             // PWA Installation Logic
             let deferredPrompt;
@@ -4397,28 +4485,111 @@ Object       : ${objFileName}
                 }
 
                 let hideTooltipTimeout;
+                // --- LOGIKA TOOLTIP FINAL v2 (Gantikan yang lama dengan ini) ---
+                let activeMobileTooltip = null;
+                let activeMobileTooltipOverlay = null;
+
+                const hideMobileTooltip = () => {
+                    if (activeMobileTooltip) {
+                        activeMobileTooltip.remove();
+                        activeMobileTooltip = null;
+                    }
+                    if (activeMobileTooltipOverlay) {
+                        activeMobileTooltipOverlay.remove();
+                        activeMobileTooltipOverlay = null;
+                    }
+                };
 
                 document.querySelectorAll('.info-tooltip-trigger').forEach(trigger => {
                     const tooltip = trigger.querySelector('.info-tooltip');
                     if (!tooltip) return;
 
-                    const showTooltip = () => {
-                        clearTimeout(hideTooltipTimeout);
-                        tooltip.classList.add('tooltip-visible');
+                    // --- 1. LOGIKA UNTUK DESKTOP (DENGAN DETEKSI TABRAKAN) ---
+                    let hideDesktopTimeout;
+
+                    const showDesktopTooltip = () => {
+                        if (window.innerWidth > 480) {
+                            clearTimeout(hideDesktopTimeout);
+                            
+                            // Tampilkan tooltip agar bisa diukur, tapi tetap transparan
+                            tooltip.classList.add('tooltip-visible');
+
+                            // Gunakan requestAnimationFrame untuk memastikan browser sudah siap mengukur
+                            requestAnimationFrame(() => {
+                                const tooltipRect = tooltip.getBoundingClientRect();
+                                const viewportWidth = window.innerWidth;
+                                const margin = 16; // Jarak 16px dari tepi layar
+
+                                // Kalkulasi potensi tabrakan
+                                const overflowLeft = tooltipRect.left < margin ? margin - tooltipRect.left : 0;
+                                const overflowRight = tooltipRect.right > viewportWidth - margin ? tooltipRect.right - (viewportWidth - margin) : 0;
+
+                                let transformStyle = 'translateX(-50%)'; // Default: tengah
+
+                                if (overflowRight > 0) {
+                                    // Jika menabrak kanan, geser ke kiri
+                                    transformStyle = `translateX(calc(-50% - ${overflowRight}px))`;
+                                } else if (overflowLeft > 0) {
+                                    // Jika menabrak kiri, geser ke kanan
+                                    transformStyle = `translateX(calc(-50% + ${overflowLeft}px))`;
+                                }
+                                
+                                tooltip.style.transform = transformStyle;
+                            });
+                        }
                     };
 
-                    const startHideTimer = () => {
-                        hideTooltipTimeout = setTimeout(() => {
-                            tooltip.classList.remove('tooltip-visible');
-                        }, 500);
+                    const hideDesktopTooltip = () => {
+                        if (window.innerWidth > 480) {
+                            hideDesktopTimeout = setTimeout(() => {
+                                tooltip.classList.remove('tooltip-visible');
+                                // Reset inline style saat tooltip disembunyikan
+                                tooltip.style.transform = ''; 
+                            }, 200);
+                        }
                     };
 
-                    trigger.addEventListener('mouseenter', showTooltip);
-                    trigger.addEventListener('mouseleave', startHideTimer);
-                    tooltip.addEventListener('mouseenter', showTooltip);
-                    tooltip.addEventListener('mouseleave', startHideTimer);
+                    trigger.addEventListener('mouseenter', showDesktopTooltip);
+                    tooltip.addEventListener('mouseenter', showDesktopTooltip); // Agar bisa hover ke tooltip
+                    trigger.addEventListener('mouseleave', hideDesktopTooltip);
+                    tooltip.addEventListener('mouseleave', hideDesktopTooltip); // Agar bisa keluar dari tooltip
+
+
+                    // --- 2. LOGIKA UNTUK MOBILE (TETAP SAMA SEPERTI SEBELUMNYA) ---
+                    trigger.addEventListener('click', (e) => {
+                        if (window.innerWidth <= 480) {
+                            e.stopPropagation();
+                            
+                            if (activeMobileTooltip) {
+                                hideMobileTooltip();
+                                return;
+                            }
+
+                            activeMobileTooltipOverlay = document.createElement('div');
+                            activeMobileTooltipOverlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; z-index:9998;';
+                            document.body.appendChild(activeMobileTooltipOverlay);
+                            activeMobileTooltipOverlay.addEventListener('click', hideMobileTooltip);
+
+                            activeMobileTooltip = tooltip.cloneNode(true);
+                            activeMobileTooltip.classList.remove('absolute', 'bottom-full', 'left-1/2', '-translate-x-1/2', 'mb-2', 'pointer-events-none');
+                            document.body.appendChild(activeMobileTooltip);
+
+                            const triggerRect = trigger.getBoundingClientRect();
+                            const tooltipHeight = activeMobileTooltip.offsetHeight;
+                            const margin = 12;
+                            const topPosition = triggerRect.top - tooltipHeight - margin;
+
+                            activeMobileTooltip.style.position = 'fixed';
+                            activeMobileTooltip.style.zIndex = '9999';
+                            activeMobileTooltip.style.visibility = 'visible';
+                            activeMobileTooltip.style.opacity = '1';
+                            activeMobileTooltip.style.pointerEvents = 'auto';
+                            activeMobileTooltip.style.top = `${topPosition}px`;
+                            activeMobileTooltip.style.left = '50%';
+                            activeMobileTooltip.style.transform = 'translateX(-50%)';
+                        }
+                    });
                 });
-                
                 // MODIFIKASI & TAMBAHKAN Listener untuk sinkronisasi durasi
                 const exportDurationInput = document.getElementById('export-duration-input');
                 const timelineDurationInput = document.getElementById('timeline-duration-input');
@@ -4430,6 +4601,7 @@ Object       : ${objFileName}
                     timelineDurationInput.addEventListener('change', (e) => syncDurationInputs(e.target.value));
                 }     
                 setTimeout(autoAdjustMobileLayout, 500);
+                desktopPanelResizer();
                 updateUIFromState();
             }
             init();
