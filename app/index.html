@@ -106,8 +106,8 @@
             background-color: var(--border-color-light);
         }
         .btn-group-toggle button { border-radius: 0; }
-        .btn-group-toggle button:hover { border-color: var(--accent-color); color: var(--text-primary); }
-        .btn-group-toggle .active { border-color: var(--accent-color); color: var(--accent-color); background-color: rgba(59, 130, 246, 0.1); }
+        .btn-group-toggle button:hover { border-color: var(--accent-color); color: var(--text-muted); }
+        .btn-group-toggle .active { border-color: var(--accent-color); color: var(--text-primary); background-color: rgba(59, 130, 246, 0.1); }
         #canvas-wrapper {
             aspect-ratio: 16 / 9;
             line-height: 0;
@@ -556,7 +556,7 @@
             transform: translateX(-50%);
             width: 2px;
             height: 100%;
-            background-color: var(--accent-color-hover);
+            background-color: var(--border-color-light);
             border-radius: 2px;
             opacity: 0;
             transition: opacity 0.2s;
@@ -1284,7 +1284,7 @@
                 </div>
                 <div>
                     <label for="export-duration-input" class="block text-sm font-medium text-[var(--text-muted)] mt-4 mb-2" data-translate-key="duration"></label>
-                    <input type="number" id="export-duration-input" value="5" min="1" max="60" class="w-full mt-1 p-2 bg-slate-700 border border-[var(--border-color-light)]">
+                    <input type="number" id="export-duration-input" value="5" min="1" max="60" class="w-full mt-1 py-1 px-2 text-sm bg-slate-900 border border-[var(--border-color)] focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)]">
                 </div>
                 <div>
                     <div class="flex items-center gap-2 mt-4 mb-2">
@@ -1296,7 +1296,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="filename-container" class="w-full mt-1 flex items-center justify-between p-2 bg-slate-700 border border-[var(--border-color-light)]">
+                    <div id="filename-container" class="w-full mt-1 flex items-center justify-between py-1 px-2 text-sm bg-slate-900 border border-[var(--border-color)] focus-within:ring-[var(--accent-color)] focus-within:border-[var(--accent-color)]">
                         <input type="text" id="export-filename-input" value="papera-me" class="flex-1 bg-transparent border-none outline-none p-0 min-w-0">
                         <span class="flex-shrink-0 text-[var(--text-muted)] pointer-events-none ml-2">.webm</span>
                     </div>
