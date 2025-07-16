@@ -27,7 +27,7 @@ const urlsToCache = [
   '/papera.me/app/assets/icon/web-app-manifest-512x512.png',
   '/papera.me/app/assets/tailwind.css',
   '/papera.me/app/assets/CCapture.all.min.js',
-  '/papera.me/app/assets/font/Inter-VariableFont-opsz,wght.ttf'
+  '/papera.me/app/assets/font/Inter-VariableFont_opsz,wght.ttf'
 ];
 
 self.addEventListener('install', (event) => {
