@@ -1450,7 +1450,7 @@
                 language: 'en',
                 displayMode: 'auto', 
                 uiSize: 'normal',
-                activePreviewResolution: '540',
+                previewResolution: '540',
                 debugScreenEnabled: false,                
                 background: {
                     element: null, color: '#00ff00', file: null,
@@ -1968,8 +1968,8 @@
                     }
                     ctx.restore();
                 }
-
-                ctx.filter = 'none';                if (state.background.effects.vignette.enabled) {
+                ctx.filter = 'none';
+                if (state.background.effects.vignette.enabled) {
                     ctx.save();
                     const centerX = canvas.width / 2;
                     const centerY = canvas.height / 2;
@@ -2279,7 +2279,7 @@ Object       : ${objFileName}
             
             function updateInternalCanvasResolution() {
                 // Gunakan resolusi aktif dari state, bukan nilai statis
-                const PREVIEW_RESOLUTION_KEY = state.PreviewResolution;
+                const PREVIEW_RESOLUTION_KEY = state.previewResolution;
                 const aspectRatioKey = state.aspectRatio;
                 
                 // Temukan dimensi yang sesuai dari map resolusi
@@ -4338,7 +4338,7 @@ Object       : ${objFileName}
 
                     timelineSlider.addEventListener('mousedown', startScrub);
                     timelineSlider.addEventListener('touchstart', startScrub, { passive: true });
-                    timelineSlider.addEventListener('input', throttle(doScrub, 20));
+                    timelineSlider.addEventListener('input', throttle(doScrub, 50));
                     document.addEventListener('mouseup', stopScrub);
                     document.addEventListener('touchend', stopScrub);
                 }
@@ -4377,14 +4377,6 @@ Object       : ${objFileName}
                     timelineDurationInput.addEventListener('change', (e) => syncDurationInputs(e.target.value));
                 }     
                 setTimeout(autoAdjustMobileLayout, 500);
-                // Open panel by default on desktop with a delay
-                if (!window.matchMedia('(max-width: 768px)').matches) {
-                    setTimeout(() => {
-                        panelWrapper.classList.add('panel-open');
-                        body.classList.add('desktop-panel-open');
-                        animateCanvasResize();
-                    }, 500); // Delay 500 milidetik
-                }                
                 updateUIFromState();
             }
             init();
