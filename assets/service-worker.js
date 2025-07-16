@@ -1,14 +1,11 @@
-// Nama cache unik untuk setiap versi aplikasi
 const CACHE_NAME = 'papera-me-v1';
-
-// Daftar file yang akan di-cache
 const urlsToCache = [
   './',
   './index.html',
   './assets/site.webmanifest',
-  './assets/favicon-96x96.png',
-  './assets/favicon.ico',
-  './assets/apple-touch-icon.png',
+  './assets/icon/favicon-96x96.png',
+  './assets/icon/favicon.ico',
+  './assets/icon/apple-touch-icon.png',
   './assets/texture/paper_overlay_0.webp',
   './assets/texture/paper_overlay_1.webp',
   './assets/texture/paper_overlay_2.webp',
@@ -25,53 +22,59 @@ const urlsToCache = [
   './assets/texture/paper_mask_3.webp',
   './assets/texture/paper_mask_4.webp',
   './assets/texture/paper_mask_5.webp',
-  './assets/web-app-manifest-any.png',
-  './assets/web-app-manifest-192x192.png',
-  './assets/web-app-manifest-512x512.png',
-  'https://cdn.tailwindcss.com',
-  'https://cdn.jsdelivr.net/npm/ccapture.js-npmfixed/build/CCapture.all.min.js',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'
+  './assets/icon/web-app-manifest-any.png',
+  './assets/icon/web-app-manifest-192x192.png',
+  './assets/icon/web-app-manifest-512x512.png',
+  './assets/tailwind.css',
+  './assets/CCapture.all.min.js',
+  './assets/font/Inter-VariableFont-opsz,wght.ttf'
 ];
 
-// Event: install
-// Service Worker menginstal dan mengisi cache
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(urlsToCache);
+    })
   );
 });
 
-// Event: fetch
-// Menayangkan file dari cache saat offline
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        if (response) {
-          return response;
+    caches.match(event.request).then((response) => {
+      if (response) {
+        return response;
+      }
+
+      return fetch(event.request).then((networkResponse) => {
+        if (!networkResponse || networkResponse.status !== 200) {
+          return networkResponse;
         }
-        return fetch(event.request);
-      })
+
+        const clonedResponse = networkResponse.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, clonedResponse);
+        });
+
+        return networkResponse;
+      }).catch(() => {
+      });
+    })
   );
 });
 
-// Event: activate
-// Mengelola pembersihan cache lama
 self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
+          if (cacheName !== CACHE_NAME) {
             return caches.delete(cacheName);
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
