@@ -1,7 +1,8 @@
 {
   "name": "papera.me",
   "short_name": "Papera",
-  "start_url": "./",
+  "start_url": "/papera.me/app/",
+  "scope": "/papera.me/app/",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#283649",
