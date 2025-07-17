@@ -30,7 +30,7 @@
             --text-primary: #f8fafc;
             --text-secondary: #e2e8f0;
             --text-muted: #94a3b8;
-            --accent-color: #2563eb;
+            --accent-color: #3b82f6;
             --accent-color-hover: #1f5bde;
             --danger-color: #ef4444;
             --danger-color-hover: #dc2626;
@@ -1175,6 +1175,10 @@
                             </div>
                         </div>
                         <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
+                            <h2 for="accent-color-picker" class="text-lg font-bold text-slate-300" data-translate-key="accentColor"></h2>
+                            <input type="color" id="accent-color-picker" class="w-full h-10 mt-2 p-1 bg-slate-900 border border-[var(--border-color)] cursor-pointer">
+                        </div>
+                        <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
                             <div class="flex items-center gap-2">
                                 <h2 class="text-lg font-bold text-slate-300" data-translate-key="previewResolution"></h2>
                                 <div class="relative info-tooltip-trigger">
@@ -1200,7 +1204,7 @@
                     <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
                         <h2 class="text-lg font-bold text-slate-300" data-translate-key="appInfo"></h2>
                         <p class="text-sm" data-translate-key="appDescription"></p>
-                        <p class="text-sm pt-2" data-translate-key="creatorInfo2"></p>
+                        <p class="text-sm pt-2" data-translate-key="appDescription2"></p>
                     </div>
                     <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
                         <div class="grid grid-cols-2 gap-2 md:gap-2 mt-2">
@@ -1239,16 +1243,16 @@
     <!-- Mobile footer with tabs and export button -->
     <footer id="mobile-footer" class="fixed bottom-0 left-0 right-0 h-16 bg-[var(--bg-header)] border-t border-[var(--border-color)] z-50 flex justify-around items-center" style="display: var(--mobile-footer-display);">
         <button id="mobile-tab-object" data-tab="object" class="mobile-tab-btn p-2 text-slate-300 hover:text-white active" aria-label="Object">
-            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M7 3C6.44772 3 6 3.44772 6 4V7H3C2.44772 7 2 7.44772 2 8V20C2 20.5523 2.44772 21 3 21H17C17.5523 21 18 20.5523 18 20V17H21C21.5523 17 22 16.5523 22 16V4C22 3.44772 21.5523 3 21 3H7ZM17 7H8V5H20V15H18V8C18 7.44772 17.5523 7 17 7ZM16 9V15.7394L11.4911 11.6404L4 18.6321V9H16ZM11.5089 14.3596L16 18.4424V19H6.53702L11.5089 14.3596ZM7 13.5C7.82843 13.5 8.5 12.8284 8.5 12C8.5 11.1716 7.82843 10.5 7 10.5C6.17157 10.5 5.5 11.1716 5.5 12C5.5 12.8284 6.17157 13.5 7 13.5Z"></path></svg>
+            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill=#ffffff><path d="M7 3C6.44772 3 6 3.44772 6 4V7H3C2.44772 7 2 7.44772 2 8V20C2 20.5523 2.44772 21 3 21H17C17.5523 21 18 20.5523 18 20V17H21C21.5523 17 22 16.5523 22 16V4C22 3.44772 21.5523 3 21 3H7ZM17 7H8V5H20V15H18V8C18 7.44772 17.5523 7 17 7ZM16 9V15.7394L11.4911 11.6404L4 18.6321V9H16ZM11.5089 14.3596L16 18.4424V19H6.53702L11.5089 14.3596ZM7 13.5C7.82843 13.5 8.5 12.8284 8.5 12C8.5 11.1716 7.82843 10.5 7 10.5C6.17157 10.5 5.5 11.1716 5.5 12C5.5 12.8284 6.17157 13.5 7 13.5Z"></path></svg>
         </button>
         <button id="mobile-tab-background" data-tab="background" class="mobile-tab-btn p-2 text-slate-300 hover:text-white" aria-label="Background">
-            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M21 3C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H21ZM20 5H4V19H20V5ZM13 17V15H16V12H18V17H13ZM11 7V9H8V12H6V7H11Z"></path></svg>
+            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill=#ffffff><path d="M21 3C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H21ZM20 5H4V19H20V5ZM13 17V15H16V12H18V17H13ZM11 7V9H8V12H6V7H11Z"></path></svg>
         </button>
         <button id="mobile-tab-animasi" data-tab="animasi" class="mobile-tab-btn p-2 text-slate-300 hover:text-white" aria-label="Animation">
-            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M2 3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44495 22 3.9934V20.0066C22 20.5552 21.5447 21 21.0082 21H2.9918C2.44405 21 2 20.5551 2 20.0066V3.9934ZM4 5V19H20V5H4ZM10.6219 8.41459L15.5008 11.6672C15.6846 11.7897 15.7343 12.0381 15.6117 12.2219C15.5824 12.2658 15.5447 12.3035 15.5008 12.3328L10.6219 15.5854C10.4381 15.708 10.1897 15.6583 10.0672 15.4745C10.0234 15.4088 10 15.3316 10 15.2526V8.74741C10 8.52649 10.1791 8.34741 10.4 8.34741C10.479 8.34741 10.5562 8.37078 10.6219 8.41459Z"></path></svg>
+            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill=#ffffff><path d="M2 3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44495 22 3.9934V20.0066C22 20.5552 21.5447 21 21.0082 21H2.9918C2.44405 21 2 20.5551 2 20.0066V3.9934ZM4 5V19H20V5H4ZM10.6219 8.41459L15.5008 11.6672C15.6846 11.7897 15.7343 12.0381 15.6117 12.2219C15.5824 12.2658 15.5447 12.3035 15.5008 12.3328L10.6219 15.5854C10.4381 15.708 10.1897 15.6583 10.0672 15.4745C10.0234 15.4088 10 15.3316 10 15.2526V8.74741C10 8.52649 10.1791 8.34741 10.4 8.34741C10.479 8.34741 10.5562 8.37078 10.6219 8.41459Z"></path></svg>
         </button>
         <button id="mobile-tab-info" data-tab="info" class="mobile-tab-btn p-2 text-slate-300 hover:text-white" aria-label="Preferences">
-            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14V16C8.68629 16 6 18.6863 6 22H4C4 17.5817 7.58172 14 12 14ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11ZM14.5946 18.8115C14.5327 18.5511 14.5 18.2794 14.5 18C14.5 17.7207 14.5327 17.449 14.5945 17.1886L13.6029 16.6161L14.6029 14.884L15.5952 15.4569C15.9883 15.0851 16.4676 14.8034 17 14.6449V13.5H19V14.6449C19.5324 14.8034 20.0116 15.0851 20.4047 15.4569L21.3971 14.8839L22.3972 16.616L21.4055 17.1885C21.4673 17.449 21.5 17.7207 21.5 18C21.5 18.2793 21.4673 18.551 21.4055 18.8114L22.3972 19.3839L21.3972 21.116L20.4048 20.543C20.0117 20.9149 19.5325 21.1966 19.0001 21.355V22.5H17.0001V21.3551C16.4677 21.1967 15.9884 20.915 15.5953 20.5431L14.603 21.1161L13.6029 19.384L14.5946 18.8115ZM18 19.5C18.8284 19.5 19.5 18.8284 19.5 18C19.5 17.1716 18.8284 16.5 18 16.5C17.1716 16.5 16.5 17.1716 16.5 18C16.5 18.8284 17.1716 19.5 18 19.5Z"></path></svg>
+            <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill=#ffffff><path d="M12 14V16C8.68629 16 6 18.6863 6 22H4C4 17.5817 7.58172 14 12 14ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11ZM14.5946 18.8115C14.5327 18.5511 14.5 18.2794 14.5 18C14.5 17.7207 14.5327 17.449 14.5945 17.1886L13.6029 16.6161L14.6029 14.884L15.5952 15.4569C15.9883 15.0851 16.4676 14.8034 17 14.6449V13.5H19V14.6449C19.5324 14.8034 20.0116 15.0851 20.4047 15.4569L21.3971 14.8839L22.3972 16.616L21.4055 17.1885C21.4673 17.449 21.5 17.7207 21.5 18C21.5 18.2793 21.4673 18.551 21.4055 18.8114L22.3972 19.3839L21.3972 21.116L20.4048 20.543C20.0117 20.9149 19.5325 21.1966 19.0001 21.355V22.5H17.0001V21.3551C16.4677 21.1967 15.9884 20.915 15.5953 20.5431L14.603 21.1161L13.6029 19.384L14.5946 18.8115ZM18 19.5C18.8284 19.5 19.5 18.8284 19.5 18C19.5 17.1716 18.8284 16.5 18 16.5C17.1716 16.5 16.5 17.1716 16.5 18C16.5 18.8284 17.1716 19.5 18 19.5Z"></path></svg>
         </button>
         <button id="mobile-export-btn" class="px-5 py-2.5 bg-[var(--accent-color)] text-white text-sm font-semibold hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer" data-translate-key="export">Export
         </button>
@@ -1498,6 +1502,7 @@
                 displayMode: 'auto', 
                 uiSize: 'normal',
                 previewResolution: '540',
+                accentColor: '#3b82f6',
                 debugScreenEnabled: false,                
                 background: {
                     element: null, color: '#00ff00', file: null,
@@ -1557,7 +1562,7 @@
                     resetBackgroundTransformTitle: 'Reset Background Transform', backgroundMode: 'Background Mode', fill: 'Fill',
                     stretch: 'Stretch', backgroundSize: 'Background Size (%)', offsetX: 'Offset X (%)', offsetY: 'Offset Y (%)',
                     backgroundColorCorrection: 'Background Color Correction', resetBackgroundColorCorrectionTitle: 'Reset Background Color Correction',
-                    hue: 'Hue', saturation: 'Saturation', brightness: 'Brightness', colorize: 'Colorize', backgroundBlur: 'Background Blur',
+                    hue: 'Hue', saturation: 'Saturation', brightness: 'Brightness', colorize: 'Monochrome', backgroundBlur: 'Background Blur',
                     resetBackgroundBlurTitle: 'Reset Background Blur', intensity: 'Intensity', backgroundVignette: 'Background Vignette',
                     resetBackgroundVignetteTitle: 'Reset Background Vignette', opacity: 'Opacity', radius: 'Radius', feather: 'Feather',
                     vignetteColor: 'Vignette Color', objectImage: 'Object Image', transform: 'Transform', resetTransformTitle: 'Reset Transform',
@@ -1570,42 +1575,27 @@
                     positionSpeedX: 'Position Speed X', positionSpeedY: 'Position Speed Y', positionStrengthX: 'Position Strength X',
                     positionStrengthY: 'Position Strength Y', colorCorrection: 'Color Correction', resetColorCorrectionTitle: 'Reset Color Correction',
                     language: 'Language', displayMode: 'Display Mode', auto: 'Auto', mobile: 'Mobile (Force)', desktop: 'Desktop (Force)',
-                    displayModeWarning: 'Warning: Forcing a display mode may break layout or functionality if it doesn\'t match your screen size.',
                     uiSize: 'UI Size', compact: 'Compact', normal: 'Normal', spacious: 'Spacious', appInfo: 'App Information',
-                    appDescription: 'This app was created to allow users to easily add paper tear effects and animations to their images.',
-                    creatorInfo: 'Creator Info', donateLocal: 'Local Donation [IDR]', donateGlobal: 'Global Donation [USD]',
                     resetAll: 'Reset All', exportSettings: 'Export Settings', fps: 'Frames per Second (FPS)', duration: 'Duration (seconds)',
                     fileName: 'File Name', cancel: 'Cancel', startExport: 'Start Export', exportingVideo: 'Exporting Video...',
-                    creatorInfo2: 'This app was created by Nurhidayat and is completely free to use.<br>If you find it useful, your support through donations is greatly appreciated.<br>YouTube: @nurimator | Instagram: @nurimator',
                     exportingVideoWait: 'Please wait and do not close this window.', confirmResetTitle: 'Confirm Reset',
                     confirmResetMessage: 'Are you sure you want to reset all settings to their default values?',
-                    deleteImportedImages: 'Delete imported images', continue: 'Continue',
-                    notificationWarnUpload: 'Please upload an image first!',
-                    notificationWarnBg: 'Upload a background image first to adjust its settings.',
-                    notificationWarnObject: 'Upload an object image first to adjust its settings.',
+                    deleteImportedImages: 'Delete imported images', continue: 'Continue', notificationWarnUpload: 'Please upload an image first!',
                     tabTitleBackground: 'Background Settings', tabTitleObject: 'Object Settings', tabTitleAnimasi: 'Animation Settings', tabTitleInfo: 'Preferences',
-                    activeObject: 'Active Object',
-                    animationObject: 'Object Animation',
-                    dropShadowTooltip: 'We recommend turning off drop shadow when exporting for a greenscreen. <a href="#" target="_blank" class="text-blue-400 hover:underline">Learn more</a>',
-                    easing: 'Easing', installApp: 'Install App', appInstalled: 'Installed',
-                    linear: 'Linear',
-                    easeIn: 'Ease In',
-                    easeOut: 'Ease Out',
-                    backIn: 'Back In',
-                    backOut: 'Back Out',
-                    instant: 'Instant',
-                    easeInOut: 'Ease In Out',
-                    backInOut: 'Back In Out',
+                    activeObject: 'Active Object', animationObject: 'Object Animation', easing: 'Easing', linear: 'Linear', easeIn: 'Ease In',
+                    easeOut: 'Ease Out', backIn: 'Back In', backOut: 'Back Out', instant: 'Instant', easeInOut: 'Ease In Out', backInOut: 'Back In Out',
                     keyframeProperties: 'Keyframe Properties', rotation: 'Rotation', easingToNext: 'Easing to Next', keyframeAnim: 'Paper Animation', animNone: 'None', animOpen: 'Open', animClose: 'Close',
                     addKeyframe: 'Add Keyframe', keyframePropertiesTitle: 'Keyframe Properties #',
-                    simple: 'Simple',
-                    advanced: 'Advanced',
-                    openAnim: 'Opening Animation', tutorial: 'Tutorial', sourceCode: 'Source Code', license: 'License', supportCreator: 'Support Creator',
-                    closeAnim: 'Closing Animation', timeline: 'Timeline',
+                    simple: 'Simple', advanced: 'Advanced', openAnim: 'Paper Unfolding Animation', closeAnim: 'Paper Folding Animation', timeline: 'Timeline',
+                    tutorial: 'Tutorial', sourceCode: 'Source Code', license: 'License', supportCreator: 'Support Creator', installApp: 'Install App', appInstalled: 'Installed',
                     resetPreferences: 'Reset Preferences', preparingExportCanvas: 'Preparing export canvas...',
                     confirmResetPrefsTitle: 'Confirm Preferences Reset', completing: 'Completing',
-                    previewResolution: 'Preview Resolution', debugScreen: 'Debug Screen',
+                    accentColor: 'Accent Color', previewResolution: 'Preview Resolution', debugScreen: 'Debug Screen',
+                    appDescription: 'Papera.me is a web-based application that allows users to add paper effects to images. Users can access and use this application offline because all processing is done directly on their device, ensuring user data remains secure.',
+                    appDescription2: 'This application was created by Nurhidayat (a.k.a. nurimator). Papera.me is completely free and open source. Donations are very helpful to keep the app available for everyone.',
+                    displayModeWarning: 'Warning: Forcing a display mode may break layout or functionality if it doesn\'t match your screen size.',
                     previewResolutionWarning: 'Preview resolution does not affect the final export resolution.',
+                    dropShadowTooltip: 'We recommend turning off drop shadow when exporting for a greenscreen. <a href="#" target="_blank" class="text-blue-400 hover:underline">Learn more</a>',
                     exportInfoTooltip: 'Currently, the only available video export option is .webm to keep the app free and lightweight. <a href="https://www.webmproject.org/about/" target="_blank" rel="noopener noreferrer" class="text-[var(--accent-color)] hover:underline">Learn more</a>',
                     confirmResetPrefsMessage: 'Are you sure you want to reset language, display mode, and UI size to their defaults?'                    
                 },
@@ -1616,7 +1606,7 @@
                     resetBackgroundTransformTitle: 'Reset Transformasi Latar', backgroundMode: 'Mode Latar', fill: 'Isi',
                     stretch: 'Regangkan', backgroundSize: 'Ukuran Latar (%)', offsetX: 'Offset X (%)', offsetY: 'Offset Y (%)',
                     backgroundColorCorrection: 'Koreksi Warna Latar', resetBackgroundColorCorrectionTitle: 'Reset Koreksi Warna Latar',
-                    hue: 'Hue', saturation: 'Saturasi', brightness: 'Kecerahan', colorize: 'Warnai', backgroundBlur: 'Blur Latar',
+                    hue: 'Hue', saturation: 'Saturasi', brightness: 'Kecerahan', colorize: 'Monokrom', backgroundBlur: 'Blur Latar',
                     resetBackgroundBlurTitle: 'Reset Blur Latar', intensity: 'Intensitas', backgroundVignette: 'Vinyet Latar',
                     resetBackgroundVignetteTitle: 'Reset Vinyet Latar', opacity: 'Opasitas', radius: 'Radius', feather: 'Feather',
                     vignetteColor: 'Warna Vinyet', objectImage: 'Gambar Objek', transform: 'Transformasi', resetTransformTitle: 'Reset Transformasi',
@@ -1629,42 +1619,27 @@
                     positionSpeedX: 'Kecepatan Posisi X', positionSpeedY: 'Kecepatan Posisi Y', positionStrengthX: 'Kekuatan Posisi X',
                     positionStrengthY: 'Kekuatan Posisi Y', colorCorrection: 'Koreksi Warna', resetColorCorrectionTitle: 'Reset Koreksi Warna',
                     language: 'Bahasa', displayMode: 'Mode Tampilan', auto: 'Otomatis', mobile: 'Seluler (Paksa)', desktop: 'Desktop (Paksa)',
-                    displayModeWarning: 'Peringatan: Memaksa mode tampilan dapat merusak tata letak atau fungsionalitas jika tidak sesuai dengan ukuran layar Anda.',
                     uiSize: 'Ukuran UI', compact: 'Sempit', normal: 'Normal', spacious: 'Luas', appInfo: 'Informasi Aplikasi',
-                    appDescription: 'Aplikasi ini dibuat untuk memungkinkan pengguna menambahkan efek sobekan kertas dan animasi pada gambar mereka dengan mudah.',
-                    creatorInfo: 'Informasi Kreator', donateLocal: 'Donasi Lokal [IDR]', donateGlobal: 'Donasi Global [USD]',
                     resetAll: 'Reset Semua', exportSettings: 'Pengaturan Ekspor', fps: 'Frame per Detik (FPS)', duration: 'Durasi (detik)',
                     fileName: 'Nama File', cancel: 'Batal', startExport: 'Mulai Ekspor', exportingVideo: 'Mengekspor Video...',
-                    creatorInfo2: 'Aplikasi ini dibuat oleh Nurhidayat dan sepenuhnya gratis untuk digunakan.<br>Jika kamu merasa aplikasi ini bermanfaat, dukungan dalam bentuk donasi sangat diapresiasi.<br>YouTube: @nurimator | Instagram: @nurimator',
                     exportingVideoWait: 'Harap tunggu dan jangan tutup jendela ini.', confirmResetTitle: 'Konfirmasi Reset',
                     confirmResetMessage: 'Apakah Anda yakin ingin mereset semua pengaturan ke nilai default?',
-                    deleteImportedImages: 'Hapus gambar yang telah diimpor', continue: 'Lanjutkan',
-                    notificationWarnUpload: 'Silakan masukan gambar terlebih dahulu!',
-                    notificationWarnBg: 'Masukan gambar latar terlebih dahulu untuk mengaturnya.',
-                    notificationWarnObject: 'Masukan gambar objek terlebih dahulu untuk mengaturnya.',
+                    deleteImportedImages: 'Hapus gambar yang telah diimpor', continue: 'Lanjutkan', notificationWarnUpload: 'Silakan masukan gambar terlebih dahulu!',
                     tabTitleBackground: 'Pengaturan Latar', tabTitleObject: 'Pengaturan Objek', tabTitleAnimasi: 'Pengaturan Animasi', tabTitleInfo: 'Preferensi',
-                    activeObject: 'Objek Aktif',
-                    animationObject: 'Animasi Objek',
-                    dropShadowTooltip: 'Kami menyarankan dropshadow dimatikan jika ekspor sebagai greenscreen. <a href="#" target="_blank" class="text-blue-400 hover:underline">Pelajari selengkapnya</a>',
-                    easing: 'Easing', installApp: 'Instal Aplikasi', appInstalled: 'Terinstal',
-                    linear: 'Linear',
-                    easeIn: 'Ease In',
-                    easeOut: 'Ease Out',
-                    backIn: 'Back In',
-                    backOut: 'Back Out',
-                    instant: 'Instan',
-                    easeInOut: 'Ease In Out',
-                    backInOut: 'Back In Out',
+                    activeObject: 'Objek Aktif', animationObject: 'Animasi Objek', easing: 'Easing', linear: 'Linear', easeIn: 'Ease In',
+                    easeOut: 'Ease Out', backIn: 'Back In', backOut: 'Back Out', instant: 'Instan', easeInOut: 'Ease In Out', backInOut: 'Back In Out',
                     keyframeProperties: 'Properti Keyframe', rotation: 'Rotasi', easingToNext: 'Easing Berikutnya', keyframeAnim: 'Animasi Kertas', animNone: 'Tidak Ada', animOpen: 'Buka', animClose: 'Tutup',
                     addKeyframe: 'Tambah Keyframe', keyframePropertiesTitle: 'Properti Keyframe ke-',
-                    simple: 'Simpel',
-                    advanced: 'Lanjutan',
-                    openAnim: 'Animasi Terbuka', tutorial: 'Tutorial', sourceCode: 'Kode Sumber', license: 'Lisensi', supportCreator: 'Dukung Kreator',
-                    closeAnim: 'Animasi Tertutup', timeline: 'Timeline',
+                    simple: 'Simpel', advanced: 'Lanjutan', openAnim: 'Animasi Kertas Terbuka', closeAnim: 'Animasi Kertas Tertutup', timeline: 'Timeline',
+                    tutorial: 'Tutorial', sourceCode: 'Kode Sumber', license: 'Lisensi', supportCreator: 'Dukung Kreator', installApp: 'Instal Aplikasi', appInstalled: 'Terinstal',
                     resetPreferences: 'Reset Preferensi', preparingExportCanvas: 'Menyiapkan kanvas ekspor...',
                     confirmResetPrefsTitle: 'Konfirmasi Reset Preferensi', completing: 'Menyelesaikan',
-                    previewResolution: 'Resolusi Pratinjau', debugScreen: 'Layar Debug',
+                    accentColor: 'Warna Aksen', previewResolution: 'Resolusi Pratinjau', debugScreen: 'Debug Screen',
+                    appDescription: 'Aplikasi ini dibuat oleh Nurhidayat (nurimator). Papera.me sepenuhnya gratis dan bersifat open source. Donasi sangat membantu untuk menjaga agar aplikasi ini tetap tersedia bagi semua orang.',
+                    appDescription2: 'Setelah menginstal aplikasi, pengguna dapat menggunakan aplikasi ini secara offline karena seluruh proses dilakukan langsung di perangkat pengguna sehingga data pengguna tetap aman.',
+                    displayModeWarning: 'Peringatan: Memaksa mode tampilan dapat merusak tata letak atau fungsionalitas jika tidak sesuai dengan ukuran layar Anda.',
                     previewResolutionWarning: 'Resolusi pratinjau tidak memengaruhi resolusi ekspor.',
+                    dropShadowTooltip: 'Kami menyarankan dropshadow dimatikan jika ekspor sebagai greenscreen. <a href="#" target="_blank" class="text-blue-400 hover:underline">Pelajari selengkapnya</a>',
                     exportInfoTooltip: 'Saat ini opsi file video ekspor yang tersedia adalah .webm untuk menjaga aplikasi tetap gratis dan ringan. <a href="https://www.webmproject.org/about/" target="_blank" rel="noopener noreferrer" class="text-[var(--accent-color)] hover:underline">Pelajari selengkapnya</a>',
                     confirmResetPrefsMessage: 'Apakah Anda yakin ingin mereset bahasa, mode tampilan, dan ukuran UI ke nilai default?'
                 }
@@ -1679,6 +1654,31 @@
                 }
                 return `rgba(${r},${g},${b},${opacity})`;
             }
+
+            function darkenHexColor(hex, amount) {
+                let [r, g, b] = hex.match(/\w\w/g).map(x => parseInt(x, 16));
+                const factor = 1 - amount / 100;
+                r = Math.floor(r * factor);
+                g = Math.floor(g * factor);
+                b = Math.floor(b * factor);
+                return "#" + [r, g, b].map(x => {
+                    const hexVal = x.toString(16);
+                    return hexVal.length === 1 ? '0' + hexVal : hexVal;
+                }).join('');
+            }
+
+            function applyAccentColor(hexColor) {
+                if (!hexColor) return;
+                const hoverColor = darkenHexColor(hexColor, 15); // Buat 15% lebih gelap
+                document.body.style.setProperty('--accent-color', hexColor);
+                document.body.style.setProperty('--accent-color-hover', hoverColor);
+
+                // Update juga nilai input color picker itu sendiri agar swatch-nya berubah
+                const picker = document.getElementById('accent-color-picker');
+                if (picker) {
+                    picker.value = hexColor;
+                }
+            }           
 
             function throttle(func, delay) {
                 let inProgress = false;
@@ -1710,7 +1710,7 @@
                     }
                 }
                 return currentState;
-            }
+            }           
 
             // Fungsi ini berisi logika keyframe yang sudah ada sebelumnya
             function getAdvancedTransform(timeInSeconds, objectState) {
@@ -2701,7 +2701,7 @@ Object       : ${objFileName}
                 document.querySelectorAll('[data-translate-key]').forEach(el => {
                     const key = el.dataset.translateKey;
                     if (translationMap[key]) {
-                        if (key === 'dropImagePrompt' || key === 'creatorInfo2' || key === 'exportInfoTooltip' || key === 'dropShadowTooltip') {
+                        if (key === 'dropImagePrompt' || key === 'appDescription2' || key === 'exportInfoTooltip' || key === 'dropShadowTooltip') {
                            el.innerHTML = translationMap[key];
                         } else {
                            el.textContent = translationMap[key];
@@ -3192,25 +3192,95 @@ Object       : ${objFileName}
             function applyUISize(size) {
                 state.uiSize = size;
                 syncUISizeUI();
-                resizeAndRedrawAll(); 
+                resizeAndRedrawAll();
+                savePreferences(); 
             }
+
+
+            // Kunci untuk menyimpan data di localStorage
+            const PREFERENCES_KEY = 'paperaMeUserPreferences';
+
+            /**
+             * Menyimpan preferensi pengguna ke localStorage.
+             * Fungsi ini akan dipanggil setiap kali ada perubahan pada preferensi.
+             */
+            function savePreferences() {
+                try {
+                    const prefsToSave = {
+                        language: state.language,
+                        uiSize: state.uiSize,
+                        previewResolution: state.previewResolution,
+                        accentColor: state.accentColor,
+                        desktopPanelWidth: userDesktopPanelWidth, // Variabel global untuk lebar panel desktop
+                    };
+                    localStorage.setItem(PREFERENCES_KEY, JSON.stringify(prefsToSave));
+                } catch (e) {
+                    console.error("Gagal menyimpan preferensi:", e);
+                }
+            }
+
+            /**
+             * Memuat preferensi pengguna dari localStorage saat aplikasi dimulai.
+             */
+            function loadPreferences() {
+                try {
+                    const savedPrefsString = localStorage.getItem(PREFERENCES_KEY);
+                    if (savedPrefsString) {
+                        const savedPrefs = JSON.parse(savedPrefsString);
+
+                        // Terapkan preferensi yang tersimpan ke state
+                        state.language = savedPrefs.language || state.language;
+                        state.uiSize = savedPrefs.uiSize || state.uiSize;
+                        state.previewResolution = savedPrefs.previewResolution || state.previewResolution;
+                        state.accentColor = savedPrefs.accentColor || state.accentColor;
+                        userDesktopPanelWidth = savedPrefs.desktopPanelWidth || null;
+                    }
+                } catch (e) {
+                    console.error("Gagal memuat preferensi:", e);
+                    // Jika gagal, hapus data yang mungkin rusak
+                    localStorage.removeItem(PREFERENCES_KEY);
+                }
+            } 
                 
             function resetPreferences() {
-                // Tentukan nilai default berdasarkan browser/perangkat
+                // 1. Hapus data dari localStorage
+                localStorage.removeItem(PREFERENCES_KEY);
+                
+                // 2. Reset variabel lebar panel desktop
+                userDesktopPanelWidth = null;
+                body.style.removeProperty('--panel-width');
+
+                // 3. Reset tinggi panel mobile
+                panelWrapper.style.removeProperty('flex-basis');
+                canvasContainer.style.removeProperty('flex-basis');
+
+                // 4. Tentukan nilai default berdasarkan browser/perangkat
                 const isCurrentlyMobile = !window.matchMedia('(min-width: 769px)').matches;
                 const defaultLang = navigator.language.startsWith('id') ? 'id' : 'en';
 
-                // Reset hanya properti state yang relevan
+                // 5. Reset properti state yang relevan
                 state.language = defaultLang;
                 state.displayMode = 'auto';
                 state.uiSize = isCurrentlyMobile ? 'compact' : 'normal';
+                state.accentColor = DEFAULT_STATE.accentColor;
                 
-                // Panggil fungsi-fungsi update secara eksplisit untuk memastikan UI berubah.
-                // Ini adalah kunci perbaikannya.
+                // Reset resolusi pratinjau berdasarkan lebar layar saat ini
+                const screenWidth = window.innerWidth;
+                if (screenWidth <= 480) {
+                    state.previewResolution = '360';
+                } else if (screenWidth > 480 && screenWidth < 1440) {
+                    state.previewResolution = '540';
+                } else {
+                    state.previewResolution = '720';
+                }
+                
+                // 6. Panggil fungsi update untuk memastikan UI berubah
+                applyAccentColor(state.accentColor);
                 syncDisplayModeUI(); // Fungsi ini juga memanggil resizeAndRedrawAll
                 syncUISizeUI();
                 updateUIText(state.language);
                 updateUIFromState(); // Panggil ini di akhir untuk sinkronisasi final
+                autoAdjustMobileLayout(); // Sesuaikan layout mobile ke default
             }
 
             /**
@@ -3666,11 +3736,9 @@ Object       : ${objFileName}
                 if (!isMobile) {
                     return;
                 }
-
                 const canvasContainer = document.getElementById('canvas-container');
                 const panelWrapper = document.getElementById('settings-panel-wrapper');
                 const mobileFooter = document.getElementById('mobile-footer');
-
                 if (!canvasContainer || !panelWrapper || !mobileFooter) return;
 
                 // Perhitungan dimensi
@@ -3758,6 +3826,7 @@ Object       : ${objFileName}
                     document.removeEventListener('touchend', handleMouseUp);
                     canvasContainer.style.transition = 'width 0.3s ease-out';
                     panelWrapper.style.transition = 'transform 0.3s ease-in-out';
+                    savePreferences();
                 };
 
                 const handleMouseDown = (e) => {
@@ -3837,22 +3906,26 @@ Object       : ${objFileName}
              * Initializes the application, sets up event listeners, and starts the animation loop.
              */
             function init() {
-                // Set initial language based on browser setting
-                if (navigator.language.startsWith('id')) {
-                    state.language = 'id';
-                }
-                
-                // Set initial UI size and display mode
-                state.displayMode = 'auto';
-                state.uiSize = window.innerWidth < 1280 ? 'compact' : 'normal';
+                loadPreferences();
 
-                const screenWidth = window.innerWidth;
-                if (screenWidth <= 480) {
-                    state.previewResolution = '360';
-                } else if (screenWidth > 480 && screenWidth < 1440) {
-                    state.previewResolution = '540';
-                } else {
-                    state.previewResolution = '720';
+                // Set initial language based on browser setting
+                if (!localStorage.getItem(PREFERENCES_KEY)) { // <-- UBAH LOGIKA INI
+                    if (navigator.language.startsWith('id')) {
+                        state.language = 'id';
+                    }
+                    
+                    // Set initial UI size and display mode
+                    state.displayMode = 'auto';
+                    state.uiSize = window.innerWidth < 1280 ? 'compact' : 'normal';
+
+                    const screenWidth = window.innerWidth;
+                    if (screenWidth <= 480) {
+                        state.previewResolution = '360';
+                    } else if (screenWidth > 480 && screenWidth < 1440) {
+                        state.previewResolution = '540';
+                    } else {
+                        state.previewResolution = '720';
+                    }
                 }
                 resizeAndRedrawAll();
                 animationFrameId = requestAnimationFrame(animationLoop);
@@ -3907,6 +3980,7 @@ Object       : ${objFileName}
                         state.previewResolution = button.dataset.res; // Langsung atur resolusi
                         updateUIFromState();
                         resizeAndRedrawAll();
+                        savePreferences();
                     }
                 });
 
@@ -4024,13 +4098,11 @@ Object       : ${objFileName}
                         
                         if (section.classList.contains('controls-disabled-for-bg') && !section.id.includes('color-correction') && !section.id.includes('vignette')) {
                             e.stopPropagation();
-                            showTopNotification("notificationWarnBg");
                             return;
                         }
 
                         if (section.closest('#image-specific-controls')?.classList.contains('is-disabled')) {
                              e.stopPropagation();
-                             showTopNotification("notificationWarnObject");
                              return;
                         }
 
@@ -4261,6 +4333,7 @@ Object       : ${objFileName}
                     if (button && button.dataset.lang) {
                         state.language = button.dataset.lang;
                         updateUIFromState();
+                        savePreferences();
                     }
                 });
 
@@ -4269,7 +4342,16 @@ Object       : ${objFileName}
                     clearTimeout(notificationTimeout);
                     setTimeout(() => topNotificationPopup.classList.add('hidden'), 300);
                 });
-                
+
+                const accentPicker = document.getElementById('accent-color-picker');
+                if (accentPicker) {
+                    accentPicker.addEventListener('input', (e) => {
+                        const newColor = e.target.value;
+                        state.accentColor = newColor;
+                        applyAccentColor(newColor);
+                        savePreferences();
+                    });
+                }
 
                 // Mobile panel resizer logic
 				let dragOffset = 0; // Untuk menyimpan jarak klik dari tepi atas header
@@ -4303,6 +4385,7 @@ Object       : ${objFileName}
 					document.removeEventListener('touchend', resizerStop);
 					body.style.userSelect = '';
 					resizeAndRedrawAll();
+                    savePreferences();
 				};
 
 				const resizerStart = (e) => {
@@ -4609,6 +4692,7 @@ Object       : ${objFileName}
                 }     
                 setTimeout(autoAdjustMobileLayout, 500);
                 desktopPanelResizer();
+                applyAccentColor(state.accentColor);
                 updateUIFromState();
             }
             init();
