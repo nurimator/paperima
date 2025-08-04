@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>papera.me | Paperize your Images</title>
+    <title>Papera | Paperize your Images</title>
     <link rel="icon" type="image/png" href="./assets/icon/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="./assets/icon/favicon.svg" />
     <link rel="shortcut icon" href="./assets/icon/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/icon/apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-title" content="Papera.me" />
+    <meta name="apple-mobile-web-app-title" content="Papera" />
     <link rel="manifest" href="./assets/site.webmanifest" />
     <link href="./assets/tailwind.css" rel="stylesheet">
     <script src="./assets/CCapture.all.min.js"></script>
@@ -1591,8 +1591,8 @@
                     resetPreferences: 'Reset Preferences', preparingExportCanvas: 'Preparing export canvas...',
                     confirmResetPrefsTitle: 'Confirm Preferences Reset', completing: 'Completing',
                     accentColor: 'Accent Color', previewResolution: 'Preview Resolution', debugScreen: 'Debug Screen',
-                    appDescription: 'Papera.me is a web-based application that allows users to add paper effects to images. Users can access and use this application offline because all processing is done directly on their device, ensuring user data remains secure.',
-                    appDescription2: 'This application was created by Nurhidayat (a.k.a. nurimator). Papera.me is completely free and open source. Donations are very helpful to keep the app available for everyone.',
+                    appDescription: 'Papera is a web-based application that allows users to add paper effects to images. Users can access and use this application offline because all processing is done directly on their device, ensuring user data remains secure.',
+                    appDescription2: 'This application was created by Nurhidayat (a.k.a. nurimator). Papera is completely free and open source. Donations are very helpful to keep the app available for everyone.',
                     displayModeWarning: 'Warning: Forcing a display mode may break layout or functionality if it doesn\'t match your screen size.',
                     previewResolutionWarning: 'Preview resolution does not affect the final export resolution.',
                     dropShadowTooltip: 'We recommend turning off drop shadow when exporting for a greenscreen. <a href="#" target="_blank" class="text-blue-400 hover:underline">Learn more</a>',
@@ -1635,7 +1635,7 @@
                     resetPreferences: 'Reset Preferensi', preparingExportCanvas: 'Menyiapkan kanvas ekspor...',
                     confirmResetPrefsTitle: 'Konfirmasi Reset Preferensi', completing: 'Menyelesaikan',
                     accentColor: 'Warna Aksen', previewResolution: 'Resolusi Pratinjau', debugScreen: 'Debug Screen',
-                    appDescription: 'Aplikasi ini dibuat oleh Nurhidayat (nurimator). Papera.me sepenuhnya gratis dan bersifat open source. Donasi sangat membantu untuk menjaga agar aplikasi ini tetap tersedia bagi semua orang.',
+                    appDescription: 'Aplikasi ini dibuat oleh Nurhidayat (nurimator). Papera sepenuhnya gratis dan bersifat open source. Donasi sangat membantu untuk menjaga agar aplikasi ini tetap tersedia bagi semua orang.',
                     appDescription2: 'Setelah menginstal aplikasi, pengguna dapat menggunakan aplikasi ini secara offline karena seluruh proses dilakukan langsung di perangkat pengguna sehingga data pengguna tetap aman.',
                     displayModeWarning: 'Peringatan: Memaksa mode tampilan dapat merusak tata letak atau fungsionalitas jika tidak sesuai dengan ukuran layar Anda.',
                     previewResolutionWarning: 'Resolusi pratinjau tidak memengaruhi resolusi ekspor.',
@@ -3892,7 +3892,7 @@ Object       : ${objFileName}
             // --- Kode Pendaftaran Service Worker Diletakkan di Sini ---
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('./service-worker.js', { scope: '/papera.me/app/' })
+                    navigator.serviceWorker.register('./service-worker.js', { scope: './app/' })
                         .then((registration) => {
                             console.log('Service Worker berhasil terdaftar dengan cakupan:', registration.scope);
                         })
