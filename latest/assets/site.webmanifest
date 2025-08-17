@@ -1,8 +1,8 @@
 {
-  "name": "Papera",
-  "short_name": "Papera",
-  "start_url": "/papera/app/",
-  "scope": "/papera/app/",
+  "name": "Paperima",
+  "short_name": "Paperima",
+  "start_url": "/paperima/latest/",
+  "scope": "/paperima/latest/",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#283649",
