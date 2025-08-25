@@ -1,8 +1,11 @@
-# Paperima
+<h1 align="center">Paperima - Paper your Image</h1>
 
-![License](https://img.shields.io/badge/License-AGPLv3-blue.svg)
-![Status](https://img.shields.io/badge/status-active-success)
-![Made with](https://img.shields.io/badge/made%20with-HTML%20%7C%20CSS%20%7C%20JS-orange)
+<p align="center">
+  <img src="https://img.shields.io/badge/License-AGPLv3-blue.svg">
+  <img src="https://img.shields.io/badge/status-active-success">
+  <img src="https://img.shields.io/badge/made%20with-HTML%20%7C%20CSS%20%7C%20JS-orange">
+</p>
+
 
 **Paperima** is a static **web app** built with pure **HTML, CSS, and JavaScript**, designed to create **paper-like effects** on images.  
 It helps creators add realistic textures such as folds, torn edges, wiggle effects, and open/close paper animations, then export the result as a video (with optional greenscreen).
@@ -18,9 +21,13 @@ It helps creators add realistic textures such as folds, torn edges, wiggle effec
 
 <p align="center">
   <a href="https://dayverse.id/paperima">
-    <img src="https://img.shields.io/badge/Open-Paperima-blue?style=for-the-badge">
+    <img src="https://img.shields.io/badge/Landing%20Page-Paperima-8A2BE2?style=for-the-badge">
+  </a>
+  <a href="https://dayverse.id/paperima/latest">
+    <img src="https://img.shields.io/badge/Launch%20App-Paperima-blue?style=for-the-badge">
   </a>
 </p>
+
 
 
 ## Our App Feature
