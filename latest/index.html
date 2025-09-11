@@ -53,6 +53,8 @@
         .controls-panel::-webkit-scrollbar { width: 8px; }
         .controls-panel::-webkit-scrollbar-track { background: transparent; }
         .controls-panel::-webkit-scrollbar-thumb { background: var(--border-color-light); }
+
+        /* This line of code cause problem on firefox browser */
         .slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; background: var(--border-color); outline: none; transition: background 0.3s; pointer-events: none; }
         .slider::-webkit-slider-thumb {
             -webkit-appearance: none;
@@ -1214,9 +1216,9 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M2.5 7C2.5 9.48528 4.51472 11.5 7 11.5C9.48528 11.5 11.5 9.48528 11.5 7C11.5 4.51472 9.48528 2.5 7 2.5C4.51472 2.5 2.5 4.51472 2.5 7ZM2.5 17C2.5 19.4853 4.51472 21.5 7 21.5C9.48528 21.5 11.5 19.4853 11.5 17C11.5 14.5147 9.48528 12.5 7 12.5C4.51472 12.5 2.5 14.5147 2.5 17ZM12.5 17C12.5 19.4853 14.5147 21.5 17 21.5C19.4853 21.5 21.5 19.4853 21.5 17C21.5 14.5147 19.4853 12.5 17 12.5C14.5147 12.5 12.5 14.5147 12.5 17ZM16 11V8H13V6H16V3H18V6H21V8H18V11H16Z"></path></svg>
                                 <span data-translate-key="installApp">Install App</span>
                             </button>
-                            <a href="https://dayverse.id/paperima/" target="_blank" class="flex items-center justify-center gap-2 px-4 py-2 bg-slate-600/50 text-white text-sm font-semibold text-center hover:bg-slate-500/50 transition-all duration-150 cursor-pointer">
+                            <a id="info-link" href="https://dayverse.id/en/docs/?q=paperima" target="_blank" class="flex items-center justify-center gap-2 px-4 py-2 bg-slate-600/50 text-white text-sm font-semibold text-center hover:bg-slate-500/50 transition-all duration-150 cursor-pointer">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20 22H6.5C4.567 22 3 20.433 3 18.5V5C3 3.34315 4.34315 2 6 2H20C20.5523 2 21 2.44772 21 3V21C21 21.5523 20.5523 22 20 22ZM19 20V17H6.5C5.67157 17 5 17.6716 5 18.5C5 19.3284 5.67157 20 6.5 20H19ZM10 4V12L13.5 10L17 12V4H10Z"></path></svg>
-                                <span data-translate-key="Info">Info</span>
+                                <span data-translate-key="Info">Tutorial</span>
                             </a>
                             <a href="https://github.com/nurimator/paperima" target="_blank" class="flex items-center justify-center gap-2 px-4 py-2 bg-slate-600/50 text-white text-sm font-semibold text-center hover:bg-slate-500/50 transition-all duration-150 cursor-pointer">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12.001 2C6.47598 2 2.00098 6.475 2.00098 12C2.00098 16.425 4.86348 20.1625 8.83848 21.4875C9.33848 21.575 9.52598 21.275 9.52598 21.0125C9.52598 20.775 9.51348 19.9875 9.51348 19.15C7.00098 19.6125 6.35098 18.5375 6.15098 17.975C6.03848 17.6875 5.55098 16.8 5.12598 16.5625C4.77598 16.375 4.27598 15.9125 5.11348 15.9C5.90098 15.8875 6.46348 16.625 6.65098 16.925C7.55098 18.4375 8.98848 18.0125 9.56348 17.75C9.65098 17.1 9.91348 16.6625 10.201 16.4125C7.97598 16.1625 5.65098 15.3 5.65098 11.475C5.65098 10.3875 6.03848 9.4875 6.67598 8.7875C6.57598 8.5375 6.22598 7.5125 6.77598 6.1375C6.77598 6.1375 7.61348 5.875 9.52598 7.1625C10.326 6.9375 11.176 6.825 12.026 6.825C12.876 6.825 13.726 6.9375 14.526 7.1625C16.4385 5.8625 17.276 6.1375 17.276 6.1375C17.826 7.5125 17.476 8.5375 17.376 8.7875C18.0135 9.4875 18.401 10.375 18.401 11.475C18.401 15.3125 16.0635 16.1625 13.8385 16.4125C14.201 16.725 14.5135 17.325 14.5135 18.2625C14.5135 19.6 14.501 20.675 14.501 21.0125C14.501 21.275 14.6885 21.5875 15.1885 21.4875C19.259 20.1133 21.9999 16.2963 22.001 12C22.001 6.475 17.526 2 12.001 2Z"></path></svg>
@@ -1228,7 +1230,7 @@
                             </button>
                         </div>
                         <div class="mt-2">
-                            <a href="https://dayverse.id/en/donate" target="_blank" class="flex items-center justify-center gap-2 w-full px-4 py-2 bg-[var(--accent-color)] text-white text-sm font-semibold text-center hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer">
+                            <a id="support-link" href="https://dayverse.id/en/donate" target="_blank" class="flex items-center justify-center gap-2 w-full px-4 py-2 bg-[var(--accent-color)] text-white text-sm font-semibold text-center hover:bg-[var(--accent-color-hover)] transition-all duration-150 cursor-pointer">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12.001 4.52853C14.35 2.42 17.98 2.49 20.2426 4.75736C22.5053 7.02472 22.583 10.637 20.4786 12.993L11.9999 21.485L3.52138 12.993C1.41705 10.637 1.49571 7.01901 3.75736 4.75736C6.02157 2.49315 9.64519 2.41687 12.001 4.52853Z"></path></svg>
                                 <span data-translate-key="supportCreator">Support Creator</span>
                             </a>
@@ -1603,7 +1605,7 @@
                     keyframeProperties: 'Keyframe Properties', rotation: 'Rotation', easingToNext: 'Easing to Next', keyframeAnim: 'Paper Animation', animNone: 'None', animOpen: 'Open', animClose: 'Close',
                     addKeyframe: 'Add Keyframe', keyframePropertiesTitle: 'Keyframe Properties #',
                     simple: 'Simple', advanced: 'Advanced', openAnim: 'Paper Unfolding Animation', closeAnim: 'Paper Folding Animation', timeline: 'Timeline',
-                    Info: 'Info', sourceCode: 'Source Code', license: 'License', supportCreator: 'Support Creator', installApp: 'Install App', appInstalled: 'Installed',
+                    Info: 'Guides', sourceCode: 'Source Code', license: 'License', supportCreator: 'Support Creator', installApp: 'Install App', appInstalled: 'Installed',
                     licenseTitle: 'GNU Affero General Public License v3.0', 
                     licenseContent: `
 <div class="text-sm text-slate-300 space-y-4">
@@ -1635,7 +1637,9 @@
                     previewResolutionWarning: 'Preview resolution does not affect the final export resolution.',
                     dropShadowTooltip: 'We recommend turning off drop shadow when exporting for a greenscreen. <a href="#" target="_blank" class="text-blue-400 hover:underline">Learn more</a>',
                     exportInfoTooltip: 'Currently, the only available video export option is .webm to keep the app free and lightweight. <a href="https://www.webmproject.org/about/" target="_blank" rel="noopener noreferrer" class="text-[var(--accent-color)] hover:underline">Learn more</a>',
-                    confirmResetPrefsMessage: 'Are you sure you want to reset language, display mode, and UI size to their defaults?'                    
+                    confirmResetPrefsMessage: 'Are you sure you want to reset language, display mode, and UI size to their defaults?',
+                    infoLink: 'https://dayverse.id/en/docs/?q=paperima',
+                    supportLink: 'https://dayverse.id/en/donate/'
                 },
                 'id': {
                     settings: 'Pengaturan', export: 'Ekspor', canvas: 'Kanvas', previewAspectRatio: 'Aspek Rasio',
@@ -1669,7 +1673,7 @@
                     keyframeProperties: 'Properti Keyframe', rotation: 'Rotasi', easingToNext: 'Easing Berikutnya', keyframeAnim: 'Animasi Kertas', animNone: 'Tidak Ada', animOpen: 'Buka', animClose: 'Tutup',
                     addKeyframe: 'Tambah Keyframe', keyframePropertiesTitle: 'Properti Keyframe ke-',
                     simple: 'Simpel', advanced: 'Lanjutan', openAnim: 'Animasi Kertas Terbuka', closeAnim: 'Animasi Kertas Tertutup', timeline: 'Timeline',
-                    Info: 'Info', sourceCode: 'Kode Sumber', license: 'Lisensi', supportCreator: 'Dukung Kreator', installApp: 'Instal Aplikasi', appInstalled: 'Terinstal',
+                    Info: 'Panduan', sourceCode: 'Kode Sumber', license: 'Lisensi', supportCreator: 'Dukung Kreator', installApp: 'Instal Aplikasi', appInstalled: 'Terinstal',
                     licenseTitle: 'GNU Affero General Public License v3.0',
                     licenseContent: `
 <div class="text-sm text-slate-300 space-y-4">
@@ -1701,7 +1705,9 @@
                     previewResolutionWarning: 'Resolusi pratinjau tidak memengaruhi resolusi ekspor.',
                     dropShadowTooltip: 'Kami menyarankan dropshadow dimatikan jika ekspor sebagai greenscreen. <a href="#" target="_blank" class="text-blue-400 hover:underline">Pelajari selengkapnya</a>',
                     exportInfoTooltip: 'Saat ini opsi file video ekspor yang tersedia adalah .webm untuk menjaga aplikasi tetap gratis dan ringan. <a href="https://www.webmproject.org/about/" target="_blank" rel="noopener noreferrer" class="text-[var(--accent-color)] hover:underline">Pelajari selengkapnya</a>',
-                    confirmResetPrefsMessage: 'Apakah Anda yakin ingin mereset bahasa, mode tampilan, dan ukuran UI ke nilai default?'
+                    confirmResetPrefsMessage: 'Apakah Anda yakin ingin mereset bahasa, mode tampilan, dan ukuran UI ke nilai default?',
+                    infoLink: 'https://dayverse.id/id/docs/?q=paperima',
+                    supportLink: 'https://dayverse.id/id/donate/'
                 }
             };
             
@@ -3156,7 +3162,18 @@ Object       : ${objFileName}
 				document.querySelectorAll('#preview-resolution-btns button').forEach(button => {
 					button.classList.toggle('active', button.dataset.res === state.previewResolution);
 				});
+                const langLinks = translations[state.language];
+                if (langLinks) {
+                    const infoLinkEl = document.getElementById('info-link');
+                    if (infoLinkEl && langLinks.infoLink) {
+                        infoLinkEl.href = langLinks.infoLink;
+                    }
 
+                    const supportLinkEl = document.getElementById('support-link');
+                    if (supportLinkEl && langLinks.supportLink) {
+                        supportLinkEl.href = langLinks.supportLink;
+                    }
+                }
 				document.getElementById('debug-screen-switch').checked = state.debugScreenEnabled;
 				document.getElementById('debug-screen').classList.toggle('hidden', !state.debugScreenEnabled);
 				showTab(state.activeTab);
