@@ -12,7 +12,7 @@
     <link rel="manifest" href="./assets/site.webmanifest" />
     <meta name="robots" content="noindex, follow">
     <link href="./assets/tailwind.css" rel="stylesheet">
-    <script src="./assets/CCapture.all.min.js"></script>
+    <!-- CCapture.js will be loaded lazily when needed for export -->
     <style>
         @font-face {
             font-family: 'Inter';
@@ -3415,194 +3415,49 @@ Object       : ${objFileName}
                 });
             }
 
-            // Starts the video export process using CCapture.js
+            // Starts the video export process using CCapture.js (loaded lazily)
             async function startExport() {
-                isExporting = true;
-                const hasAnyImage = state.object.image.element || state.background.element;
-                if (!hasAnyImage) {
-                    showTopNotification("notificationWarnUpload");
-                    isExporting = false;
-                    return;
-                }
-
-                const exportSettingsPopup = document.getElementById('export-settings-popup');
-                const exportProgressPopup = document.getElementById('export-progress-popup');
-                const progressBarFill = document.getElementById('progress-bar-fill');
-                const cancelExportBtn = document.getElementById('cancel-export-btn');
-
-                exportSettingsPopup.classList.add('hidden');
-                exportProgressPopup.classList.remove('hidden');
-                exportProgressPopup.classList.add('flex');
-
-                const exportTitle = exportProgressPopup.querySelector('h3');
-                progressBarFill.style.width = '0%';
-                progressBarFill.textContent = '0%';
-                exportTitle.textContent = translations[state.language].preparingExportCanvas || 'Menyiapkan kanvas ekspor...';
-                await new Promise(resolve => setTimeout(resolve, 100));
-                cancelAnimationFrame(animationFrameId);
-
-                // Determine final export canvas dimensions from UI
-                const exportResolutionKey = document.querySelector('#canvas-resolution-btns button.active')?.dataset.res || state.previewResolution;
-                const finalExportDims = RESOLUTION_MAPS[exportResolutionKey]?.[state.aspectRatio];
-
-                if (!finalExportDims) {
-                    console.error("Resolusi ekspor tidak valid.");
-                    isExporting = false;
-                    exportProgressPopup.classList.add('hidden');
-                    exportProgressPopup.classList.remove('flex');
-                    return;
-                }
-
-                // Save canvas & preview image state to restore later
-                const originalCanvasWidth = canvas.width;
-                const originalCanvasHeight = canvas.height;
-                const previewImageElement = state.object.image.element;
-                const originalImageSize = state.object.image.size; 
-
-                // Set MAIN canvas to export resolution
-                canvas.width = finalExportDims.w;
-                canvas.height = finalExportDims.h;
-
-                const imageSizeSlider = document.getElementById('image-size');
-                const maxScalePercent = imageSizeSlider ? parseFloat(imageSizeSlider.max) : 200;
-                const offscreenMultiplier = (maxScalePercent / 100.0) + 0.1;
-
-                const offscreenCanvasWidth = Math.round(canvas.width * offscreenMultiplier);
-                const offscreenCanvasHeight = Math.round(canvas.height * offscreenMultiplier);
-
-                objectCanvas.width = contentCanvas.width = finalObjectCanvas.width = offscreenCanvasWidth;
-                objectCanvas.height = contentCanvas.height = finalObjectCanvas.height = offscreenCanvasHeight;
-
-                if (state.object.image.originalElement) {
-                    let highResImg = state.object.image.originalElement;
-                    const exportTargetsForUpscale = ['1080', '1440'];
-                    if (exportTargetsForUpscale.includes(exportResolutionKey)) {
-                        const exportWidth = finalExportDims.w;
-                        const exportHeight = finalExportDims.h;
-                        const sourceWidth = highResImg.width;
-                        const sourceHeight = highResImg.height;
-
-                        const targetWidth = exportWidth * 0.8;
-                        const targetHeight = exportHeight * 0.8;
-
-                        const sourceAspectRatio = sourceWidth / sourceHeight;
-                        const targetAspectRatio = targetWidth / targetHeight;
-
-                        let newWidth, newHeight;
-                        if (sourceAspectRatio > targetAspectRatio) {
-                            newWidth = targetWidth;
-                            newHeight = newWidth / sourceAspectRatio;
-                        } else {
-                            newHeight = targetHeight;
-                            newWidth = newHeight * sourceAspectRatio;
-                        }
-
-                        if (newWidth > sourceWidth || newHeight > sourceHeight) {
-                            console.log("Gambar objek terlalu kecil, melakukan upscale...");
-
-                            const upscaleCanvas = document.createElement('canvas');
-                            upscaleCanvas.width = newWidth;
-                            upscaleCanvas.height = newHeight;
-                            const upscaleCtx = upscaleCanvas.getContext('2d');
-                            upscaleCtx.drawImage(highResImg, 0, 0, newWidth, newHeight);
-
-                            const upscaledImage = new Image();
-                            upscaledImage.src = upscaleCanvas.toDataURL();
-                            await upscaledImage.decode();
-                            highResImg = upscaledImage;
-                        }
-                    }                    
-                    const paddingX = highResImg.width * 0.25;
-                    const paddingY = highResImg.height * 0.25;
-                    const paddedCanvas = document.createElement('canvas');
-                    const paddedCtx = paddedCanvas.getContext('2d');
-                    paddedCanvas.width = highResImg.width + paddingX * 2;
-                    paddedCanvas.height = highResImg.height + paddingY * 2;
-                    paddedCtx.drawImage(highResImg, paddingX, paddingY);
-                    const highResPaddedImg = new Image();
-                    highResPaddedImg.src = paddedCanvas.toDataURL();
-                    await highResPaddedImg.decode();
-                    state.object.image.element = highResPaddedImg;
-                }
-
-                // Rebuild cache with correct image & resolution
-                isCacheGenerationNeeded = true;
-                await generateTornEdgeCache();
-
-                exportTitle.textContent = translations[state.language].exportingVideo || 'Mengekspor Video...';
-                await new Promise(resolve => setTimeout(resolve, 100));
-
-                Object.assign(state.object.movement, DEFAULT_OBJECT_STATE.movement);
-                Object.assign(state.object.paperFoldOverlay, DEFAULT_OBJECT_STATE.paperFoldOverlay);
-
-                const DURATION_S = state.export.duration;
-                const FRAME_RATE = state.export.fps;
-                const FILENAME = state.export.filename || 'paperima';
-                const TOTAL_FRAMES = DURATION_S * FRAME_RATE;
-                const capturer = new CCapture({ format: 'webm', framerate: FRAME_RATE, quality: 95, name: FILENAME });
-
-                let isExportCancelled = false;
-                const handleCancel = () => { isExportCancelled = true; };
-                cancelExportBtn.addEventListener('click', handleCancel, { once: true });
-
-                const cleanupAfterExport = () => {
-                    console.log("Mengembalikan ke gambar pratinjau...");
-                    state.object.image.element = previewImageElement;
-                    state.object.image.size = originalImageSize;
-                    
-                    canvas.width = originalCanvasWidth;
-                    canvas.height = originalCanvasHeight;
-
-                    resizeAndRedrawAll();
-                    exportProgressPopup.classList.add('hidden');
-                    exportProgressPopup.classList.remove('flex');
-                    cancelExportBtn.removeEventListener('click', handleCancel);
-                    isExporting = false;
-                    isCacheGenerationNeeded = true;
-                    needsRedraw = true;
-                    animationFrameId = requestAnimationFrame(animationLoop);
-                };
-
-                capturer.start();
-
-                async function processFrame(frame) {
-                    if (isExportCancelled) {
-                        capturer.stop();
-                        cleanupAfterExport();
-                        return;
-                    }
-
-                    if (frame > TOTAL_FRAMES) {
-                        progressBarFill.textContent = '100%';
-                        exportTitle.textContent = `${translations[state.language].completing}...`;
-                        capturer.stop();
-                        capturer.save(blob => {
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `${FILENAME}.webm`;
-                            a.click();
-                            URL.revokeObjectURL(url);
-                            a.remove();
-                            cleanupAfterExport();
+                // Load export module if not already loaded
+                if (!window.startVideoExport) {
+                    try {
+                        await new Promise((resolve, reject) => {
+                            const script = document.createElement('script');
+                            script.src = './assets/export-module.js';
+                            script.onload = resolve;
+                            script.onerror = () => reject(new Error('Failed to load export module'));
+                            document.head.appendChild(script);
                         });
+                    } catch (error) {
+                        console.error('Failed to load export module:', error);
+                        showTopNotification("exportError");
                         return;
                     }
-
-                    const timestamp = (frame / FRAME_RATE) * 1000;
-                    updateMovement(timestamp);
-                    updatePaperFoldOverlay(timestamp);
-                    await draw(timestamp);
-                    capturer.capture(canvas);
-
-                    const percentage = Math.round((frame / TOTAL_FRAMES) * 100);
-                    progressBarFill.style.width = `${percentage}%`;
-                    progressBarFill.textContent = `${percentage}%`;
-
-                    requestAnimationFrame(() => processFrame(frame + 1));
                 }
 
-                processFrame(0);
+                // Call the actual export function from the module
+                await window.startVideoExport(
+                    state, 
+                    translations, 
+                    canvas, 
+                    ctx, 
+                    draw, 
+                    updateMovement, 
+                    updatePaperFoldOverlay, 
+                    animationFrameId, 
+                    requestAnimationFrame, 
+                    showTopNotification, 
+                    generateTornEdgeCache, 
+                    resizeAndRedrawAll, 
+                    DEFAULT_OBJECT_STATE,
+                    RESOLUTION_MAPS,
+                    objectCanvas,
+                    contentCanvas,
+                    finalObjectCanvas,
+                    isCacheGenerationNeeded,
+                    needsRedraw,
+                    animationLoop,
+                    isExporting
+                );
             }
 
             // Shows the content for a specific tab and updates the active state of tab buttons
@@ -3834,52 +3689,14 @@ Object       : ${objFileName}
                 }, { passive: false });
             }      
             
-            // PWA Installation Logic
-            let deferredPrompt;
-            const installButton = document.getElementById('pwa-install-button');
-            if (installButton) {
-                if (window.matchMedia('(display-mode: standalone)').matches) {
-                    setInstallButtonToInstalled();
+            // PWA and Service Worker will be loaded lazily
+            function loadPWAModule() {
+                if (!window.paperimaPWA) {
+                    const script = document.createElement('script');
+                    script.src = './assets/pwa-module.js';
+                    script.async = true;
+                    document.head.appendChild(script);
                 }
-
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    e.preventDefault();
-                    deferredPrompt = e;
-                    installButton.style.display = 'flex';
-                    installButton.disabled = false;
-                    installButton.classList.remove('is-disabled');
-                });
-
-                installButton.addEventListener('click', async () => {
-                    if (deferredPrompt) {
-                        deferredPrompt.prompt();
-                        const { outcome } = await deferredPrompt.userChoice;
-
-                        if (outcome === 'accepted') {
-                            setInstallButtonToInstalled();
-                        }
-
-                        deferredPrompt = null;
-                    }
-                });
-
-                window.addEventListener('appinstalled', () => {
-                    setInstallButtonToInstalled();
-                });
-            }
-
-
-            // Service Worker Registration Code
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('./service-worker.js', { scope: './latest/' })
-                        .then((registration) => {
-                            console.log('Service Worker successfully registered with scope:', registration.scope);
-                        })
-                        .catch((error) => {
-                            console.error('Service Worker registration failed:', error);
-                        });
-                });
             }
 
             //Initializes the application, sets up event listeners, and starts the animation loop.
@@ -4663,12 +4480,17 @@ Object       : ${objFileName}
                 updateUIFromState();
             }
             init();
+            
+            // Load PWA module after main initialization
             window.addEventListener('load', () => {
                 if (!window.matchMedia('(max-width: 768px)').matches) {
                     panelWrapper.classList.add('panel-open');
                     body.classList.add('desktop-panel-open');
                     animateCanvasResize();
                 }
+                
+                // Load PWA functionality after page load
+                loadPWAModule();
             });            
         });
     </script>
