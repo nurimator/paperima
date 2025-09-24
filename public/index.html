@@ -1273,6 +1273,17 @@
         <div class="bg-slate-800 shadow-xl p-8 w-full max-w-sm text-left border border-[var(--border-color)]">
             <h3 class="text-xl font-bold mb-6 text-slate-100" data-translate-key="exportSettings"></h3>
             <div class="space-y-4 md:space-y-4">
+                <!-- Export Format Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-[var(--text-muted)] mb-2" data-translate-key="exportFormat"></label>
+                    <select id="export-format-select" class="w-full py-3 px-2 text-sm bg-slate-700 border border-[var(--border-color)] focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)] text-slate-100">
+                        <option value="webm" data-translate-key="videoWebm">Video (.webm)</option>
+                        <option value="png" data-translate-key="imagePng">Image (.png)</option>
+                        <option value="jpg" data-translate-key="imageJpg">Image (.jpg)</option>
+                    </select>
+                </div>
+                
+                <!-- Resolution Settings -->
                 <div>
                     <label class="block text-sm font-medium text-[var(--text-muted)] mb-2" data-translate-key="canvasResolution"></label>
                     <div id="canvas-resolution-btns" class="grid grid-cols-3 gap-2 md:gap-2 btn-group-toggle">
@@ -1281,19 +1292,47 @@
                         <button data-res="1440" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">1440p</button>
                     </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-[var(--text-muted)] mb-2" data-translate-key="fps"></label>
-                    <div id="export-fps-btns" class="grid grid-cols-4 gap-2 md:gap-2 btn-group-toggle">
-                        <button data-fps="12" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">12</button>
-                        <button data-fps="24" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">24</button>
-                        <button data-fps="30" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">30</button>
-                        <button data-fps="60" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">60</button>
+                
+                <!-- Video-specific settings (FPS and Duration) -->
+                <div id="video-settings">
+                    <div>
+                        <label class="block text-sm font-medium text-[var(--text-muted)] mb-2" data-translate-key="fps"></label>
+                        <div id="export-fps-btns" class="grid grid-cols-4 gap-2 md:gap-2 btn-group-toggle">
+                            <button data-fps="12" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">12</button>
+                            <button data-fps="24" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">24</button>
+                            <button data-fps="30" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">30</button>
+                            <button data-fps="60" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">60</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="export-duration-input" class="block text-sm font-medium text-[var(--text-muted)] mt-4 mb-2" data-translate-key="duration"></label>
+                        <input type="number" id="export-duration-input" value="5" min="1" max="60" class="w-full mt-1 py-3 px-2 text-sm bg-slate-700 border border-[var(--border-color)] focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)]">
                     </div>
                 </div>
-                <div>
-                    <label for="export-duration-input" class="block text-sm font-medium text-[var(--text-muted)] mt-4 mb-2" data-translate-key="duration"></label>
-                    <input type="number" id="export-duration-input" value="5" min="1" max="60" class="w-full mt-1 py-3 px-2 text-sm bg-slate-700 border border-[var(--border-color)] focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)]">
+                
+                <!-- PNG-specific settings (Transparent Background) -->
+                <div id="png-settings" class="hidden">
+                    <div class="flex items-center gap-3">
+                        <label class="switch">
+                            <input type="checkbox" id="transparent-background-checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <label for="transparent-background-checkbox" class="text-sm font-medium text-[var(--text-muted)]" data-translate-key="transparentBackground"></label>
+                    </div>
                 </div>
+                
+                <!-- JPG-specific settings (Quality) -->
+                <div id="jpg-settings" class="hidden">
+                    <div>
+                        <label for="jpg-quality-slider" class="block text-sm font-medium text-[var(--text-muted)] mb-2" data-translate-key="imageQuality"></label>
+                        <div class="flex items-center gap-3">
+                            <input type="range" id="jpg-quality-slider" min="10" max="100" value="95" class="flex-1 slider">
+                            <span id="jpg-quality-value" class="text-sm text-[var(--text-muted)] min-w-[3rem] text-right">95%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filename Settings -->
                 <div>
                     <div class="flex items-center gap-2 mt-4 mb-2">
                         <label for="export-filename-input" class="block text-sm font-medium text-[var(--text-muted)]" data-translate-key="fileName"></label>
@@ -1306,7 +1345,7 @@
                     </div>
                     <div id="filename-container" class="w-full mt-1 flex items-center justify-between py-3 px-2 text-sm bg-slate-700 border border-[var(--border-color)] focus-within:ring-[var(--accent-color)] focus-within:border-[var(--accent-color)]">
                         <input type="text" id="export-filename-input" value="paperima" class="flex-1 bg-transparent border-none outline-none p-0 min-w-0">
-                        <span class="flex-shrink-0 text-[var(--text-muted)] pointer-events-none ml-2">.webm</span>
+                        <span id="file-extension" class="flex-shrink-0 text-[var(--text-muted)] pointer-events-none ml-2">.webm</span>
                     </div>
                 </div>
             </div>
@@ -1535,7 +1574,7 @@
                 aspectRatio: '16/9',
                 canvasDisplayResolution: 720,
                 export: {
-                    duration: 5, fps: 24, filename: 'paperima'
+                    duration: 5, fps: 24, filename: 'paperima', format: 'webm', jpgQuality: 95, transparentBackground: true
                 },
                 object: JSON.parse(JSON.stringify(DEFAULT_OBJECT_STATE))
             };
@@ -1594,8 +1633,11 @@
                     positionStrengthY: 'Position Strength Y', colorCorrection: 'Color Correction', resetColorCorrectionTitle: 'Reset Color Correction',
                     language: 'Language', displayMode: 'Display Mode', auto: 'Auto', mobile: 'Mobile (Force)', desktop: 'Desktop (Force)',
                     uiSize: 'UI Size', compact: 'Compact', normal: 'Normal', spacious: 'Spacious', appInfo: 'App Information',
-                    resetAll: 'Reset All', exportSettings: 'Export Settings', fps: 'Frames per Second (FPS)', duration: 'Duration (seconds)',
-                    fileName: 'File Name', cancel: 'Cancel', startExport: 'Start Export', exportingVideo: 'Exporting Video...',
+                    resetAll: 'Reset All', exportSettings: 'Export Settings', exportFormat: 'Export Format', 
+                    videoWebm: 'Video (.webm)', imagePng: 'Image (.png)', imageJpg: 'Image (.jpg)',
+                    fps: 'Frames per Second (FPS)', duration: 'Duration (seconds)', transparentBackground: 'Transparent Background',
+                    imageQuality: 'Image Quality', fileName: 'File Name', cancel: 'Cancel', startExport: 'Start Export', 
+                    exportingVideo: 'Exporting Video...', exportingImage: 'Exporting Image...',
                     exportingVideoWait: 'Please wait and do not close this window.', confirmResetTitle: 'Confirm Reset',
                     confirmResetMessage: 'Are you sure you want to reset all settings to their default values?',
                     deleteImportedImages: 'Delete imported images', continue: 'Continue', notificationWarnUpload: 'Please upload an image first!',
@@ -1636,7 +1678,7 @@
                     displayModeWarning: 'Warning: Forcing a display mode may break layout or functionality if it doesn\'t match your screen size.',
                     previewResolutionWarning: 'Preview resolution does not affect the final export resolution.',
                     dropShadowTooltip: 'We recommend turning off drop shadow when exporting for a greenscreen. <a href="#" target="_blank" class="text-blue-400 hover:underline">Learn more</a>',
-                    exportInfoTooltip: 'Currently, the only available video export option is .webm to keep the app free and lightweight. <a href="https://www.webmproject.org/about/" target="_blank" rel="noopener noreferrer" class="text-[var(--accent-color)] hover:underline">Learn more</a>',
+                    exportInfoTooltip: 'Export options include video (.webm), and image formats (.png with transparency support, .jpg with quality settings) to keep the app free and lightweight.',
                     confirmResetPrefsMessage: 'Are you sure you want to reset language, display mode, and UI size to their defaults?',
                     infoLink: 'https://dayverse.id/en/docs/?q=paperima',
                     supportLink: 'https://dayverse.id/en/donate/'
@@ -1662,8 +1704,11 @@
                     positionStrengthY: 'Kekuatan Posisi Y', colorCorrection: 'Koreksi Warna', resetColorCorrectionTitle: 'Reset Koreksi Warna',
                     language: 'Bahasa', displayMode: 'Mode Tampilan', auto: 'Otomatis', mobile: 'Seluler (Paksa)', desktop: 'Desktop (Paksa)',
                     uiSize: 'Ukuran UI', compact: 'Sempit', normal: 'Normal', spacious: 'Luas', appInfo: 'Informasi Aplikasi',
-                    resetAll: 'Reset Semua', exportSettings: 'Pengaturan Ekspor', fps: 'Frame per Detik (FPS)', duration: 'Durasi (detik)',
-                    fileName: 'Nama File', cancel: 'Batal', startExport: 'Mulai Ekspor', exportingVideo: 'Mengekspor Video...',
+                    resetAll: 'Reset Semua', exportSettings: 'Pengaturan Ekspor', exportFormat: 'Format Ekspor', 
+                    videoWebm: 'Video (.webm)', imagePng: 'Gambar (.png)', imageJpg: 'Gambar (.jpg)',
+                    fps: 'Frame per Detik (FPS)', duration: 'Durasi (detik)', transparentBackground: 'Latar Belakang Transparan',
+                    imageQuality: 'Kualitas Gambar', fileName: 'Nama File', cancel: 'Batal', startExport: 'Mulai Ekspor', 
+                    exportingVideo: 'Mengekspor Video...', exportingImage: 'Mengekspor Gambar...',
                     exportingVideoWait: 'Harap tunggu dan jangan tutup jendela ini.', confirmResetTitle: 'Konfirmasi Reset',
                     confirmResetMessage: 'Apakah Anda yakin ingin mereset semua pengaturan ke nilai default?',
                     deleteImportedImages: 'Hapus gambar yang telah diimpor', continue: 'Lanjutkan', notificationWarnUpload: 'Silakan masukan gambar terlebih dahulu!',
@@ -1704,7 +1749,7 @@
                     displayModeWarning: 'Peringatan: Memaksa mode tampilan dapat merusak tata letak atau fungsionalitas jika tidak sesuai dengan ukuran layar Anda.',
                     previewResolutionWarning: 'Resolusi pratinjau tidak memengaruhi resolusi ekspor.',
                     dropShadowTooltip: 'Kami menyarankan dropshadow dimatikan jika ekspor sebagai greenscreen. <a href="#" target="_blank" class="text-blue-400 hover:underline">Pelajari selengkapnya</a>',
-                    exportInfoTooltip: 'Saat ini opsi file video ekspor yang tersedia adalah .webm untuk menjaga aplikasi tetap gratis dan ringan. <a href="https://www.webmproject.org/about/" target="_blank" rel="noopener noreferrer" class="text-[var(--accent-color)] hover:underline">Pelajari selengkapnya</a>',
+                    exportInfoTooltip: 'Opsi ekspor mencakup video (.webm), dan format gambar (.png dengan dukungan transparansi, .jpg dengan pengaturan kualitas) untuk menjaga aplikasi tetap gratis dan ringan.',
                     confirmResetPrefsMessage: 'Apakah Anda yakin ingin mereset bahasa, mode tampilan, dan ukuran UI ke nilai default?',
                     infoLink: 'https://dayverse.id/id/docs/?q=paperima',
                     supportLink: 'https://dayverse.id/id/donate/'
@@ -2750,6 +2795,14 @@ Object       : ${objFileName}
                         el.title = translationMap[key];
                     }
                 });
+                
+                // Update option elements specifically
+                document.querySelectorAll('option[data-translate-key]').forEach(option => {
+                    const key = option.dataset.translateKey;
+                    if (translationMap[key]) {
+                        option.textContent = translationMap[key];
+                    }
+                });
             }
             function lerp(a, b, t) {
                 return a + (b - a) * t;
@@ -3179,7 +3232,57 @@ Object       : ${objFileName}
 				showTab(state.activeTab);
 				requestRedraw();
 				renderKeyframeList();
+				updateExportFormatUI(state.export.format);
 			}
+
+            // Updates the export modal UI based on the selected format
+            function updateExportFormatUI(format) {
+                const videoSettings = document.getElementById('video-settings');
+                const pngSettings = document.getElementById('png-settings');
+                const jpgSettings = document.getElementById('jpg-settings');
+                const fileExtension = document.getElementById('file-extension');
+                const exportFormatSelect = document.getElementById('export-format-select');
+                
+                // Update dropdown selection
+                if (exportFormatSelect) {
+                    exportFormatSelect.value = format;
+                }
+                
+                // Show/hide settings based on format
+                if (videoSettings) {
+                    videoSettings.classList.toggle('hidden', format !== 'webm');
+                }
+                if (pngSettings) {
+                    pngSettings.classList.toggle('hidden', format !== 'png');
+                }
+                if (jpgSettings) {
+                    jpgSettings.classList.toggle('hidden', format !== 'jpg');
+                }
+                
+                // Update file extension
+                if (fileExtension) {
+                    const extensions = { webm: '.webm', png: '.png', jpg: '.jpg' };
+                    fileExtension.textContent = extensions[format] || '.webm';
+                }
+                
+                // Update UI for JPG quality
+                if (format === 'jpg') {
+                    const qualitySlider = document.getElementById('jpg-quality-slider');
+                    const qualityValue = document.getElementById('jpg-quality-value');
+                    if (qualitySlider && qualityValue) {
+                        qualitySlider.value = state.export.jpgQuality;
+                        qualityValue.textContent = state.export.jpgQuality + '%';
+                    }
+                }
+                
+                // Update UI for PNG transparent background
+                if (format === 'png') {
+                    const transparentBgCheckbox = document.getElementById('transparent-background-checkbox');
+                    if (transparentBgCheckbox) {
+                        transparentBgCheckbox.checked = state.export.transparentBackground;
+                    }
+                }
+            }
 
             // Updates the UI for the background transform controls based on the selected mode ('fill' or 'stretch')
             function syncBackgroundTransformModeUI() {
@@ -3456,7 +3559,13 @@ Object       : ${objFileName}
                     isCacheGenerationNeeded,
                     needsRedraw,
                     animationLoop,
-                    isExporting
+                    isExporting,
+                    drawFinalObject,
+                    getAdvancedTransform,
+                    getVisualStateAtTime,
+                    layerImages,
+                    maskImages,
+                    hexToRgba
                 );
             }
 
@@ -3863,6 +3972,25 @@ Object       : ${objFileName}
                 });
                 document.getElementById('export-filename-input').addEventListener('input', (e) => {
                     state.export.filename = e.target.value.trim();
+                });
+                
+                // Export format dropdown handler
+                document.getElementById('export-format-select').addEventListener('change', (e) => {
+                    const format = e.target.value;
+                    state.export.format = format;
+                    updateExportFormatUI(format);
+                });
+                
+                // JPG quality slider handler
+                document.getElementById('jpg-quality-slider').addEventListener('input', (e) => {
+                    const quality = parseInt(e.target.value);
+                    state.export.jpgQuality = quality;
+                    document.getElementById('jpg-quality-value').textContent = quality + '%';
+                });
+                
+                // Transparent background checkbox handler
+                document.getElementById('transparent-background-checkbox').addEventListener('change', (e) => {
+                    state.export.transparentBackground = e.target.checked;
                 });
 
                 // Setup drag and drop zones

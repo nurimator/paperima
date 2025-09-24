@@ -15,6 +15,160 @@ async function loadCCaptureLibrary() {
     });
 }
 
+// Function to draw only the object without background for transparent PNG export
+async function drawObjectOnly(ctx, canvas, state, elapsedTime = 0, drawFinalObject, getAdvancedTransform, getVisualStateAtTime, layerImages, maskImages, hexToRgba) {
+    const objectState = state.object;
+    if (!objectState.image.element) return;
+
+    ctx.save();
+    // Clear canvas with transparency
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const animState = objectState.animation;
+    const isSimpleMode = animState.mode === 'simple';
+    const totalDuration = state.export.duration;
+    let timeInSeconds = elapsedTime / 1000;
+    
+    let transform, isPaperAnimActive = false, paperFrameIndex = 0, currentLayer = null, currentMask = null;
+    
+    if (isSimpleMode) {
+        transform = { 
+            x: objectState.image.offset.x, 
+            y: objectState.image.offset.y, 
+            scale: objectState.image.size, 
+            rotation: objectState.image.rotation 
+        };
+        
+        // Handle simple paper animation
+        const animDuration = 1.0, frameDuration = animDuration / 6.0;
+        if (animState.simple.previewing) {
+            const timeSincePreviewStart = (performance.now() - animState.simple.previewStartTime) / 1000;
+            if (timeSincePreviewStart < animDuration) {
+                isPaperAnimActive = true;
+                let frameIndex = Math.min(5, Math.floor(timeSincePreviewStart / frameDuration));
+                paperFrameIndex = (animState.simple.previewing === 'close') ? 5 - frameIndex : frameIndex;
+            }
+        } else {
+            if (animState.simple.open && timeInSeconds >= 0 && timeInSeconds < animDuration) {
+                isPaperAnimActive = true;
+                paperFrameIndex = Math.min(5, Math.floor(timeInSeconds / frameDuration));
+            }
+            const closeAnimStartTime = totalDuration - animDuration;
+            if (animState.simple.close && timeInSeconds >= closeAnimStartTime && timeInSeconds <= totalDuration) {
+                isPaperAnimActive = true;
+                const timeIntoClose = timeInSeconds - closeAnimStartTime;
+                const frameIndex = Math.min(5, Math.floor(timeIntoClose / frameDuration));
+                paperFrameIndex = 5 - frameIndex;
+            }
+        }
+    } else {
+        // Advanced mode - use keyframe system
+        if (getAdvancedTransform) {
+            const { transform: advTransform, prevKeyframe, nextKeyframe } = getAdvancedTransform(timeInSeconds, objectState);
+            transform = advTransform;
+            
+            if (prevKeyframe && nextKeyframe) {
+                const paperAnimType = prevKeyframe.paperAnim;
+                const segmentDuration = nextKeyframe.time - prevKeyframe.time;
+                if (paperAnimType !== 'none' && segmentDuration > 0) {
+                    isPaperAnimActive = true;
+                    const progress = Math.min(1, Math.max(0, (timeInSeconds - prevKeyframe.time) / segmentDuration));
+                    let frameIndex = Math.floor(progress * (layerImages ? layerImages.length : 6));
+                    paperFrameIndex = Math.max(0, Math.min((layerImages ? layerImages.length : 6) - 1, frameIndex));
+                    if (paperAnimType === 'close') {
+                        paperFrameIndex = ((layerImages ? layerImages.length : 6) - 1) - paperFrameIndex;
+                    }
+                }
+            }
+        } else {
+            // Fallback to basic transform
+            transform = { 
+                x: objectState.image.offset.x, 
+                y: objectState.image.offset.y, 
+                scale: objectState.image.size, 
+                rotation: objectState.image.rotation 
+            };
+        }
+    }
+    
+    if (!transform) {
+        ctx.restore();
+        return;
+    }
+    
+    // Calculate object positioning and scaling
+    const canvasAspect = canvas.width / canvas.height;
+    const imageAspect = objectState.image.element.width / objectState.image.element.height;
+    const baseScale = (canvasAspect > imageAspect) ? 
+        canvas.height / objectState.image.element.height : 
+        canvas.width / objectState.image.element.width;
+    const finalScale = baseScale * (transform.scale / 100);
+    const finalW = objectState.image.element.width * finalScale;
+    const finalH = objectState.image.element.height * finalScale;
+    
+    const imgBaseOffsetX = (canvas.width * transform.x) / 100;
+    const imgBaseOffsetY = (canvas.height * transform.y) / 100;
+    const totalOffsetX = imgBaseOffsetX + objectState.movement.positionOffset.x;
+    const totalOffsetY = imgBaseOffsetY + objectState.movement.positionOffset.y;
+    
+    // Get paper animation layers if active
+    if (isPaperAnimActive && layerImages && maskImages) {
+        currentLayer = layerImages[paperFrameIndex];
+        currentMask = maskImages[paperFrameIndex];
+    }
+    
+    const isTornEdgesEnabled = objectState.stroke.enabled;
+    
+    // Draw the final object using the drawFinalObject function
+    let finalStampSource;
+    if (drawFinalObject) {
+        finalStampSource = drawFinalObject(
+            objectState, finalW, finalH, totalOffsetX, totalOffsetY, 
+            isTornEdgesEnabled, currentLayer, currentMask
+        );
+    } else {
+        // Fallback: draw object directly if drawFinalObject is not available
+        finalStampSource = document.createElement('canvas');
+        finalStampSource.width = finalW;
+        finalStampSource.height = finalH;
+        const stampCtx = finalStampSource.getContext('2d');
+        stampCtx.drawImage(objectState.image.element, 0, 0, finalW, finalH);
+    }
+    
+    ctx.save();
+    
+    // Apply shadow if enabled
+    if (objectState.shadow.enabled) {
+        const baseResolution = 720;
+        const currentResolution = canvas.height;
+        const resolutionScaleFactor = currentResolution / baseResolution;
+        
+        if (hexToRgba) {
+            ctx.shadowColor = hexToRgba(objectState.shadow.color, objectState.shadow.opacity / 100);
+        } else {
+            // Fallback color conversion
+            ctx.shadowColor = `rgba(${parseInt(objectState.shadow.color.slice(1, 3), 16)}, ${parseInt(objectState.shadow.color.slice(3, 5), 16)}, ${parseInt(objectState.shadow.color.slice(5, 7), 16)}, ${objectState.shadow.opacity / 100})`;
+        }
+        
+        ctx.shadowBlur = objectState.shadow.blur * resolutionScaleFactor;
+        ctx.shadowOffsetX = objectState.shadow.offsetX * resolutionScaleFactor;
+        ctx.shadowOffsetY = (objectState.shadow.offsetY * -1) * resolutionScaleFactor;
+    }
+    
+    // Apply transformations
+    ctx.translate(canvas.width / 2 + totalOffsetX, canvas.height / 2 + (totalOffsetY * -1));
+    if (objectState.movement.enabled || transform.rotation !== 0) {
+        const totalRotation = transform.rotation + objectState.movement.rotation;
+        ctx.rotate(totalRotation * Math.PI / 180);
+    }
+    
+    // Draw the final object
+    ctx.drawImage(finalStampSource, -finalStampSource.width / 2, -finalStampSource.height / 2);
+    
+    ctx.restore();
+    ctx.restore();
+}
+
 async function startExport(
     state, 
     translations, 
@@ -36,13 +190,24 @@ async function startExport(
     isCacheGenerationNeeded,
     needsRedraw,
     animationLoop,
-    isExporting
+    isExporting,
+    drawFinalObject,
+    getAdvancedTransform,
+    getVisualStateAtTime,
+    layerImages,
+    maskImages,
+    hexToRgba
 ) {
-    try {
-        await loadCCaptureLibrary();
-    } catch (error) {
-        showTopNotification("exportError");
-        return;
+    const exportFormat = state.export.format || 'webm';
+    
+    // For video export, load CCapture.js
+    if (exportFormat === 'webm') {
+        try {
+            await loadCCaptureLibrary();
+        } catch (error) {
+            showTopNotification("exportError");
+            return;
+        }
     }
 
     isExporting = true;
@@ -153,18 +318,6 @@ async function startExport(
     isCacheGenerationNeeded = true;
     await generateTornEdgeCache();
 
-    exportTitle.textContent = translations[state.language].exportingVideo || 'Mengekspor Video...';
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    Object.assign(state.object.movement, DEFAULT_OBJECT_STATE.movement);
-    Object.assign(state.object.paperFoldOverlay, DEFAULT_OBJECT_STATE.paperFoldOverlay);
-
-    const DURATION_S = state.export.duration;
-    const FRAME_RATE = state.export.fps;
-    const FILENAME = state.export.filename || 'paperima';
-    const TOTAL_FRAMES = DURATION_S * FRAME_RATE;
-    const capturer = new CCapture({ format: 'webm', framerate: FRAME_RATE, quality: 95, name: FILENAME });
-
     let isExportCancelled = false;
     const handleCancel = () => { isExportCancelled = true; };
     cancelExportBtn.addEventListener('click', handleCancel, { once: true });
@@ -188,6 +341,86 @@ async function startExport(
             requestAnimationFrame(animationLoop);
         }
     };
+
+    // Handle image export (PNG/JPG)
+    if (exportFormat === 'png' || exportFormat === 'jpg') {
+        exportTitle.textContent = translations[state.language].exportingImage || 'Mengekspor Gambar...';
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // For image export, just draw a single frame
+        Object.assign(state.object.movement, DEFAULT_OBJECT_STATE.movement);
+        Object.assign(state.object.paperFoldOverlay, DEFAULT_OBJECT_STATE.paperFoldOverlay);
+        
+        // Set progress to 50%
+        progressBarFill.style.width = '50%';
+        progressBarFill.textContent = '50%';
+        
+        // Draw the image
+        await draw(0);
+        
+        // Set progress to 90%
+        progressBarFill.style.width = '90%';
+        progressBarFill.textContent = '90%';
+        
+        // Export the image
+        let dataURL;
+        if (exportFormat === 'png') {
+            if (state.export.transparentBackground) {
+                // For transparent PNG, create a separate canvas with only the object
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = canvas.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                // Draw only the object without background
+                await drawObjectOnly(tempCtx, tempCanvas, state, 0, drawFinalObject, getAdvancedTransform, getVisualStateAtTime, layerImages, maskImages, hexToRgba);
+                dataURL = tempCanvas.toDataURL('image/png');
+            } else {
+                // For non-transparent PNG, draw everything normally
+                await draw(0);
+                dataURL = canvas.toDataURL('image/png');
+            }
+        } else if (exportFormat === 'jpg') {
+            // For JPG, always draw everything (no transparency support)
+            await draw(0);
+            const quality = (state.export.jpgQuality || 95) / 100;
+            dataURL = canvas.toDataURL('image/jpeg', quality);
+        }
+        
+        // Set progress to 100%
+        progressBarFill.style.width = '100%';
+        progressBarFill.textContent = '100%';
+        exportTitle.textContent = `${translations[state.language].completing}...`;
+        
+        // Download the image
+        const filename = state.export.filename || 'paperima';
+        const extension = exportFormat === 'png' ? '.png' : '.jpg';
+        const link = document.createElement('a');
+        link.href = dataURL;
+        link.download = `${filename}${extension}`;
+        link.click();
+        link.remove();
+        
+        // Cleanup
+        setTimeout(() => {
+            cleanupAfterExport();
+        }, 500);
+        
+        return;
+    }
+
+    // Video export logic continues below
+    exportTitle.textContent = translations[state.language].exportingVideo || 'Mengekspor Video...';
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    Object.assign(state.object.movement, DEFAULT_OBJECT_STATE.movement);
+    Object.assign(state.object.paperFoldOverlay, DEFAULT_OBJECT_STATE.paperFoldOverlay);
+
+    const DURATION_S = state.export.duration;
+    const FRAME_RATE = state.export.fps;
+    const FILENAME = state.export.filename || 'paperima';
+    const TOTAL_FRAMES = DURATION_S * FRAME_RATE;
+    const capturer = new CCapture({ format: 'webm', framerate: FRAME_RATE, quality: 95, name: FILENAME });
 
     capturer.start();
 
