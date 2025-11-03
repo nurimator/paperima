@@ -1,8 +1,8 @@
 {
   "name": "Paperima",
   "short_name": "Paperima",
-  "start_url": "/paperima/latest/",
-  "scope": "/paperima/latest/",
+  "start_url": "/paperima/src/",
+  "scope": "/paperima/src/",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#283649",

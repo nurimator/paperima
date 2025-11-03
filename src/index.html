@@ -3872,7 +3872,7 @@ Object       : ${objFileName}
             // Service Worker Registration Code
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('./service-worker.js', { scope: './latest/' })
+                    navigator.serviceWorker.register('./service-worker.js', { scope: './src/' })
                         .then((registration) => {
                             console.log('Service Worker successfully registered with scope:', registration.scope);
                         })
