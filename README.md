@@ -48,11 +48,11 @@ It helps creators add realistic textures such as folds, torn edges, wiggle effec
   Paperima is fully open source. You can explore the code, learn from it, and contribute improvements.  
 
 
-## Tech Stack
-- **HTML, CSS, JavaScript** (no frontend frameworks)  
-- [TailwindCSS](https://tailwindcss.com/) – UI styling  
-- [Remixicon](https://remixicon.com/) – icons  
-- [CCapture](https://github.com/spite/ccapture.js/) – video exporting  
+## Built With
+
+- [TailwindCSS](https://tailwindcss.com/) – for UI styling  
+- [Remixicon](https://remixicon.com/) – for icons  
+- [CCapture](https://github.com/spite/ccapture.js/) – for video export  
 
 
 ## Our next Plans

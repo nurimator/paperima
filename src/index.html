@@ -146,76 +146,152 @@
         #settings-panel-wrapper:not(.panel-open) #handle-icon-open { display: none; }
         #settings-panel-wrapper:not(.panel-open) #handle-icon-closed { display: block; }
         #export-video-btn-header { display: var(--export-header-btn-display); border-radius: 0; }
-        [data-ui-size="compact"] .controls-panel { --p: 0.6rem; }
-        [data-ui-size="compact"] .p-4, [data-ui-size="compact"] .md\:p-4 { padding: 0.6rem; }
-        [data-ui-size="compact"] .px-4 { padding-left: 0.6rem; padding-right: 0.6rem; }
-        [data-ui-size="compact"] .py-2\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
-        [data-ui-size="compact"] .px-2\.5 { padding-left: 0.375rem; padding-right: 0.375rem; }
-        [data-ui-size="compact"] .space-y-4 > *:not([hidden]) ~ *:not([hidden]), [data-ui-size="compact"] .md\:space-y-4 > *:not([hidden]) ~ *:not([hidden]) { margin-top: 0.75rem; }
-        [data-ui-size="compact"] .space-y-2 > *:not([hidden]) ~ *:not([hidden]), [data-ui-size="compact"] .md\:space-y-2 > *:not([hidden]) ~ *:not([hidden]) { margin-top: 0.375rem; }
-        [data-ui-size="compact"] .gap-2, [data-ui-size="compact"] .md\:gap-2 { gap: 0.25rem; }
-        [data-ui-size="compact"] .gap-3, [data-ui-size="compact"] .md\:gap-3 { gap: 0.5rem; }
-        [data-ui-size="compact"] .accordion-section .accordion-header { padding: 0.6rem; }
-        [data-ui-size="compact"] .accordion-section .accordion-body { padding: 0.6rem; }
-        [data-ui-size="compact"] #drop-zone, [data-ui-size="compact"] #background-drop-zone { height: 90px; }
-        [data-ui-size="compact"] .drop-zone-delete-btn { top: 0.25rem; right: 0.25rem; padding: 0.125rem; }
-        [data-ui-size="compact"] #export-settings-popup > div, [data-ui-size="compact"] #confirmation-popup > div, [data-ui-size="compact"] #license-popup > div { padding: 1.5rem; }
-        [data-ui-size="compact"] #export-progress-popup h3 { font-size: 1.25rem; margin-bottom: 0.75rem; }
-        [data-ui-size="compact"] #export-progress-popup p { font-size: 0.875rem; }
-        [data-ui-size="compact"] #progress-bar-container { margin-top: 1rem; }
-        [data-ui-size="compact"] #panel-title { font-size: 1rem; }
-        [data-ui-size="compact"] #export-video-btn-header { padding: 0.5rem 0.75rem; font-size: 0.875rem; }
-        [data-ui-size="compact"] #mobile-export-btn { padding: 0.5rem 1rem; font-size: 0.875rem; }
-        [data-ui-size="compact"] .text-lg, [data-ui-size="compact"] .md\:text-lg { font-size: 1rem; }
-        [data-ui-size="compact"] .text-base { font-size: 0.875rem; }
-        [data-ui-size="compact"] .text-sm, [data-ui-size="compact"] .md\:text-sm { font-size: 0.8rem; }
-        [data-ui-size="compact"] .text-xs { font-size: 0.75rem; }
-        [data-ui-size="compact"] .w-6, [data-ui-size="compact"] .h-6 { width: 1.25rem; height: 1.25rem; }
-        [data-ui-size="compact"] .w-7, [data-ui-size="compact"] .h-7 { width: 1.5rem; height: 1.5rem; }
-        [data-ui-size="compact"] #settings-panel .desktop-header { height: 3rem; }
-        [data-ui-size="compact"] #mobile-panel-header { height: 2.5rem; font-size: 0.8rem; }
-        [data-ui-size="compact"] #mobile-footer { height: 3.5rem; }
-        [data-ui-size="compact"] .controls-panel { padding-bottom: 5rem; }
-        [data-ui-size="normal"] #settings-panel .desktop-header { height: 4rem; }
-        [data-ui-size="normal"] #mobile-panel-header { height: 3rem; font-size: 0.9rem; }
-        [data-ui-size="normal"] #mobile-footer { height: 4rem; }
-        [data-ui-size="normal"] .controls-panel { padding-bottom: 6rem; }
-        [data-ui-size="luas"] .p-4, [data-ui-size="luas"] .md\:p-4 { padding: 1.5rem; }
-        [data-ui-size="luas"] .px-4 { padding-left: 1.5rem; padding-right: 1.5rem; }
-        [data-ui-size="luas"] .py-2\.5 { padding-top: 1rem; padding-bottom: 1rem; }
-        [data-ui-size="luas"] .px-2\.5 { padding-left: 1rem; padding-right: 1rem; }
-        [data-ui-size="luas"] .space-y-4 > *:not([hidden]) ~ *:not([hidden]), [data-ui-size="luas"] .md\:space-y-4 > *:not([hidden]) ~ *:not([hidden]) { margin-top: 1.5rem; }
-        [data-ui-size="luas"] .space-y-2 > *:not([hidden]) ~ *:not([hidden]), [data-ui-size="luas"] .md\:space-y-2 > *:not([hidden]) ~ *:not([hidden]) { margin-top: 0.75rem; }
-        [data-ui-size="luas"] .gap-2, [data-ui-size="luas"] .md\:gap-2 { gap: 0.75rem; }
-        [data-ui-size="luas"] .gap-3, [data-ui-size="luas"] .md\:gap-3 { gap: 1rem; }
-        [data-ui-size="luas"] .accordion-section .accordion-header { padding: 1.5rem; }
-        [data-ui-size="luas"] .accordion-section .accordion-body { padding: 1.5rem; }
-        [data-ui-size="luas"] #drop-zone, [data-ui-size="luas"] #background-drop-zone { height: 160px; }
-        [data-ui-size="luas"] .overlay-drop-zone { height: 120px; }
-        [data-ui-size="luas"] .drop-zone-delete-btn { top: 0.75rem; right: 0.75rem; padding: 0.5rem; }
-        [data-ui-size="luas"] #export-settings-popup > div, [data-ui-size="luas"] #confirmation-popup > div, [data-ui-size="luas"] #license-popup > div { padding: 2.5rem; }
-        [data-ui-size="luas"] #export-progress-popup h3 { font-size: 2rem; margin-bottom: 1.25rem; }
-        [data-ui-size="luas"] #export-progress-popup p { font-size: 1.125rem; }
-        [data-ui-size="luas"] #progress-bar-container { margin-top: 2rem; }
-        [data-ui-size="luas"] #panel-title { font-size: 1.25rem; }
-        [data-ui-size="luas"] #export-video-btn-header { padding: 0.75rem 1.25rem; font-size: 1rem; }
-        [data-ui-size="luas"] #mobile-export-btn { padding: 0.75rem 1.5rem; font-size: 1rem; }
-        [data-ui-size="luas"] .text-lg, [data-ui-size="luas"] .md\:text-lg { font-size: 1.25rem; }
-        [data-ui-size="luas"] .text-base { font-size: 1.125rem; }
-        [data-ui-size="luas"] .text-sm, [data-ui-size="luas"] .md\:text-sm { font-size: 1rem; }
-        [data-ui-size="luas"] .text-xs { font-size: 0.875rem; }
-        [data-ui-size="luas"] .w-6, [data-ui-size="luas"] .h-6 { width: 1.75rem; height: 1.75rem; }
-        [data-ui-size="luas"] .w-7, [data-ui-size="luas"] .h-7 { width: 2rem; height: 2rem; }
-        [data-ui-size="luas"] #settings-panel .desktop-header { height: 5rem; }
-        [data-ui-size="luas"] #mobile-panel-header { height: 3.5rem; font-size: 1.1rem; }
-        [data-ui-size="luas"] #mobile-footer { height: 5rem; }
-        [data-ui-size="luas"] .controls-panel { padding-bottom: 7rem; }
-        [data-ui-size="compact"] .reset-all-btn,
-        [data-ui-size="compact"] #reset-preferences-btn { padding: 0.5rem 1rem; font-size: 0.875rem; }
-        [data-ui-size="normal"] .reset-all-btn,
-        [data-ui-size="normal"] #reset-preferences-btn { padding: 0.75rem 1.25rem; }
-        [data-ui-size="luas"] .reset-all-btn,
-        [data-ui-size="luas"] #reset-preferences-btn { padding: 1rem 1.5rem; font-size: 1rem; }
+        
+        /* ========================================
+           UI Size: COMPACT
+           ======================================== */
+        [data-ui-size="compact"] {
+            /* Spacing */
+            .controls-panel { --p: 0.6rem; padding-bottom: 5rem; }
+            .p-4, .md\:p-4 { padding: 0.6rem; }
+            .px-4 { padding-left: 0.6rem; padding-right: 0.6rem; }
+            .py-2\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+            .px-2\.5 { padding-left: 0.375rem; padding-right: 0.375rem; }
+            .space-y-4 > *:not([hidden]) ~ *:not([hidden]), 
+            .md\:space-y-4 > *:not([hidden]) ~ *:not([hidden]) { margin-top: 0.75rem; }
+            .space-y-2 > *:not([hidden]) ~ *:not([hidden]), 
+            .md\:space-y-2 > *:not([hidden]) ~ *:not([hidden]) { margin-top: 0.375rem; }
+            .gap-2, .md\:gap-2 { gap: 0.25rem; }
+            .gap-3, .md\:gap-3 { gap: 0.5rem; }
+            
+            /* Accordion */
+            .accordion-section .accordion-header { padding: 0.6rem; }
+            .accordion-section .accordion-body { padding: 0.6rem; }
+            
+            /* Drop zones */
+            #drop-zone, #background-drop-zone { height: 90px; }
+            .drop-zone-delete-btn { top: 0.25rem; right: 0.25rem; padding: 0.125rem; }
+            
+            /* Popups */
+            #export-settings-popup > div, 
+            #confirmation-popup > div, 
+            #license-popup > div { padding: 1.5rem; }
+            #export-progress-popup h3 { font-size: 1.25rem; margin-bottom: 0.75rem; }
+            #export-progress-popup p { font-size: 0.875rem; }
+            #progress-bar-container { margin-top: 1rem; }
+            
+            /* Buttons */
+            .reset-all-btn, #reset-preferences-btn { padding: 0.5rem 1rem; font-size: 0.875rem; }
+            #export-video-btn-header { padding: 0.5rem 0.75rem; font-size: 0.875rem; }
+            #mobile-export-btn { padding: 0.5rem 1rem; font-size: 0.875rem; }
+            .btn-group-toggle button { padding: 0.375rem 0.5rem; font-size: 0.75rem; }
+            .btn-group-toggle button.p-2\.5 { padding: 0.375rem 0.5rem !important; }
+            
+            /* Input fields */
+            .number-input-uniform { padding: 0.375rem 0.5rem; font-size: 0.75rem; }
+            input[type="number"].py-1 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+            input[type="number"].px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+            select { padding: 0.375rem 0.5rem; font-size: 0.75rem; height: 2rem; }
+            
+            /* Typography */
+            #panel-title { font-size: 1rem; }
+            .text-lg, .md\:text-lg { font-size: 1rem; }
+            .text-base { font-size: 0.875rem; }
+            .text-sm, .md\:text-sm { font-size: 0.8rem; }
+            .text-xs { font-size: 0.75rem; }
+            
+            /* Icons */
+            .w-6, .h-6 { width: 1.25rem; height: 1.25rem; }
+            .w-7, .h-7 { width: 1.5rem; height: 1.5rem; }
+            
+            /* Layout */
+            #settings-panel .desktop-header { height: 3rem; }
+            #mobile-panel-header { height: 2.5rem; font-size: 0.8rem; }
+            #mobile-footer { height: 3.5rem; }
+        }
+        
+        @media (min-width: 769px) {
+            [data-ui-size="compact"] #drop-zone,
+            [data-ui-size="compact"] #background-drop-zone { height: 120px; }
+        }
+        
+        /* ========================================
+           UI Size: NORMAL (Default)
+           ======================================== */
+        [data-ui-size="normal"] {
+            /* Buttons */
+            .reset-all-btn, #reset-preferences-btn { padding: 0.75rem 1.25rem; }
+            
+            /* Layout */
+            #settings-panel .desktop-header { height: 4rem; }
+            #mobile-panel-header { height: 3rem; font-size: 0.9rem; }
+            #mobile-footer { height: 4rem; }
+            .controls-panel { padding-bottom: 6rem; }
+        }
+        
+        /* ========================================
+           UI Size: WIDE (Spacious)
+           ======================================== */
+        [data-ui-size="wide"] {
+            /* Spacing */
+            .controls-panel { padding-bottom: 7rem; }
+            .p-4, .md\:p-4 { padding: 1.5rem; }
+            .px-4 { padding-left: 1.5rem; padding-right: 1.5rem; }
+            .py-2\.5 { padding-top: 1rem; padding-bottom: 1rem; }
+            .px-2\.5 { padding-left: 1rem; padding-right: 1rem; }
+            .space-y-4 > *:not([hidden]) ~ *:not([hidden]), 
+            .md\:space-y-4 > *:not([hidden]) ~ *:not([hidden]) { margin-top: 1.5rem; }
+            .space-y-2 > *:not([hidden]) ~ *:not([hidden]), 
+            .md\:space-y-2 > *:not([hidden]) ~ *:not([hidden]) { margin-top: 0.75rem; }
+            .gap-2, .md\:gap-2 { gap: 0.75rem; }
+            .gap-3, .md\:gap-3 { gap: 1rem; }
+            
+            /* Accordion */
+            .accordion-section .accordion-header { padding: 1.5rem; }
+            .accordion-section .accordion-body { padding: 1.5rem; }
+            
+            /* Drop zones */
+            #drop-zone, #background-drop-zone { height: 160px; }
+            .overlay-drop-zone { height: 120px; }
+            .drop-zone-delete-btn { top: 0.75rem; right: 0.75rem; padding: 0.5rem; }
+            
+            /* Popups */
+            #export-settings-popup > div, 
+            #confirmation-popup > div, 
+            #license-popup > div { padding: 2.5rem; }
+            #export-progress-popup h3 { font-size: 2rem; margin-bottom: 1.25rem; }
+            #export-progress-popup p { font-size: 1.125rem; }
+            #progress-bar-container { margin-top: 2rem; }
+            
+            /* Buttons */
+            .reset-all-btn, #reset-preferences-btn { padding: 1rem 1.5rem; font-size: 1rem; }
+            #export-video-btn-header { padding: 0.75rem 1.25rem; font-size: 1rem; }
+            #mobile-export-btn { padding: 0.75rem 1.5rem; font-size: 1rem; }
+            .btn-group-toggle button { padding: 0.875rem 1rem; font-size: 1rem; }
+            .btn-group-toggle button.p-2\.5 { padding: 0.875rem 1rem !important; }
+            
+            /* Input fields */
+            .number-input-uniform { padding: 0.875rem 1rem; font-size: 1rem; }
+            input[type="number"].py-1 { padding-top: 0.875rem; padding-bottom: 0.875rem; }
+            input[type="number"].px-2 { padding-left: 1rem; padding-right: 1rem; }
+            select { padding: 0.875rem 1rem; font-size: 1rem; height: 3.5rem; }
+            
+            /* Typography */
+            #panel-title { font-size: 1.25rem; }
+            .text-lg, .md\:text-lg { font-size: 1.25rem; }
+            .text-base { font-size: 1.125rem; }
+            .text-sm, .md\:text-sm { font-size: 1rem; }
+            .text-xs { font-size: 0.875rem; }
+            
+            /* Icons */
+            .w-6, .h-6 { width: 1.75rem; height: 1.75rem; }
+            .w-7, .h-7 { width: 2rem; height: 2rem; }
+            
+            /* Layout */
+            #settings-panel .desktop-header { height: 5rem; }
+            #mobile-panel-header { height: 3.5rem; font-size: 1.1rem; }
+            #mobile-footer { height: 5rem; }
+        }
         @media (min-width: 769px) {
             [data-ui-size="compact"] #drop-zone,
             [data-ui-size="compact"] #background-drop-zone {
@@ -1175,7 +1251,7 @@
                             <div id="ui-size-btns" class="grid grid-cols-3 gap-2 md:gap-2 mt-2 btn-group-toggle">
                                 <button data-size="compact" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="compact"></button>
                                 <button data-size="normal" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="normal"></button>
-                                <button data-size="luas" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="spacious"></button>
+                                <button data-size="wide" class="p-2.5 px-2 py-1.5 border-2 border-[var(--border-color)] text-[var(--text-muted)] text-sm font-medium transition-all duration-150" data-translate-key="spacious"></button>
                             </div>
                         </div>
                         <div class="space-y-2 md:space-y-2 pt-4 border-t border-[var(--border-color)]">
@@ -1276,7 +1352,7 @@
                 <!-- Export Format Selection -->
                 <div>
                     <label class="block text-sm font-medium text-[var(--text-muted)] mb-2" data-translate-key="exportFormat"></label>
-                    <select id="export-format-select" class="w-full py-3 px-2 text-sm bg-slate-700 border border-[var(--border-color)] focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)] text-slate-100">
+                    <select id="export-format-select" class="w-full text-sm bg-slate-700 border border-[var(--border-color)] focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)] text-slate-100" style="height: 46px; padding: 0.75rem 0.5rem; line-height: 1.25;">
                         <option value="webm" data-translate-key="videoWebm">Video (.webm)</option>
                         <option value="png" data-translate-key="imagePng">Image (.png)</option>
                         <option value="jpg" data-translate-key="imageJpg">Image (.jpg)</option>
@@ -1295,18 +1371,20 @@
                 
                 <!-- Video-specific settings (FPS and Duration) -->
                 <div id="video-settings">
-                    <div>
-                        <label class="block text-sm font-medium text-[var(--text-muted)] mb-2" data-translate-key="fps"></label>
-                        <div id="export-fps-btns" class="grid grid-cols-4 gap-2 md:gap-2 btn-group-toggle">
-                            <button data-fps="12" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">12</button>
-                            <button data-fps="24" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">24</button>
-                            <button data-fps="30" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">30</button>
-                            <button data-fps="60" class="px-2 py-1.5 text-sm border-2 border-[var(--border-color)] text-[var(--text-muted)]">60</button>
+                    <div class="grid grid-cols-2 gap-3 md:gap-3">
+                        <div>
+                            <label for="export-fps-select" class="block text-sm font-medium text-[var(--text-muted)] mb-2" data-translate-key="fps"></label>
+                            <select id="export-fps-select" class="w-full text-sm bg-slate-700 border border-[var(--border-color)] focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)] text-slate-100" style="height: 46px; padding: 0.75rem 0.5rem; line-height: 1.25;">
+                                <option value="12">12</option>
+                                <option value="24" selected>24</option>
+                                <option value="30">30</option>
+                                <option value="60">60</option>
+                            </select>
                         </div>
-                    </div>
-                    <div>
-                        <label for="export-duration-input" class="block text-sm font-medium text-[var(--text-muted)] mt-4 mb-2" data-translate-key="duration"></label>
-                        <input type="number" id="export-duration-input" value="5" min="1" max="60" class="w-full mt-1 py-3 px-2 text-sm bg-slate-700 border border-[var(--border-color)] focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)]">
+                        <div>
+                            <label for="export-duration-input" class="block text-sm font-medium text-[var(--text-muted)] mb-2" data-translate-key="duration"></label>
+                            <input type="number" id="export-duration-input" value="5" min="1" max="60" class="w-full text-sm bg-slate-700 border border-[var(--border-color)] focus:ring-[var(--accent-color)] focus:border-[var(--accent-color)]" style="height: 46px; padding: 0.75rem 0.5rem; line-height: 1.25;">
+                        </div>
                     </div>
                 </div>
                 
@@ -1703,7 +1781,7 @@
                     positionSpeedX: 'Kecepatan Posisi X', positionSpeedY: 'Kecepatan Posisi Y', positionStrengthX: 'Kekuatan Posisi X',
                     positionStrengthY: 'Kekuatan Posisi Y', colorCorrection: 'Koreksi Warna', resetColorCorrectionTitle: 'Reset Koreksi Warna',
                     language: 'Bahasa', displayMode: 'Mode Tampilan', auto: 'Otomatis', mobile: 'Seluler (Paksa)', desktop: 'Desktop (Paksa)',
-                    uiSize: 'Ukuran UI', compact: 'Sempit', normal: 'Normal', spacious: 'Luas', appInfo: 'Informasi Aplikasi',
+                    uiSize: 'Ukuran UI', compact: 'Sempit', normal: 'Normal', spacious: 'Lebar', appInfo: 'Informasi Aplikasi',
                     resetAll: 'Reset Semua', exportSettings: 'Pengaturan Ekspor', exportFormat: 'Format Ekspor', 
                     videoWebm: 'Video (.webm)', imagePng: 'Gambar (.png)', imageJpg: 'Gambar (.jpg)',
                     fps: 'Frame per Detik (FPS)', duration: 'Durasi (detik)', transparentBackground: 'Latar Belakang Transparan',
@@ -3163,7 +3241,11 @@ Object       : ${objFileName}
 					}
 				});
 
-				document.querySelectorAll('#export-fps-btns button').forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.fps) === state.export.fps));
+				// Update FPS dropdown selection
+				const fpsSelect = document.getElementById('export-fps-select');
+				if (fpsSelect) {
+					fpsSelect.value = state.export.fps;
+				}
 
 				document.querySelectorAll('.accordion-section').forEach(section => {
 					const switchInput = section.querySelector('.accordion-header .switch input');
@@ -3956,12 +4038,8 @@ Object       : ${objFileName}
                     }
                 });
                 
-                document.getElementById('export-fps-btns').addEventListener('click', (e) => {
-                    const button = e.target.closest('button');
-                    if(button) {
-                        state.export.fps = parseInt(button.dataset.fps);
-                        updateUIFromState(); 
-                    }
+                document.getElementById('export-fps-select').addEventListener('change', (e) => {
+                    state.export.fps = parseInt(e.target.value);
                 });
                 document.getElementById('export-duration-input').addEventListener('change', (e) => {
                     const val = parseInt(e.target.value, 10);
