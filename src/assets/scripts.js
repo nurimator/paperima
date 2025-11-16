@@ -240,6 +240,7 @@
                     exportingVideoWait: 'Please wait and do not close this window.', confirmResetTitle: 'Confirm Reset',
                     confirmResetMessage: 'Are you sure you want to reset all settings to their default values?',
                     deleteImportedImages: 'Delete imported images', continue: 'Continue', notificationWarnUpload: 'Please upload an image first!',
+                    notificationWarnObject: 'Please upload an object image first!',
                     tabTitleBackground: 'Background Settings', tabTitleObject: 'Object Settings', tabTitleAnimasi: 'Animation Settings', tabTitleInfo: 'Preferences',
                     activeObject: 'Active Object', animationObject: 'Object Animation', easing: 'Easing', linear: 'Linear', easeIn: 'Ease In',
                     easeOut: 'Ease Out', backIn: 'Back In', backOut: 'Back Out', instant: 'Instant', easeInOut: 'Ease In Out', backInOut: 'Back In Out',
@@ -277,7 +278,7 @@
                     displayModeWarning: 'Warning: Forcing a display mode may break layout or functionality if it doesn\'t match your screen size.',
                     previewResolutionWarning: 'Preview resolution does not affect the final export resolution.',
                     dropShadowTooltip: 'We recommend turning off drop shadow when exporting for a greenscreen. <a href="#" target="_blank" class="text-blue-400 hover:underline">Learn more</a>',
-                    exportInfoTooltip: 'Export options include video (.webm), and image formats (.png with transparency support, .jpg with quality settings) to keep the app free and lightweight.',
+                    exportFormatInfoTooltip: 'For now, video export only supports WebM format.',
                     confirmResetPrefsMessage: 'Are you sure you want to reset language, display mode, and UI size to their defaults?',
                     infoLink: 'https://dayverse.id/en/docs/?q=paperima',
                     supportLink: 'https://dayverse.id/en/donate/'
@@ -311,6 +312,7 @@
                     exportingVideoWait: 'Harap tunggu dan jangan tutup jendela ini.', confirmResetTitle: 'Konfirmasi Reset',
                     confirmResetMessage: 'Apakah Anda yakin ingin mereset semua pengaturan ke nilai default?',
                     deleteImportedImages: 'Hapus gambar yang telah diimpor', continue: 'Lanjutkan', notificationWarnUpload: 'Silakan masukan gambar terlebih dahulu!',
+                    notificationWarnObject: 'Masukan gambar objek terlebih dahulu!',
                     tabTitleBackground: 'Pengaturan Latar', tabTitleObject: 'Pengaturan Objek', tabTitleAnimasi: 'Pengaturan Animasi', tabTitleInfo: 'Preferensi',
                     activeObject: 'Objek Aktif', animationObject: 'Animasi Objek', easing: 'Easing', linear: 'Linear', easeIn: 'Ease In',
                     easeOut: 'Ease Out', backIn: 'Back In', backOut: 'Back Out', instant: 'Instan', easeInOut: 'Ease In Out', backInOut: 'Back In Out',
@@ -348,7 +350,7 @@
                     displayModeWarning: 'Peringatan: Memaksa mode tampilan dapat merusak tata letak atau fungsionalitas jika tidak sesuai dengan ukuran layar Anda.',
                     previewResolutionWarning: 'Resolusi pratinjau tidak memengaruhi resolusi ekspor.',
                     dropShadowTooltip: 'Kami menyarankan dropshadow dimatikan jika ekspor sebagai greenscreen. <a href="#" target="_blank" class="text-blue-400 hover:underline">Pelajari selengkapnya</a>',
-                    exportInfoTooltip: 'Opsi ekspor mencakup video (.webm), dan format gambar (.png dengan dukungan transparansi, .jpg dengan pengaturan kualitas) untuk menjaga aplikasi tetap gratis dan ringan.',
+                    exportFormatInfoTooltip: 'Untuk saat ini, ekspor video hanya mendukung format WebM.',
                     confirmResetPrefsMessage: 'Apakah Anda yakin ingin mereset bahasa, mode tampilan, dan ukuran UI ke nilai default?',
                     infoLink: 'https://dayverse.id/id/docs/?q=paperima',
                     supportLink: 'https://dayverse.id/id/donate/'
@@ -871,25 +873,34 @@
 
             function animationLoop() {
                 const timestamp = performance.now()
+                const animState = state.object.animation
+                
+                // Calculate current playhead time
+                let currentPlayheadTime;
+                if (animState.previewTime !== null) {
+                    // When paused or scrubbing, use the fixed preview time
+                    currentPlayheadTime = animState.previewTime * 1000
+                } else if (animState.isPlaying) {
+                    // Only calculate elapsed time when actually playing
+                    const elapsed = timestamp - animationStartTime
+                    currentPlayheadTime = elapsed
+                } else {
+                    // When paused but previewTime not set, use pauseStartTime
+                    currentPlayheadTime = pauseStartTime
+                }
 
-                if (state.object.animation.isPlaying && !isScrubbing) {
-                    updateMovement(timestamp)
-                    updatePaperFoldOverlay(timestamp)
+                // Only update movement and overlay when playing or when redraw is needed
+                if (animState.isPlaying || needsRedraw || isScrubbing) {
+                    updateMovement(currentPlayheadTime)
+                    updatePaperFoldOverlay(currentPlayheadTime)
+                }
+                
+                if (animState.isPlaying && !isScrubbing) {
                     updateTimelineUI()
                 }
 
                 if (needsRedraw) {
-                    const animState = state.object.animation
-                    let timeToDraw
-
-                    if (animState.previewTime !== null) {
-                        timeToDraw = animState.previewTime * 1000
-                    } else {
-                        const elapsed = timestamp - animationStartTime
-                        timeToDraw = elapsed
-                    }
-
-                    draw(timeToDraw).then(() => {
+                    draw(currentPlayheadTime).then(() => {
                         needsRedraw = false
                     })
                 }
@@ -897,8 +908,14 @@
                 animationFrameId = requestAnimationFrame(animationLoop)
             }
 
-            //Updates objects' positions and rotations based on movement settings and time.
-            function updateMovement(timestamp) {
+            // Seeded pseudo-random number generator for consistent randomness
+            function seededRandom(seed) {
+                const x = Math.sin(seed) * 10000;
+                return x - Math.floor(x);
+            }
+
+            //Updates objects' positions and rotations based on playhead time (elapsedTime in ms)
+            function updateMovement(elapsedTime) {
                 if (isLiveTornEdgePreview) return;
                 let hasChanged = false;
                 const objectState = state.object;
@@ -917,10 +934,6 @@
                     const canvasWidth = canvas.offsetWidth;
                     const canvasHeight = canvas.offsetHeight;
                     
-                    // Scale movement strength based on canvas size (e.g., 5% of canvas width/height)
-                    const strengthScaleX = (canvasWidth / 100) * objectState.movement.positionStrength.x * strengthMultiplier;
-                    const strengthScaleY = (canvasHeight / 100) * objectState.movement.positionStrength.y * strengthMultiplier;                    
-                    
                     const effectiveRotationSpeed = objectState.movement.rotationSpeed * speedMultiplier;
                     const effectiveRotationStrength = objectState.movement.rotationStrength * strengthMultiplier;
                     const effectivePositionSpeedX = objectState.movement.positionSpeed.x * speedMultiplier;
@@ -928,66 +941,70 @@
                     const effectivePositionStrengthX = objectState.movement.positionStrength.x * strengthMultiplier;
                     const effectivePositionStrengthY = objectState.movement.positionStrength.y * strengthMultiplier;
 
+                    // Calculate rotation based on time
+                    let newRotation = 0;
                     if (effectiveRotationSpeed > 0 && effectiveRotationStrength > 0) {
                         const rotationInterval = 1000 / effectiveRotationSpeed;
-                        if (timestamp - objectState.movement.lastRotationUpdateTime > rotationInterval) {
-                            objectState.movement.rotation = objectState.movement.rotation > 0 ? -effectiveRotationStrength : effectiveRotationStrength;
-                            objectState.movement.lastRotationUpdateTime = timestamp;
-                            hasChanged = true;
-                        }
-                    } else if (objectState.movement.rotation !== 0) {
-                        objectState.movement.rotation = 0; hasChanged = true;
+                        const cycleIndex = Math.floor(elapsedTime / rotationInterval);
+                        // Alternate between positive and negative rotation
+                        newRotation = (cycleIndex % 2 === 0) ? effectiveRotationStrength : -effectiveRotationStrength;
+                    }
+                    
+                    if (objectState.movement.rotation !== newRotation) {
+                        objectState.movement.rotation = newRotation;
+                        hasChanged = true;
                     }
 
+                    // Calculate position X based on time with seeded random
+                    let newPositionX = 0;
                     if (effectivePositionSpeedX > 0 && effectivePositionStrengthX > 0) {
                         const positionIntervalX = 1000 / effectivePositionSpeedX;
-                        if (timestamp - objectState.movement.lastPositionUpdateTime.x > positionIntervalX) {
-                            objectState.movement.positionOffset.x = (Math.random() - 0.5) * effectivePositionStrengthX;
-                            objectState.movement.lastPositionUpdateTime.x = timestamp;
-                            hasChanged = true;
-                        }
-                    } else if (objectState.movement.positionOffset.x !== 0) {
-                        objectState.movement.positionOffset.x = 0; hasChanged = true;
+                        const cycleIndexX = Math.floor(elapsedTime / positionIntervalX);
+                        // Use seeded random for consistent results at same time
+                        newPositionX = (seededRandom(cycleIndexX * 1000) - 0.5) * effectivePositionStrengthX;
+                    }
+                    
+                    if (objectState.movement.positionOffset.x !== newPositionX) {
+                        objectState.movement.positionOffset.x = newPositionX;
+                        hasChanged = true;
                     }
 
+                    // Calculate position Y based on time with seeded random
+                    let newPositionY = 0;
                     if (effectivePositionSpeedY > 0 && effectivePositionStrengthY > 0) {
                         const positionIntervalY = 1000 / effectivePositionSpeedY;
-                        if (timestamp - objectState.movement.lastPositionUpdateTime.y > positionIntervalY) {
-                            objectState.movement.positionOffset.y = (Math.random() - 0.5) * effectivePositionStrengthY;
-                            objectState.movement.lastPositionUpdateTime.y = timestamp;
-                            hasChanged = true;
-                        }
-                    } else if (objectState.movement.positionOffset.y !== 0) {
-                        objectState.movement.positionOffset.y = 0; hasChanged = true;
+                        const cycleIndexY = Math.floor(elapsedTime / positionIntervalY);
+                        // Use seeded random for consistent results at same time
+                        newPositionY = (seededRandom(cycleIndexY * 2000 + 500) - 0.5) * effectivePositionStrengthY;
+                    }
+                    
+                    if (objectState.movement.positionOffset.y !== newPositionY) {
+                        objectState.movement.positionOffset.y = newPositionY;
+                        hasChanged = true;
                     }
                 }
 
                 if (hasChanged) { requestRedraw(); }
             }
             
-            // Cycles through the paper texture overlay images for each object
-			function updatePaperFoldOverlay(timestamp) {
+            // Updates paper texture overlay based on playhead time (elapsedTime in ms)
+			function updatePaperFoldOverlay(elapsedTime) {
 				const objectState = state.object;
-				const hasOverlayImages = originalOverlayImages.filter(img => img && img.complete).length > 0;
-
-				if ((!objectState.paperFoldOverlay.enabled || !hasOverlayImages) && !objectState.stroke.enabled) {
+				
+				// Early return if not enabled
+				if (!objectState.paperFoldOverlay.enabled && !objectState.stroke.enabled) {
 					return;
 				}
 
 				const speed = objectState.paperFoldOverlay.speed;
 				if (speed <= 0) return;
 
-				const timeSinceLastSwitch = timestamp - objectState.paperFoldOverlay.lastImageSwitchTime;
+				// Calculate texture index based on elapsed time
 				const interval = 1000 / speed;
-				let hasChanged = false;
-
-				if (timeSinceLastSwitch >= interval) {
-					objectState.paperFoldOverlay.currentImageIndex = (objectState.paperFoldOverlay.currentImageIndex + 1) % 4;
-					objectState.paperFoldOverlay.lastImageSwitchTime = timestamp;
-					hasChanged = true;
-				}
-
-				if (hasChanged) {
+				const newIndex = Math.floor(elapsedTime / interval) % 4;
+				
+				if (objectState.paperFoldOverlay.currentImageIndex !== newIndex) {
+					objectState.paperFoldOverlay.currentImageIndex = newIndex;
 					requestRedraw();
 				}
 			}
@@ -1428,7 +1445,7 @@ Object       : ${objFileName}
                 document.querySelectorAll('[data-translate-key]').forEach(el => {
                     const key = el.dataset.translateKey;
                     if (translationMap[key]) {
-                        if (key === 'dropImagePrompt' || key === 'appDescription2' || key === 'exportInfoTooltip' || key === 'dropShadowTooltip' || key === 'licenseContent') {
+                        if (key === 'dropImagePrompt' || key === 'appDescription2' || key === 'exportFormatInfoTooltip' || key === 'dropShadowTooltip' || key === 'licenseContent') {
                            el.innerHTML = translationMap[key];
                         } else {
                            el.textContent = translationMap[key];
@@ -2215,7 +2232,8 @@ Object       : ${objFileName}
                     getVisualStateAtTime,
                     layerImages,
                     maskImages,
-                    hexToRgba
+                    hexToRgba,
+                    animationStartTime
                 );
             }
 
@@ -2228,7 +2246,10 @@ Object       : ${objFileName}
                     tabScrollPositions[currentActiveTab] = controlsPanel.scrollTop;
                 }
 
-                state.object.animation.previewTime = null;
+                // Only reset previewTime if animation is playing
+                if (state.object.animation.isPlaying) {
+                    state.object.animation.previewTime = null;
+                }
                 const lang = state.language;
                 const tabTitles = {
                     background: translations[lang].tabTitleBackground,
@@ -2481,6 +2502,11 @@ Object       : ${objFileName}
                         state.previewResolution = '720';
                     }
                 }
+                
+                // Initialize animation timing
+                animationStartTime = performance.now();
+                pauseStartTime = 0;
+                
                 resizeAndRedrawAll();
                 animationFrameId = requestAnimationFrame(animationLoop);
                 requestAnimationFrame(fpsLoop);
@@ -2983,10 +3009,14 @@ Object       : ${objFileName}
                     const button = e.target.closest('button');
                     if (button) {
                         state.object.animation.mode = button.dataset.mode;
-                        state.object.animation.previewTime = null;
+                        // Only reset previewTime if animation is playing
+                        if (state.object.animation.isPlaying) {
+                            state.object.animation.previewTime = null;
+                        }
                         updateUIFromState();
                         renderKeyframeMarkers();
                         renderSimpleAnimationMarkers();
+                        requestRedraw();
                     }
                 });
 
@@ -2994,11 +3024,13 @@ Object       : ${objFileName}
                 document.getElementById('simple-anim-open-switch').addEventListener('change', (e) => {
                     state.object.animation.simple.open = e.target.checked;
                     renderSimpleAnimationMarkers();
+                    requestRedraw();
                 });
 
                 document.getElementById('simple-anim-close-switch').addEventListener('change', (e) => {
                     state.object.animation.simple.close = e.target.checked;
                     renderSimpleAnimationMarkers();
+                    requestRedraw();
                 });
                              
                 document.getElementById('add-keyframe-btn').addEventListener('click', () => {

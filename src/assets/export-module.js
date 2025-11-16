@@ -196,7 +196,8 @@ async function startExport(
     getVisualStateAtTime,
     layerImages,
     maskImages,
-    hexToRgba
+    hexToRgba,
+    animationStartTime
 ) {
     const exportFormat = state.export.format || 'webm';
     
@@ -322,12 +323,20 @@ async function startExport(
     const handleCancel = () => { isExportCancelled = true; };
     cancelExportBtn.addEventListener('click', handleCancel, { once: true });
 
+    // Save current animation state before export
+    const savedPreviewTime = state.object.animation.previewTime;
+    const savedIsPlaying = state.object.animation.isPlaying;
+
     const cleanupAfterExport = () => {
         state.object.image.element = previewImageElement;
         state.object.image.size = originalImageSize;
         
         canvas.width = originalCanvasWidth;
         canvas.height = originalCanvasHeight;
+
+        // Restore animation state after export
+        state.object.animation.previewTime = savedPreviewTime;
+        state.object.animation.isPlaying = savedIsPlaying;
 
         resizeAndRedrawAll();
         exportProgressPopup.classList.add('hidden');
@@ -347,16 +356,29 @@ async function startExport(
         exportTitle.textContent = translations[state.language].exportingImage || 'Mengekspor Gambar...';
         await new Promise(resolve => setTimeout(resolve, 100));
         
-        // For image export, just draw a single frame
-        Object.assign(state.object.movement, DEFAULT_OBJECT_STATE.movement);
-        Object.assign(state.object.paperFoldOverlay, DEFAULT_OBJECT_STATE.paperFoldOverlay);
+        // Calculate current playhead time
+        let currentPlayheadTime = 0;
+        const animState = state.object.animation;
+        
+        if (animState.previewTime !== null) {
+            // If there's a preview time (scrubbing/paused), use that
+            currentPlayheadTime = animState.previewTime * 1000;
+        } else {
+            // Otherwise calculate elapsed time from animation start
+            const elapsed = performance.now() - animationStartTime;
+            currentPlayheadTime = elapsed;
+        }
+        
+        // Update movement and overlay to match current playhead time
+        updateMovement(currentPlayheadTime);
+        updatePaperFoldOverlay(currentPlayheadTime);
         
         // Set progress to 50%
         progressBarFill.style.width = '50%';
         progressBarFill.textContent = '50%';
         
-        // Draw the image
-        await draw(0);
+        // Draw the image at current playhead time
+        await draw(currentPlayheadTime);
         
         // Set progress to 90%
         progressBarFill.style.width = '90%';
@@ -372,17 +394,17 @@ async function startExport(
                 tempCanvas.height = canvas.height;
                 const tempCtx = tempCanvas.getContext('2d');
                 
-                // Draw only the object without background
-                await drawObjectOnly(tempCtx, tempCanvas, state, 0, drawFinalObject, getAdvancedTransform, getVisualStateAtTime, layerImages, maskImages, hexToRgba);
+                // Draw only the object without background at current playhead time
+                await drawObjectOnly(tempCtx, tempCanvas, state, currentPlayheadTime, drawFinalObject, getAdvancedTransform, getVisualStateAtTime, layerImages, maskImages, hexToRgba);
                 dataURL = tempCanvas.toDataURL('image/png');
             } else {
-                // For non-transparent PNG, draw everything normally
-                await draw(0);
+                // For non-transparent PNG, draw everything normally at current playhead time
+                await draw(currentPlayheadTime);
                 dataURL = canvas.toDataURL('image/png');
             }
         } else if (exportFormat === 'jpg') {
-            // For JPG, always draw everything (no transparency support)
-            await draw(0);
+            // For JPG, always draw everything at current playhead time (no transparency support)
+            await draw(currentPlayheadTime);
             const quality = (state.export.jpgQuality || 95) / 100;
             dataURL = canvas.toDataURL('image/jpeg', quality);
         }
@@ -413,6 +435,8 @@ async function startExport(
     exportTitle.textContent = translations[state.language].exportingVideo || 'Mengekspor Video...';
     await new Promise(resolve => setTimeout(resolve, 100));
 
+    // Reset animation state to start from beginning for video export
+    state.object.animation.previewTime = null;
     Object.assign(state.object.movement, DEFAULT_OBJECT_STATE.movement);
     Object.assign(state.object.paperFoldOverlay, DEFAULT_OBJECT_STATE.paperFoldOverlay);
 
