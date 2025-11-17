@@ -272,19 +272,25 @@ async function startExport(
 
     if (state.object.image.originalElement) {
         let highResImg = state.object.image.originalElement;
-        const exportTargetsForUpscale = ['1080', '1440', '2160'];
-        if (exportTargetsForUpscale.includes(exportResolutionKey)) {
+        const isSVG = state.object.image.isSVG;
+        
+        // For SVG, re-render at export resolution instead of upscaling
+        if (isSVG && state.object.image.originalSVGSrc) {
             const exportWidth = finalExportDims.width || finalExportDims.w;
             const exportHeight = finalExportDims.height || finalExportDims.h;
-            const sourceWidth = highResImg.width;
-            const sourceHeight = highResImg.height;
-
+            
+            // Calculate target size (80% of canvas as per original logic)
             const targetWidth = exportWidth * 0.8;
             const targetHeight = exportHeight * 0.8;
-
-            const sourceAspectRatio = sourceWidth / sourceHeight;
+            
+            // Load SVG at native resolution
+            const svgImg = new Image();
+            svgImg.src = state.object.image.originalSVGSrc;
+            await svgImg.decode();
+            
+            const sourceAspectRatio = svgImg.width / svgImg.height;
             const targetAspectRatio = targetWidth / targetHeight;
-
+            
             let newWidth, newHeight;
             if (sourceAspectRatio > targetAspectRatio) {
                 newWidth = targetWidth;
@@ -293,18 +299,54 @@ async function startExport(
                 newHeight = targetHeight;
                 newWidth = newHeight * sourceAspectRatio;
             }
+            
+            // Render SVG at export resolution
+            const svgCanvas = document.createElement('canvas');
+            svgCanvas.width = newWidth;
+            svgCanvas.height = newHeight;
+            const svgCtx = svgCanvas.getContext('2d');
+            svgCtx.drawImage(svgImg, 0, 0, newWidth, newHeight);
+            
+            const renderedSVG = new Image();
+            renderedSVG.src = svgCanvas.toDataURL();
+            await renderedSVG.decode();
+            highResImg = renderedSVG;
+        } else {
+            // For raster images, upscale if needed
+            const exportTargetsForUpscale = ['1080', '1440', '2160'];
+            if (exportTargetsForUpscale.includes(exportResolutionKey)) {
+                const exportWidth = finalExportDims.width || finalExportDims.w;
+                const exportHeight = finalExportDims.height || finalExportDims.h;
+                const sourceWidth = highResImg.width;
+                const sourceHeight = highResImg.height;
 
-            if (newWidth > sourceWidth || newHeight > sourceHeight) {
-                const upscaleCanvas = document.createElement('canvas');
-                upscaleCanvas.width = newWidth;
-                upscaleCanvas.height = newHeight;
-                const upscaleCtx = upscaleCanvas.getContext('2d');
-                upscaleCtx.drawImage(highResImg, 0, 0, newWidth, newHeight);
+                const targetWidth = exportWidth * 0.8;
+                const targetHeight = exportHeight * 0.8;
 
-                const upscaledImage = new Image();
-                upscaledImage.src = upscaleCanvas.toDataURL();
-                await upscaledImage.decode();
-                highResImg = upscaledImage;
+                const sourceAspectRatio = sourceWidth / sourceHeight;
+                const targetAspectRatio = targetWidth / targetHeight;
+
+                let newWidth, newHeight;
+                if (sourceAspectRatio > targetAspectRatio) {
+                    newWidth = targetWidth;
+                    newHeight = newWidth / sourceAspectRatio;
+                } else {
+                    newHeight = targetHeight;
+                    newWidth = newHeight * sourceAspectRatio;
+                }
+
+                if (newWidth > sourceWidth || newHeight > sourceHeight) {
+                    const upscaleCanvas = document.createElement('canvas');
+                    upscaleCanvas.width = newWidth;
+                    upscaleCanvas.height = newHeight;
+                    const upscaleCtx = upscaleCanvas.getContext('2d');
+                    upscaleCtx.drawImage(highResImg, 0, 0, newWidth, newHeight);
+
+                    const upscaledImage = new Image();
+                    upscaledImage.src = upscaleCanvas.toDataURL();
+                    await upscaledImage.decode();
+                    highResImg = upscaledImage;
+                }
             }
         }
         

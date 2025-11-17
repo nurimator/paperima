@@ -93,7 +93,7 @@
             const timingRef = { get pauseStartTime() { return pauseStartTime; }, set pauseStartTime(v) { pauseStartTime = v; }, get animationStartTime() { return animationStartTime; }, set animationStartTime(v) { animationStartTime = v; } };
             // Default state for a single object
             const DEFAULT_OBJECT_STATE = {
-                image: { element: null, originalElement: null, size: 80, offset: { x: 0, y: 0 }, rotation: 0, file: null },
+                image: { element: null, originalElement: null, size: 80, offset: { x: 0, y: 0 }, rotation: 0, file: null, isSVG: false, originalSVGSrc: null },
                 stroke: { enabled: true, width: 25, roughness: 25, detail: 0.020, seed: 0 },
                 shadow: { enabled: true, offsetX: 5, offsetY: -5, blur: 5, color: '#000000', opacity: 50 },
                 color: { enabled: false, hue: 0, saturation: 0, brightness: 0, colorize: false },
@@ -1370,6 +1370,10 @@ Object       : ${objFileName}
                         // For foreground/object images
                         state.object.image.originalElement = highResImg
                         state.object.image.file = file
+                        state.object.image.isSVG = isSVG
+                        if (isSVG) {
+                            state.object.image.originalSVGSrc = event.target.result
+                        }
 
                         const MAX_PREVIEW_SIZE = 800
                         let previewWidth, previewHeight
