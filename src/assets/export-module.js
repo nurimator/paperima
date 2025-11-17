@@ -197,7 +197,7 @@ async function startExport(
     layerImages,
     maskImages,
     hexToRgba,
-    animationStartTime
+    timingRef
 ) {
     const exportFormat = state.export.format || 'webm';
     
@@ -233,6 +233,11 @@ async function startExport(
     progressBarFill.textContent = '0%';
     exportTitle.textContent = translations[state.language].preparingExportCanvas || 'Menyiapkan kanvas ekspor...';
     await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Pause animation to focus computational resources on export
+    const wasPlayingBeforeExport = state.object.animation.isPlaying;
+    state.object.animation.isPlaying = false;
+    
     cancelAnimationFrame(animationFrameId);
 
     const exportResolutionKey = document.querySelector('#canvas-resolution-btns button.active')?.dataset.res || state.previewResolution;
@@ -326,6 +331,8 @@ async function startExport(
     // Save current animation state before export
     const savedPreviewTime = state.object.animation.previewTime;
     const savedIsPlaying = state.object.animation.isPlaying;
+    const savedAnimationStartTime = timingRef.animationStartTime;
+    const savedPauseStartTime = timingRef.pauseStartTime;
 
     const cleanupAfterExport = () => {
         state.object.image.element = previewImageElement;
@@ -334,9 +341,13 @@ async function startExport(
         canvas.width = originalCanvasWidth;
         canvas.height = originalCanvasHeight;
 
-        // Restore animation state after export
+        // Restore animation state after export (restore to state before export started)
         state.object.animation.previewTime = savedPreviewTime;
-        state.object.animation.isPlaying = savedIsPlaying;
+        state.object.animation.isPlaying = wasPlayingBeforeExport;
+        
+        // Restore animation timing
+        timingRef.animationStartTime = savedAnimationStartTime;
+        timingRef.pauseStartTime = savedPauseStartTime;
 
         resizeAndRedrawAll();
         exportProgressPopup.classList.add('hidden');
@@ -365,7 +376,7 @@ async function startExport(
             currentPlayheadTime = animState.previewTime * 1000;
         } else {
             // Otherwise calculate elapsed time from animation start
-            const elapsed = performance.now() - animationStartTime;
+            const elapsed = performance.now() - timingRef.animationStartTime;
             currentPlayheadTime = elapsed;
         }
         

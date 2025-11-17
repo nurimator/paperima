@@ -89,6 +89,8 @@
             let isScrubbing = false;
             let pauseStartTime = 0;
             let animationStartTime = 0;
+            // Timing reference object for export module to update
+            const timingRef = { get pauseStartTime() { return pauseStartTime; }, set pauseStartTime(v) { pauseStartTime = v; }, get animationStartTime() { return animationStartTime; }, set animationStartTime(v) { animationStartTime = v; } };
             // Default state for a single object
             const DEFAULT_OBJECT_STATE = {
                 image: { element: null, originalElement: null, size: 80, offset: { x: 0, y: 0 }, rotation: 0, file: null },
@@ -2233,7 +2235,7 @@ Object       : ${objFileName}
                     layerImages,
                     maskImages,
                     hexToRgba,
-                    animationStartTime
+                    timingRef
                 );
             }
 
