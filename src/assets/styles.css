@@ -359,6 +359,7 @@
             body:not(.force-desktop) .controls-panel {
                 flex-grow: 1;
                 overflow-y: auto;
+                padding-bottom: 5rem;
             }
             body:not(.force-desktop) #mobile-footer {
                 display: var(--mobile-footer-display);
@@ -398,6 +399,7 @@
         body.force-mobile .controls-panel {
             flex-grow: 1;
             overflow-y: auto;
+            padding-bottom: 6rem;
         }
         body.force-mobile #mobile-footer { display: var(--mobile-footer-display); }
         body.force-desktop {
